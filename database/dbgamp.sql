@@ -1,0 +1,175 @@
+DROP DATABASE IF EXISTS gamp;
+CREATE DATABASE GAMP;
+USE gamp;
+
+CREATE TABLE TIPO_DOC
+(
+  idtipodoc   int auto_increment primary key,
+  tipodoc     varchar(50) not null
+)ENGINE=INNODB;
+
+
+CREATE TABLE PERSONAS
+(
+	id_persona    int auto_increment  primary key,
+	idtipodoc     int                 not null,
+	num_doc       varchar(50)         not null,
+	apellidos     varchar(100)        not null,
+	nombres	      varchar(100)        not null,
+	genero        char(1)             not null,
+	telefono      char(9)		      not null,
+	nacionalidad  varchar(50)         not null,
+	constraint    uk_telefono         UNIQUE(telefono),
+	constraint    uk_num_doc          UNIQUE(num_doc),
+	constraint    fk_idtipodoc        foreign key (idtipodoc) references TIPO_DOC (idtipodoc),
+	constraint    chk_genero          CHECK(genero IN('M', 'F'))
+)ENGINE=INNODB;
+
+
+CREATE TABLE ROLES
+(
+  idrol		int auto_increment primary key,
+  rol 		varchar(20)	not null,
+  CONSTRAINT uk_rol UNIQUE(rol)
+)ENGINE=INNODB;
+
+CREATE TABLE permisos
+(
+	idpermiso 	INT AUTO_INCREMENT PRIMARY KEY,
+    idrol		INT NOT NULL,
+    permiso  	JSON NOT NULL,
+    CONSTRAINT fk_idrol FOREIGN KEY(idrol) REFERENCES roles(idrol)
+)ENGINE=INNODB;
+
+
+CREATE TABLE USUARIOS
+(
+  id_usuario	int auto_increment primary key,
+  idpersona	  	int not null,
+  idrol		    int not null,
+  usuario     	varchar(120) not null,
+  contrasena 	varchar(120) not null,
+  estado	  	CHAR(1) DEFAULT '1',  -- 1 , 0
+  CONSTRAINT fk_persona FOREIGN KEY (idpersona) REFERENCES PERSONAS(id_persona),
+  CONSTRAINT fk_rol FOREIGN KEY (idrol) REFERENCES roles (idrol),
+  CONSTRAINT uk_idpersonaUser UNIQUE(idpersona,usuario)
+)ENGINE=INNODB;
+
+CREATE TABLE categorias
+(
+	idcategoria		INT AUTO_INCREMENT PRIMARY KEY,
+    categoria		VARCHAR(60) NOT NULL,	-- UK
+    CONSTRAINT uk_categoria UNIQUE(categoria)
+)ENGINE=INNODB;
+
+CREATE TABLE subcategorias
+(
+	idsubcategoria	INT AUTO_INCREMENT PRIMARY KEY,
+    idcategoria		INT NOT NULL,
+    subcategoria	VARCHAR(60) NOT NULL,	-- UK
+    CONSTRAINT uk_subcategoria UNIQUE(subcategoria),
+    CONSTRAINT fk_categoria FOREIGN KEY (idcategoria) REFERENCES categorias (idcategoria)
+)ENGINE=INNODB;
+
+CREATE TABLE marcas
+(
+	idmarca		INT AUTO_INCREMENT PRIMARY KEY,
+    marca		VARCHAR(80) NOT NULL, 	-- UK
+    CONSTRAINT uk_marca UNIQUE(marca)
+)ENGINE=INNODB;
+
+CREATE TABLE ubicaciones
+(
+	idubicacion	INT AUTO_INCREMENT PRIMARY KEY,
+    ubicacion	VARCHAR(60) NOT NULL,	-- UK
+    CONSTRAINT uk_ubicacion UNIQUE(ubicacion)
+)ENGINE=INNODB;
+
+CREATE TABLE estados
+(
+	idestado 	INT AUTO_INCREMENT PRIMARY KEY,
+    tipo_estado VARCHAR(50) NOT NULL,
+    nom_estado	VARCHAR(50) NOT NULL,
+    CONSTRAINT uk_nom_estado UNIQUE(nom_estado)
+)ENGINE=INNODB;
+
+CREATE TABLE activos
+(
+	idactivo			INT AUTO_INCREMENT PRIMARY KEY,
+    idsubcategoria		INT			NOT NULL,
+    idmarca				INT 		NOT NULL,
+    idestado			INT 		NOT NULL DEFAULT 1,
+    modelo				VARCHAR(60) NULL,
+    cod_identificacion	CHAR(40) 	NOT NULL,
+    fecha_adquisicion	DATE 		NOT NULL,
+    descripcion			VARCHAR(200) NULL,
+    especificaciones	JSON 		NOT NULL,
+    CONSTRAINT fkidmarca	 FOREIGN KEY (idmarca)	REFERENCES marcas(idmarca),
+    CONSTRAINT fk_actsubcategoria FOREIGN KEY(idsubcategoria) REFERENCES subcategorias(idsubcategoria),
+    CONSTRAINT fk_idestado FOREIGN KEY (idestado) REFERENCES estados(idestado),
+    CONSTRAINT uk_cod_identificacion UNIQUE(cod_identificacion)
+    -- CONSTRAINT chkfecha_ad	 CHECK (fecha_aquisicion>=NOW())
+)ENGINE=INNODB;
+
+-- TABLA AUN POR VERIFICAR
+CREATE TABLE solicitudes_activos
+(
+	idsolicitud			INT AUTO_INCREMENT PRIMARY KEY,
+    idusuario			INT NOT NULL,
+    idactivo			INT NOT NULL,
+    fecha_solicitud 	DATE NOT NULL DEFAULT NOW(),
+    estado_solicitud 	ENUM('pendiente', 'aprobado','rechazado') NOT NULL DEFAULT 'pendiente',
+    motivo_solicitud	VARCHAR(500) NULL,
+    idautorizador		INT NOT NULL,
+    fecha_respuesta		DATE NULL,
+    coment_autorizador 	VARCHAR(500) NULL,
+    CONSTRAINT fk_usuario_sol FOREIGN KEY (idusuario) REFERENCES usuarios(id_usuario),
+    CONSTRAINT fk_activo_sol  FOREIGN KEY (idactivo) REFERENCES activos (idactivo),
+    CONSTRAINT chk_resp_sol CHECK(fecha_respuesta>=fecha_solicitud)
+)
+ENGINE=INNODB;
+
+CREATE TABLE notificaciones
+(
+	idnotificacion	INT AUTO_INCREMENT PRIMARY KEY,
+	idusuario		INT NOT NULL,
+    tipo			VARCHAR(20) NOT NULL, --  ASIGNACION, DESIGNACION, cuando la ubicacion del activo cambia
+	mensaje			VARCHAR(400) NOT NULL,
+	estado			ENUM('no leido', 'leido') NOT NULL DEFAULT('no leido'),
+	fecha_creacion	DATETIME NOT NULL DEFAULT NOW(),
+	CONSTRAINT fk_idusuario_notif FOREIGN KEY(idusuario) REFERENCES usuarios(id_usuario)
+)ENGINE=INNODB;
+
+-- TABLA CONTROLADA POR LOS ADMINISTRADORES
+CREATE TABLE activos_responsables
+(
+	idactivo_resp		INT AUTO_INCREMENT PRIMARY KEY,
+    idactivo			INT NOT NULL,
+    idusuario			INT NOT NULL,
+    es_responsable 		CHAR(1) NOT NULL DEFAULT '0',
+    fecha_asignacion 	DATE NOT NULL DEFAULT NOW(),
+    fecha_designacion	DATE NULL,
+    condicion_equipo	VARCHAR(500),
+    imagenes			JSON NOT NULL,
+    descripcion			VARCHAR(500) NOT NULL,
+    autorizacion		INT NOT NULL,	-- USER ROL ADMIN (validar en codigo)
+    solicitud			INT NOT NULL,   
+    CONSTRAINT fk_activo_resp FOREIGN KEY(idactivo) REFERENCES activos(idactivo),
+    CONSTRAINT fk_user_resp	  FOREIGN KEY(idusuario) REFERENCES usuarios(id_usuario),
+	CONSTRAINT	fk_autorizacion FOREIGN KEY (autorizacion) REFERENCES usuarios (id_usuario),
+    CONSTRAINT	fk_solicitud FOREIGN KEY(solicitud) REFERENCES usuarios(id_usuario),
+    CONSTRAINT chk_es_responsable CHECK(es_responsable IN('1','0'))
+    -- CONSTRAINT chk_fech_desig CHECK(fecha_designacion>fecha_asignacion)
+)ENGINE=INNODB;
+
+CREATE TABLE historial_activos
+(
+	idhistorial_activo 	INT AUTO_INCREMENT PRIMARY KEY,
+    idactivo_resp		INT NOT NULL,
+	idubicacion			INT	NOT NULL,
+    fecha_movimiento 	DATETIME NOT NULL DEFAULT NOW(),
+    CONSTRAINT fk_idactivo_resp FOREIGN KEY (idactivo_resp)REFERENCES activos_responsables(idactivo_resp),
+	CONSTRAINT fk_idubicacion	FOREIGN KEY(idubicacion) REFERENCES ubicaciones(idubicacion)
+)ENGINE=INNODB;
+
+

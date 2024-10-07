@@ -1,0 +1,13 @@
+.container{
+  display: flex;
+  margin: 10px;
+  flex-direction: column;
+}
+
+.Aac-especificaciones{
+  display: flex;
+}
+
+.Aac-datos{
+  display: flex;
+}

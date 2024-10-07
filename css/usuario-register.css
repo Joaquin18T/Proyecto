@@ -1,0 +1,21 @@
+.hr-text {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #6c757d; /* Color del texto */
+}
+
+.hr-text::before,
+.hr-text::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid #6c757d; /* Color de la línea */
+}
+
+.hr-text::before {
+  margin-right: 10px;
+}
+
+.hr-text::after {
+  margin-left: 10px;
+}
