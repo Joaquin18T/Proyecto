@@ -143,10 +143,24 @@ class Usuario extends ExecQuery{
       error_log("Error: ".$e->getMessage());
     }
   }
+
+  public function getDataUserPersona($params = []):array{
+    try{
+      $cmd = parent::execQ("CALL sp_get_user_persona(?)");
+      $cmd->execute(
+        array($params['idusuario'])
+      );
+      return $cmd->fetchAll(PDO::FETCH_ASSOC);
+    }catch(Exception $e){
+      error_log("Error: ".$e->getMessage());
+    }
+  }
 }
 
 //echo (password_hash('contrasena2', PASSWORD_BCRYPT));
 // $user = new Usuario();
+
+// echo json_encode($user->getDataUserPersona(['idusuario'=>1]));
 
 // echo json_encode($user->listFilters([]));
 
@@ -156,11 +170,12 @@ class Usuario extends ExecQuery{
 //echo json_encode($user->updateEstado(['idusuario'=>8, 'estado'=>0]));
 
 // $resp = $user->updateUser([
-//   'idusuario'=>2,
-//   'idrol'=>2,
-//   'usuario'=>'A.smith'
+//   'idusuario'=>1,
+//   'idrol'=>1,
+//   'usuario'=>'Dani46'
 // ]);
 // echo json_encode($resp);
+
 // echo json_encode($user->add([
 //   'idpersona'=>4,
 //   'idrol'=>2,
