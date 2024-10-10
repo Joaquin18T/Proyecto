@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           name: image.name
         }
 
-        img.classList.add('img-fluid', 'rounded', 'img-select');
+        img.classList.add('img-fluid', 'rounded', 'img-select','images-select');
         img.setAttribute("data-filename", image.name);
         console.log(listImages);
         
@@ -95,21 +95,25 @@ document.addEventListener("DOMContentLoaded", async () => {
           const parent = selector("imagePreview");
           const child = selector(isSame);
           parent.removeChild(child); //elimina la imagen de la lista previa
+
+          const myModal = bootstrap.Modal.getOrCreateInstance('#imageModal');
+          myModal.hide();
+          
         }
         console.log(listImages);
         
         dataImage="";
       });
-      if (e.target.classList.contains("img-select")) {
-        const imgSrc = e.target.src;
-        const imgModal = selector("modalImg");
+      // if (e.target.classList.contains("img-select")) {
+      //   const imgSrc = e.target.src;
+      //   const imgModal = selector("modalImg");
 
-        imgModal.src = imgSrc;
-        imgModal.height=300;
-        imgModal.width=150;
-        const modalImg = new bootstrap.Modal(selector("imageModal"));
-        modalImg.show();
-      }
+      //   imgModal.src = imgSrc;
+      //   imgModal.height=300;
+      //   imgModal.width=150;
+      // }
+      const modalImg = new bootstrap.Modal(selector("imageModal"));
+      modalImg.show();
     });
   }
 

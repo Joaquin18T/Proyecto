@@ -98,7 +98,11 @@ document.addEventListener("DOMContentLoaded",()=>{
         <td class="text-center">${x.modelo}</td>
         <td class="text-center">${x.descripcion}</td>
         <td><div class="field-espec ms-auto"></div></td>
-        <td class="text-center"><button type="button" class="btn btn-sm btn-primary modal-update" data-id=${x.idactivo}>update</button></td>
+        <td class="text-center">
+          ${x.nom_estado==="Baja"?'Sin Acciones':`
+            <button type="button" class="btn btn-sm btn-primary modal-update" data-id=${x.idactivo}>update</button>
+          `}
+        </td>
       </tr>
       `;
       showEspecificaciones(especificaciones);

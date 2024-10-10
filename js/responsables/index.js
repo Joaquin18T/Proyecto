@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded",()=>{
+  let dataTable = null;
   function selector(value) {
     return document.querySelector(`#${value}`);
   }
@@ -20,7 +21,22 @@ document.addEventListener("DOMContentLoaded",()=>{
       </tr>
       `;
     });
-    //selector("imgTest").src=data[1].imagenes.image1;
+
+    if(!dataTable){
+      dataTable =new DataTable("#tb-activo-resp", {
+        searchable:false,
+        perPage: 5, // Número de filas por página
+        perPageSelect: [5, 10, 15] // Opciones para cambiar cantidad de filas
+      });
+    }
+    
+    data.forEach(x => {
+      const option = document.createElement("option");
+      option.textContent = x.descripcion;
+      option.value = x.idactivo;
+      selector("list-sidebar-activos").appendChild(option);
+    });
+
     buttonDetail();
     await usersByActivo();
   })();
@@ -58,6 +74,31 @@ document.addEventListener("DOMContentLoaded",()=>{
     });
   }
 
+  selector("list-sidebar-activos").addEventListener("change",async()=>{
+    const params = new URLSearchParams();
+    params.append("operation", "usersByActivo");
+    params.append("idactivo", selector("list-sidebar-activos").value);
+    const data = await getDataUsuarios(params);
+    renderListUsers(data);
+  });
+
+  function renderListUsers(data){
+    const list = selector("list-users");
+    list.innerHTML="";
+    data.forEach(x=>{
+      const li = document.createElement("li");
+      li.classList.add('list-group-item');
+      li.innerHTML=`
+        <strong>Usuario: </strong>${x.usuario}<br>
+        <strong>Apellidos: </strong>${x.apellidos}<br>
+        <strong>Nombres: </strong>${x.nombres}<br>
+        <strong>Fecha asig.: </strong>${x.fecha_asignacion}<br>
+        <strong>Tipo Asig.: </strong>${parseInt(x.es_responsable)===0?'Colaborador':'Responsable Principal'}<br>
+      `;
+      list.appendChild(li);
+    });
+  }
+
   async function usersByActivo(){
     const dataButtons = listOfButtons("btn-colab");
     dataButtons.forEach(x=>{
@@ -68,14 +109,20 @@ document.addEventListener("DOMContentLoaded",()=>{
         params.append("operation", "usersByActivo");
         params.append("idactivo", value);
 
-        const data = await getDatos(`http://localhost/CMMS/controllers/respActivo.controller.php`, params);   
-        console.log(data);
+        const data = await getDataUsuarios(params);  
+        const sidebar = selector("sidebar");
+        const offCanvas = new bootstrap.Offcanvas(sidebar);
+
+        renderListUsers(data);
+        
+        offCanvas.show();
              
       });
     });
+  }
 
-
-
+  async function getDataUsuarios(params){
+    return await getDatos(`http://localhost/CMMS/controllers/respActivo.controller.php`, params);
   }
 
   function listOfButtons(classButton){

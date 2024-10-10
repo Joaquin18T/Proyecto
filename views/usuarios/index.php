@@ -1,5 +1,5 @@
 <?php require_once '../header.php' ?>
-<link rel="stylesheet" type="text/css" href="http://localhost/CMMS/JSTable-master/dist/jstable.css">
+<link href="https://unpkg.com/vanilla-datatables@latest/dist/vanilla-dataTables.min.css" rel="stylesheet" type="text/css">
 <h2>USUARIOS</h2>
 <div class="row">
   <div class="col-md-12">
@@ -13,7 +13,7 @@
               <div class="row g-3 md-3">
                 <div class="col-md-3">
                   <div class="form-floating">
-                    <input type="text" class="form-control filters" id="dato" placeholder="Apellidos y Nombres" name="dato">
+                    <input type="text" class="form-control filters" id="dato" placeholder="Apellidos y Nombres" name="dato" autocomplete="off">
                     <label for="dato" class="form-label">Apellidos y Nombres</label>
                   </div>
                 </div>
@@ -47,7 +47,7 @@
             </div>
           </div>
         </div>
-        <div class="card mt-3">
+        <div class="card mt-3 content-table">
           <div class="card-body">
             <div class="row g-3">
               <div class="table-responsive">
@@ -104,5 +104,8 @@
 </div>
 
 <?php require_once '../footer.php' ?>
-<script type="text/javascript" src="http://localhost/CMMS/JSTable-master/dist/jstable.min.js"></script>
+
 <script src="http://localhost/CMMS/js/users/index.js"></script>
+<script src="https://unpkg.com/vanilla-datatables@latest/dist/vanilla-dataTables.min.js" type="text/javascript"></script>
+</body>
+</html>

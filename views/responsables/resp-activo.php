@@ -2,6 +2,7 @@
 
 require_once '../header.php'; ?>
 <script src="../../node_modules/tinymce/tinymce.min.js" referrerpolicy="origin"></script>
+<link rel="stylesheet" href="http://localhost/CMMS/css/responsables/asignar-resp.css">
 
 <h2>RESPONSABLES</h2>
 <div class="row">
@@ -37,17 +38,22 @@ require_once '../header.php'; ?>
     <div class="card mb-5">
       <div class="card-header">Asignar Responsable</div>
       <div class="card-body">
-        <form action="" id="form-responsables">
+        <form action="" id="form-responsables" autocomplete="off">
           <div class="row g-1 mb-1">
             <div class="col-md-3">
               <div class="form-floating">
                 <input type="text" class="form-control" id="activo" name="activo" placeholder="Escribe Nombre activo" autocomplete="off" autofocus required>
                 <label for="activo" class="form-label">Buscar Activo</label>
-                <ul id="list" class="dropdown-menu w-25"></ul>
+                <ul id="list" class="dropdown-menu w-100"></ul>
               </div>
             </div>
-            <div class="col-md-2 mb-5">
-              <button class="btn btn-outline-secondary w-100" id="modalResp" type="button">Asignar Responsable</button>
+            <div class="col-md-2">
+              <div class="form-floating">
+                <select class="form-control" id="ubicacion" required>
+                  <option value="">Selecciona</option>
+                </select>
+                <label for="ubicacion">Ubicacion</label>
+              </div>
             </div>
             <div class="col-md-7">
               <div class="form-floating">
@@ -56,14 +62,9 @@ require_once '../header.php'; ?>
               </div>
             </div>
           </div>
-          <div class="row g-1 mb-3">
-            <div class="col-md-3">
-              <div class="form-floating">
-                <select class="form-control" id="ubicacion" required>
-                  <option value="">Selecciona</option>
-                </select>
-                <label for="ubicacion">Ubicacion</label>
-              </div>
+          <div class="row g-1 mb-1 mt-4">
+            <div class="col-md-2">
+              <button class="btn btn-outline-secondary w-100" id="modalResp" type="button">Asignar Responsable</button>
             </div>
             <div class="col-md-4">
               <input class="form-control" type="file" id="imageInput" accept="image/*" multiple required>
@@ -73,13 +74,13 @@ require_once '../header.php'; ?>
             <div class="col-md-4">
               <div class="form-floating">
                 <!-- Contenedor de previsualización de imágenes -->
-                <div class="row" id="imagePreview">
+                <div class="row " id="imagePreview" class="contain-images">
                   <!-- Aquí se agregarán las imágenes previsualizadas -->
                 </div>
               </div>
             </div>
           </div>
-          <div class="row g-1 mb-3">
+          <div class="row g-1 mb-3 mt-4">
             <div class="col-md-12">
               <textarea name="condicion" id="condicion" class="w-100 form-control" style="text-decoration: none; resize:none" autocomplete="off" cols="15" rows="5" required>
               </textarea>
@@ -139,11 +140,11 @@ require_once '../header.php'; ?>
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="imageModalLabel">Vista ampliada de la imagen</h5>
+          <h5 class="modal-title" id="imageModalLabel">AVISO</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body text-center">
-          <img id="modalImg" class="img-fluid" alt="Imagen ampliada">
+        <div class="modal-body text-center ">
+          <p>¿ESTAS SEGURO DE ELIMINAR LA IMAGEN?</p>
         </div>
         <div class="modal-footer">
           <button type="button" id="btn-eliminar" class="btn btn-sm btn-danger">Eliminar</button>

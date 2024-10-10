@@ -50,6 +50,7 @@ CREATE VIEW v_activo_resp AS
 		GROUP BY H.idactivo_resp
     )HIS ON HIS.idactivo_resp = RES.idactivo_resp
 	INNER JOIN ubicaciones UBI ON HIS.idubicacion = UBI.idubicacion
+    WHERE ACT.idestado=1
     GROUP BY ACT.idactivo
     ORDER BY RES.fecha_asignacion DESC;
     
@@ -151,7 +152,8 @@ BEGIN
 	USU.usuario,
     PER.apellidos,
     RES.fecha_asignacion,
-    PER.nombres
+    PER.nombres,
+    RES.es_responsable
     FROM activos_responsables RES
     INNER JOIN usuarios USU ON RES.idusuario = USU.id_usuario
     INNER JOIN personas PER ON USU.idpersona = PER.id_persona

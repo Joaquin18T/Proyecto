@@ -40,7 +40,7 @@ BEGIN
 	FROM activos ACT
 	INNER JOIN subcategorias SUB ON ACT.idsubcategoria = SUB.idsubcategoria
     INNER JOIN marcas MAR ON ACT.idmarca = MAR.idmarca
-	WHERE ACT.descripcion LIKE CONCAT('%', _descripcion,'%')
+	WHERE ACT.descripcion LIKE CONCAT('%', _descripcion,'%') AND ACT.idestado!=4
 	ORDER BY SUB.subcategoria ASC;
 END $$
 -- CALL sp_search_activo('D');

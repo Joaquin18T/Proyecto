@@ -65,6 +65,11 @@ $host = "http://localhost/CMMS";
 
             <!-- ASIGNACION -->
             <div class="sb-sidenav-menu-heading">Asignaciones</div>
+            <a class="nav-link" href="<?= $host ?>/views/responsables/">
+              <div class="sb-nav-link-icon">
+              </div>
+              Lista de Asignaciones
+            </a>
             <a class="nav-link" href="<?= $host ?>/views/responsables/resp-activo.php">
               <div class="sb-nav-link-icon">
               </div>

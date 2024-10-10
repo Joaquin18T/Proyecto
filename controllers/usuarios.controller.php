@@ -57,6 +57,9 @@ if (isset($_GET['operation'])) {
         'dato'=>$_GET['dato']==""?null:$user->limpiarCadena($_GET['dato'])
       ]));
       break;
+    case 'getUsuarioPersona':
+      echo json_encode($user->getDataUserPersona(['idusuario'=>$user->limpiarCadena($_GET['idusuario'])]));
+      break;
   }
 }
 
@@ -82,8 +85,8 @@ if (isset($_POST['operation'])) {
       $isUpdate=['respuesta'=>-1];
       $datosEnviar = [
         'idusuario' =>$user->limpiarCadena($_POST['idusuario']),
-        'idrol' => $user->limpiarCadena($_POST['idusuario']),
-        'usuario' => $user->limpiarCadena($_POST['idusuario'])
+        'idrol' => $user->limpiarCadena($_POST['idrol']),
+        'usuario' => $user->limpiarCadena($_POST['usuario'])
       ];
       $respuesta = $user->updateUser($datosEnviar);
       if($respuesta>0){

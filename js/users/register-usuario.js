@@ -38,7 +38,8 @@ document.addEventListener("DOMContentLoaded",async()=>{
   selector("search").addEventListener("click",async()=>{
     const isNumeric = /^[0-9]+$/.test(selector("numDoc").value);
     const minLength = (selector("numDoc").value.length>=8);
-    if(selector("numDoc").value!=="" &&  isNumeric && minLength){
+    const validaNumDoc = selector("numDoc").value.length===8||selector("numDoc").value.length===20?true:false;
+    if(selector("numDoc").value!=="" &&  isNumeric && minLength && validaNumDoc){
       const data = await personByNumDoc();
       const isblock = (data.length>0);
       blockCamps(isblock);
@@ -59,6 +60,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
       if(selector("numDoc").value===""){alert("Escribe un Num de Doc.");}
       else if(!isNumeric){ alert("Ingresa solo Numeros");}
       else if(!minLength){alert("El minimo es de 8 caracteres");}
+      else if(!validaNumDoc){alert("La cantidad de digitos debe ser de 8 o 20");}
     }
     
 
@@ -78,6 +80,8 @@ document.addEventListener("DOMContentLoaded",async()=>{
     if(data.usuario==undefined){
       //selector("rol").disabled=false;
       alert("No tiene usuario");
+      resetUI()
+      blockCamps(true);
       //limpiar los campos de usuario y desactivarlos
     }else{
       selector("usuario").value=data.usuario;
@@ -124,8 +128,13 @@ document.addEventListener("DOMContentLoaded",async()=>{
     const isValidate = validateData();
     const isUserUnike = await searchUser(selector("usuario").value);
     const isTelfUk = await searchTelf(selector("telefono").value);
+    const validaNumDoc = selector("numDoc").value.length===8||selector("numDoc").value.length===20?true:false;
+
+    const existNumDoc = await personByNumDoc();
+    const numDocExist = (existNumDoc.length<1);
+    console.log(existNumDoc);
     
-    if(isValidate && isUserUnike.length===0 && isTelfUk.length===0){
+    if(isValidate && isUserUnike.length===0 && isTelfUk.length===0 && numDocExist && validaNumDoc){
       //console.log(selector("password").value);
       
       if(confirm("¿Estas seguro de guardar?")){
@@ -157,6 +166,10 @@ document.addEventListener("DOMContentLoaded",async()=>{
         alert("El nombre de usuario ya existe, por favor escriba otro");
       }else if(isTelfUk.length>0){
         alert("El numero de telefono ya existe, por favor escriba otro");
+      }else if(!numDocExist){
+        alert("El num. de doc. ya existe");
+      }else if(!validaNumDoc){
+        alert("Tu num. de documento debe tener 8 caracteres o 20");
       }
     }
 

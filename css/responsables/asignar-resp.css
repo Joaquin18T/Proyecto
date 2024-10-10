@@ -1,0 +1,19 @@
+#imagePreview {
+  display: flex;
+  flex-wrap: wrap; /* Para que las imágenes se acomoden bien si son muchas */
+  gap: 10px; /* Espaciado entre las imágenes */
+}
+
+#imagePreview img {
+  width: 100px;  /* Tamaño inicial de la imagen */
+  object-fit: cover;  /* Ajustar imagen al contenedor */
+  transition: transform 0.3s ease, z-index 0.3s ease; /* Transición suave */
+  position: relative;  /* Posición relativa para cambiar al absoluto en hover */
+}
+
+/* Efecto de zoom al pasar el cursor */
+#imagePreview img:hover {
+  transform: scale(2);  /* Escalado del 200% */
+  z-index: 10;  /* Asegurar que la imagen ampliada esté encima de otras */
+  position: absolute;  /* Para que la imagen se superponga y no afecte a otras */
+}

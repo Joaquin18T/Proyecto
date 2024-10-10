@@ -27,6 +27,7 @@ BEGIN
 		U.id_usuario,
 		U.usuario,
         R.rol,
+        U.estado,
         CONCAT(P.apellidos,' ',P.nombres) as nombres,
         P.num_doc,
         P.telefono,
@@ -41,7 +42,7 @@ BEGIN
     AND (TD.idtipodoc=_idtipodoc OR _idtipodoc IS NULL)
     AND (P.apellidos LIKE CONCAT('%', _dato ,'%') OR P.nombres LIKE CONCAT('%', _dato ,'%') OR _dato IS NULL);
 END $$
--- CALL sp_list_persona_users(1,null,null,null);
+-- CALL sp_list_persona_users(null,1,null,null);
         
 
 
@@ -145,4 +146,29 @@ BEGIN
 	UPDATE usuarios SET
     contrasena = _contrasena
     WHERE id_usuario = _idusuario;
+END $$
+
+DROP PROCEDURE IF EXISTS sp_get_user_persona;
+DELIMITER $$
+CREATE PROCEDURE sp_get_user_persona
+(
+	IN _idusuario INT
+)
+BEGIN
+		SELECT
+		U.id_usuario,
+		U.usuario,
+        R.idrol,
+        P.apellidos,
+        TD.idtipodoc,
+        P.nombres,
+        P.num_doc,
+        P.telefono,
+        P.genero,
+        P.nacionalidad
+			FROM usuarios U
+			INNER JOIN roles R ON U.idrol = R.idrol
+			INNER JOIN personas P ON U.idpersona = P.id_persona
+			INNER JOIN tipo_doc TD ON P.idtipodoc = TD.idtipodoc
+		WHERE U.id_usuario = _idusuario;
 END $$
