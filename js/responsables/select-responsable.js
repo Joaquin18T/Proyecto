@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const host="http://localhost/CMMS/controllers";
   let idactivo = 0;
 
-  selector("tb-colaboradores tbody").innerHTML=`<tr><td colspan=6 class="text-center">No hay resultados</td></tr>`;
+  selector("tb-colaboradores tbody").innerHTML=`<tr><td colspan=7 class="text-center">No hay resultados</td></tr>`;
   /**
    * Selecciona elementos mediante la id
    */
@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
           selector("activo").value = `${x.descripcion} - ${x.subcategoria}`;
           lista.innerHTML="";
           lista.style.display = "none";
-          list.classList.remove('visible');
+          //list.classList.remove('visible');
           //idactivo = x.idactivo;
           //o
           idactivo = e.target.value;

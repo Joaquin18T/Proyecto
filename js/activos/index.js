@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded",()=>{
   const host = "http://localhost/CMMS/controllers/";
-
+  let myTable = null;
 
   function selector(value) {
     return document.querySelector(`#${value}`);
@@ -93,12 +93,12 @@ document.addEventListener("DOMContentLoaded",()=>{
       let especificaciones = JSON.parse(x.especificaciones);
       selector("table-activos tbody").innerHTML+=`
       <tr >
-        <td class="text-center">${x.idactivo}</td>
-        <td class="text-center">${x.categoria}</td>
-        <td class="text-center">${x.modelo}</td>
-        <td class="text-center">${x.descripcion}</td>
+        <td>${x.idactivo}</td>
+        <td>${x.categoria}</td>
+        <td>${x.modelo}</td>
+        <td>${x.descripcion}</td>
         <td><div class="field-espec ms-auto"></div></td>
-        <td class="text-center">
+        <td>
           ${x.nom_estado==="Baja"?'Sin Acciones':`
             <button type="button" class="btn btn-sm btn-primary modal-update" data-id=${x.idactivo}>update</button>
           `}
@@ -108,6 +108,18 @@ document.addEventListener("DOMContentLoaded",()=>{
       showEspecificaciones(especificaciones);
       especificaciones="";
     });
+    if(!myTable){
+      myTable = new DataTable("#table-activos",{
+        searchable:false,
+        perPage:3,
+        perPageSelect:[3,7,10],
+        labels:{
+          perPage:"{select} Filas por pagina",
+          noRows: "No econtrado",
+          info:"Mostrando {start} a {end} de {rows} filas"
+        }
+      });
+    }
     buttonsUpdate();
   }
   

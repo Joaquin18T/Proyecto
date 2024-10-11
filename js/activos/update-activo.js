@@ -86,13 +86,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const dataJson = JSON.parse(obj);
     if (Object.values(dataJson).length > 1) {
       getEspecificaciones(dataJson);
-      //console.log("param2",JSON.parse(obj));
-
     }
     else if (Object.values(dataJson).length === 1) {
       showEspec(dataJson);
     }
-    //console.log(dataJson);
   }
 
   function getEspecificaciones(data) {
@@ -130,26 +127,64 @@ document.addEventListener("DOMContentLoaded", () => {
 
     newDiv.setAttribute("id", `espec-${contEspecificaciones}`);
     newDiv.classList.add("mt-3");
-    newDiv.innerHTML = renderElements();
+    if(contEspecificaciones<5){
+      newDiv.innerHTML = renderElements();
+    }else{
+      newDiv.innerHTML = lastEspecificacion();
+    }
     listEs.appendChild(newDiv);
     contEspecificaciones++;
 
     newDiv.querySelector(".btnRemove").addEventListener("click", () => {
       listEs.removeChild(newDiv);
       contEspecificaciones--;
-      checkButtonAdd();
+      checkButtonAdd(contEspecificaciones);
     });
   }
 
-  function checkButtonAdd() {
-    const maxEspecificaciones = 5;
+  function allSelector(value){
+    return document.querySelectorAll(`.${value}`);
+  }
+
+  function checkButtonAdd(cont=0) {
+    const maxEspecificaciones = 4;
     const btnAdd = document.querySelectorAll(".btnAdd");
     const currentCount = document.querySelectorAll(".btnAdd").length;
-    //console.log(currentCount);
+    
+    const maxInputs = 10;
+    const inputsEspec = allSelector("dataEs");
+    const countInputs = allSelector("dataEs").length;
+
+    if(cont>1){
+      const maxBtnRemove = 4;
+      const btnRemove = allSelector("btnRemove");
+      const countRemove = allSelector("btnRemove").length;
+  
+      if(countRemove<maxBtnRemove){
+        btnRemove[countRemove-1].disabled = false;
+      }
+    }
 
     if (currentCount < maxEspecificaciones) {
       btnAdd[currentCount - 1].disabled = false; // Habilitamos el botón si el conteo es menor al máximo
     }
+
+    if(countInputs<maxInputs){
+      inputsEspec[countInputs-1].disabled=false;
+      inputsEspec[countInputs-2].disabled=false;
+    }
+  }
+
+  function disabledEspec(){
+    const btnRemove = document.querySelectorAll(".btnRemove");
+    const inputsEspec = document.querySelectorAll(".dataEs");
+
+    btnRemove.forEach(x=>{
+      x.disabled=true;
+    });
+    inputsEspec.forEach(x=>{
+      x.disabled = true;
+    })
   }
   selector("list-es").addEventListener("click", (e) => {
     if (e.target.classList.contains("btnAdd")) {
@@ -159,15 +194,19 @@ document.addEventListener("DOMContentLoaded", () => {
       if (isnoEmpty) {
         for (let i = 0; i <= allDataEs.length - 1; i++) {
           allDataEs[i].disabled = true;
+          disabledEspec();
         }
         if (allDataEs.length < 5) {
           createEspec();
         } else {
           alert("Limite de 5");
         }
+      }else{
+        alert("Completa los campos");
       }
     }
   });
+
 
   function catchData() {
     document.querySelectorAll(".dataEs").forEach((input, i) => {
@@ -185,8 +224,6 @@ document.addEventListener("DOMContentLoaded", () => {
           valores.push({
             [cap]: valor,
           });
-          //valoresSend.
-          //console.log(valores);
         }
       }
       cap = valor;
@@ -218,7 +255,7 @@ document.addEventListener("DOMContentLoaded", () => {
   selector("form-update").addEventListener("submit", async (e) => {
     e.preventDefault();
     catchData();
-    console.log(valores);
+    //console.log(valores);
     
     if(confirm("¿Estas seguro de actualizar los datos?")){
   
@@ -230,12 +267,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const params = new FormData();
       params.append("operation", "updateActivo");
       params.append("idactivo", localStorage.getItem("id"));
-      params.append("idsubcategoria", selector("subcategoria").value);
-      params.append("idmarca", selector("marca").value);
-      params.append("modelo", selector("modelo").value);
-      params.append("cod_identificacion", selector("cod_identificacion").value);
-      params.append("fecha_adquisicion", selector("fecha_adquisicion").value);
-      params.append("descripcion", selector("descripcion").value);
+      params.append("idsubcategoria", selector("subcategoria").value.trim());
+      params.append("idmarca", selector("marca").value.trim());
+      params.append("modelo", selector("modelo").value.trim());
+      params.append("cod_identificacion", selector("cod_identificacion").value.trim());
+      params.append("fecha_adquisicion", selector("fecha_adquisicion").value.trim());
+      params.append("descripcion", selector("descripcion").value.trim());
       params.append("especificaciones", JSON.stringify(especData));
   
       const data = await fetch(`${host}activo.controller.php`, {
@@ -288,6 +325,26 @@ document.addEventListener("DOMContentLoaded", () => {
       <button type="button" class="btn btn-sm btn-danger btnRemove">ELIMINAR</button>
     </div>    
     `;
+  }
+
+  function lastEspecificacion(){
+    return `
+    <div class="col-6">
+      <div class="form-floating">
+        <input type="text" class="form-control w-75 dataEs" required>
+        <label for="">Especificacion ${contEspecificaciones}</label>
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="form-floating h-75">
+        <input type="text" class="form-control w-75 dataEs" required>
+        <label for="">Valor</label>
+      </div>
+    </div> 
+    <div class="col-3 mt-2">
+      <button type="button" class="btn btn-sm btn-danger btnRemove">ELIMINAR</button>
+    </div> 
+  `;
   }
 
   function resetUI() {

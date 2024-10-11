@@ -107,8 +107,8 @@ CREATE TABLE activos
     CONSTRAINT fkidmarca	 FOREIGN KEY (idmarca)	REFERENCES marcas(idmarca),
     CONSTRAINT fk_actsubcategoria FOREIGN KEY(idsubcategoria) REFERENCES subcategorias(idsubcategoria),
     CONSTRAINT fk_idestado FOREIGN KEY (idestado) REFERENCES estados(idestado),
-    CONSTRAINT uk_cod_identificacion UNIQUE(cod_identificacion)
-    -- CONSTRAINT chkfecha_ad	 CHECK (fecha_aquisicion>=NOW())
+    CONSTRAINT uk_cod_identificacion UNIQUE(cod_identificacion),
+    CONSTRAINT uk_activo UNIQUE(idsubcategoria, idmarca, modelo) -- 10/10
 )ENGINE=INNODB;
 
 -- TABLA AUN POR VERIFICAR
@@ -172,4 +172,16 @@ CREATE TABLE historial_activos
 	CONSTRAINT fk_idubicacion	FOREIGN KEY(idubicacion) REFERENCES ubicaciones(idubicacion)
 )ENGINE=INNODB;
 
-
+-- 10/10
+CREATE TABLE bajas_activo
+(
+	idbaja_activo	INT AUTO_INCREMENT PRIMARY KEY,
+    idactivo		INT NOT NULL,
+    fecha_baja		DATETIME NOT NULL DEFAULT NOW(),
+    motivo			VARCHAR(250) NOT NULL,
+    comet_adicionales VARCHAR(250) NOT NULL,
+    aprobacion		INT NOT NULL, -- QUIEN APROBO LA BAJA
+    CONSTRAINT fk_activo_baja_activo FOREIGN KEY (idactivo) REFERENCES activos(idactivo),
+    CONSTRAINT fk_usuario_baja_activo FOREIGN KEY (aprobacion) REFERENCES usuarios(id_usuario)
+)
+ENGINE=INNODB;

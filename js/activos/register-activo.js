@@ -4,16 +4,16 @@ document.addEventListener("DOMContentLoaded", () => {
   let contEspecificaciones = 2;
   let isClicked = false;
   let isnoEmpty = false;
-  let cap = "";
 
-  let
-    txtIdmarca = 0,
+  let cap = "";
+  let valorEspec = "";
+  let txtIdmarca = 0,
     txtModelo = "",
     txtCode = "",
     txtfecha = "",
     txtdescrip = "",
     txtEscec = {},
-    iduser = 0;
+    contEspec = 1;
 
   let contButtons = document.querySelectorAll(".btnAdd");
   let isvalidate = true;
@@ -35,23 +35,26 @@ document.addEventListener("DOMContentLoaded", () => {
   // })();
 
   (async () => {
-    const data = await getDatos("http://localhost/CMMS/controllers/subcategoria.controller.php", "operation=getSubCategoria");
+    const data = await getDatos(
+      "http://localhost/CMMS/controllers/subcategoria.controller.php",
+      "operation=getSubCategoria"
+    );
     //console.log(data);
-    data.forEach(x => {
+    data.forEach((x) => {
       const element = createOption(x.idsubcategoria, x.subcategoria);
       selector("subcategoria").appendChild(element);
-    })
+    });
   })();
 
   // selector("subcategoria").addEventListener("change", async () => {
   //   await showMarca(selector("subcategoria").value);
   // });
 
-  function getDate(){
+  function getDate() {
     const today = new Date();
     const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
     const formattedDate = `${year}-${month}-${day}`;
     //selector("fecha").value = formattedDate;
     return formattedDate;
@@ -76,27 +79,48 @@ document.addEventListener("DOMContentLoaded", () => {
   //   })
   // }
 
-  (async()=>{
+  (async () => {
     const params = new URLSearchParams();
     params.append("operation", "getAll");
     //params.append("idsubcategoria", id);
-    const data = await getDatos("http://localhost/CMMS/controllers/marca.controller.php", params);
+    const data = await getDatos(
+      "http://localhost/CMMS/controllers/marca.controller.php",
+      params
+    );
 
     for (let i = selector("marca").options.length - 1; i > 0; i--) {
       selector("marca").remove(i);
     }
-    data.forEach(x => {
+    data.forEach((x) => {
       const element = createOption(x.idmarca, x.marca);
       selector("marca").appendChild(element);
-    })
+    });
   })();
 
   async function searchCode() {
     const params = new URLSearchParams();
     params.append("operation", "repeatCode");
     params.append("cod_identificacion", selector("codigo").value);
-    const data = await getDatos("http://localhost/CMMS/controllers/activo.controller.php", params);
+    const data = await getDatos(
+      "http://localhost/CMMS/controllers/activo.controller.php",
+      params
+    );
     return data;
+  }
+
+  function valideWhiteSpace() {
+    txtIdmarca = selector("marca").value;
+    txtModelo = selector("modelo").value;
+    txtCode = selector("codigo").value;
+    let subcategoria = selector("subcategoria").value;
+    txtdescrip = selector("descripcion").value;
+
+    let list = [subcategoria, txtIdmarca, txtModelo, txtCode, txtdescrip];
+
+    const isValidate = list.every((x) => x.trim().length > 0);
+    console.log("alert activo");
+
+    return isValidate;
   }
 
   async function saveData() {
@@ -113,14 +137,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
       let subcategoria = selector("subcategoria").value;
 
-
       selector("descripcion").addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
           e.preventDefault();
         }
       });
 
-      catchData();
+      //catchData();
       txtEscec = valores.reduce((acum, objeto) => {
         const clave = String(Object.keys(objeto)[0]);
         acum[clave] = objeto[clave];
@@ -130,14 +153,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
       let list = [subcategoria, txtIdmarca, txtModelo, txtCode, txtdescrip];
 
+      isvalidate = list.every((x) => x.trim().length > 0);
 
-      isvalidate = list.every(x => x !== "");
-      //console.log(Object.keys(txtEscec).length);
       //console.log(txtIdUbi);
 
       if (isvalidate && Object.keys(txtEscec).length > 0 && validateEspec) {
         const params = new FormData();
-        params.append("operation", "add")
+        params.append("operation", "add");
         params.append("idsubcategoria", selector("subcategoria").value);
         params.append("idmarca", txtIdmarca);
         //params.append("idubicacion", txtIdUbi);
@@ -145,16 +167,15 @@ document.addEventListener("DOMContentLoaded", () => {
         params.append("cod_identificacion", txtCode);
         params.append("fecha_adquisicion", txtfecha);
         params.append("descripcion", txtdescrip);
-        params.append("especificaciones", JSON.stringify(txtEscec))
-        let valor = "";
+        params.append("especificaciones", JSON.stringify(txtEscec));
 
         const option = {
           method: "POST",
-          body: params
+          body: params,
         };
         fetch(`http://localhost/CMMS/controllers/activo.controller.php`, option)
-          .then(response => response.json())
-          .then(data => {
+          .then((response) => response.json())
+          .then((data) => {
             //console.log(data);
 
             if (data.idactivo > 0) {
@@ -163,8 +184,7 @@ document.addEventListener("DOMContentLoaded", () => {
             } else {
               alert("Activo no registrado");
             }
-
-          })
+          });
       } else {
         alert("Completa los campos");
 
@@ -175,26 +195,34 @@ document.addEventListener("DOMContentLoaded", () => {
       //Crear un array de objetos con las alertas, esa funcion tendra que pasarle un parametro, ejm:
       //alertArray("unico") Esta funcion mostrara una alerta de que el codigo no es unico de acuerdo a que debe
       // ser igual que la clave del objeto con el mensaje
-
     }
-
   }
 
   selector("form-activo").addEventListener("submit", (e) => {
     e.preventDefault();
     const dateToday = getDate();
-    if(selector("fecha").value>=dateToday){
+    catchData();
+
+    const validateJson = valores.every((x) => Object.keys(x).length > 0);
+    if (
+      selector("fecha").value <= dateToday &&
+      validateJson &&
+      valideWhiteSpace()
+    ) {
+      console.log(valores);
+
       if (confirm("Deseas registrar el activo?")) {
-        
         saveData();
       }
-    }else{
-      alert("No puedes asignar una fecha anterior a la actual")
+    } else {
+      if (!valideWhiteSpace()) {
+        alert("No se permiten los espacios en blanco");
+      } else if (selector("fecha").value > dateToday) {
+        alert("No puedes asignar una fecha posterior a la actual");
+      }
     }
-    
   });
-  //console.log(new Date());
-  //getEspecificaciones();
+
   function getEspecificaciones() {
     const listEs = selector("list-es");
     const newDiv = document.createElement("div");
@@ -202,7 +230,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     newDiv.setAttribute("id", `espec-${contEspecificaciones}`);
     newDiv.classList.add("mt-3");
-    newDiv.innerHTML = `
+
+    if (contEspecificaciones <5) {
+      newDiv.innerHTML = `
           <div class="col-6">
             <label for="">Especificacion ${contEspecificaciones}</label>
             <input type="text" class="form-control w-75 dataEs">
@@ -218,49 +248,126 @@ document.addEventListener("DOMContentLoaded", () => {
             <button type="button" class="btn btn-sm btn-danger btnRemove">ELIMINAR</button>
           </div> 
         `;
+
+    } else{
+      newDiv.innerHTML = `
+        <div class="col-6">
+          <label for="">Especificacion ${contEspecificaciones}</label>
+          <input type="text" class="form-control w-75 dataEs">
+        </div>
+        <div class="col-6">
+          <label for="">Valor</label>
+          <input type="text" class="form-control w-75 dataEs">
+        </div> 
+        <div class="col-3 mt-2">
+          <button type="button" class="btn btn-sm btn-danger btnRemove">ELIMINAR</button>
+        </div> 
+      `;
+    }
     listEs.appendChild(newDiv);
     contEspecificaciones++;
 
     newDiv.querySelector(".btnRemove").addEventListener("click", () => {
+      const lastInput = document.querySelectorAll(".dataEs");
+      let lastValue = lastInput[lastInput.length - 1].value;
+      //console.log(contEspec);
+
+      if (lastValue !== "") {
+        let claves = Object.keys(valores);
+        let ultimaClave = valores[claves.length - 1]; //ultima clave
+        //console.log(ultimaClave);
+
+        console.log(contEspec);
+
+        let test = valores.hasOwnProperty(contEspec - 1);
+
+        if (test) {
+          valores.splice(contEspec - 1, 1);
+          console.log(valores);
+        }
+      }
+      contEspec--;
+
       listEs.removeChild(newDiv);
       contEspecificaciones--;
-      checkButtonAdd();
+      checkButtonAdd(contEspecificaciones);
     });
   }
 
-  function checkButtonAdd() {
-    const maxEspecificaciones = 5;
+  function checkButtonAdd(cont) {
+    
+    const maxEspecificaciones = 4;
     const btnAdd = document.querySelectorAll(".btnAdd");
     const currentCount = document.querySelectorAll(".btnAdd").length;
-    //console.log(currentCount);
 
+    const maxInputs = 10;
+    const inputEs = document.querySelectorAll(".dataEs");
+    const currentinputEs = document.querySelectorAll(".dataEs").length;
+
+    if(cont>2){
+      const maxBtnRemove = 4;
+      const btnRemove = document.querySelectorAll(".btnRemove");
+      const countBtnRemove = document.querySelectorAll(".btnRemove").length;
+  
+      if (countBtnRemove<maxBtnRemove) {
+        btnRemove[countBtnRemove - 1].disabled = false;
+      }
+    }
+    //console.log(cont);
+    
     if (currentCount < maxEspecificaciones) {
       btnAdd[currentCount - 1].disabled = false; // Habilitamos el botón si el conteo es menor al máximo
     }
+
+    if (currentinputEs < maxInputs) {
+      inputEs[currentinputEs - 2].disabled = false;
+      inputEs[currentinputEs - 1].disabled = false;
+    }
+
   }
 
+  function disabledFieldsEspec() {
+    const inputDataEs = document.querySelectorAll(".dataEs");
+    const inputRemoveEs = document.querySelectorAll(".btnRemove");
+
+    if (isnoEmpty) {
+      inputDataEs.forEach((x) => {
+        x.disabled = true;
+      });
+      inputRemoveEs.forEach((x) => {
+        x.disabled = true;
+      });
+    }
+  }
 
   selector("list-es").addEventListener("click", (e) => {
     if (e.target.classList.contains("btnAdd")) {
-      const allDataEs = document.querySelectorAll('.btnAdd');
-      catchData();
+      const allDataEs = document.querySelectorAll(".btnAdd");
+      //const RemoveDataEs = document.querySelectorAll('.btnRemove');
 
+      catchData();
+      console.log("click add", valores);
       if (isnoEmpty) {
+        disabledFieldsEspec();
         for (let i = 0; i <= allDataEs.length - 1; i++) {
           allDataEs[i].disabled = true;
+          //RemoveDataEs[i].disabled = true;
         }
         if (allDataEs.length < 5) {
           getEspecificaciones();
-
+          contEspec++;
         } else {
-          alert("Limite de 5")
+          alert("Limite de 5");
+        }
+      } else {
+        if (!blankSpacesEspec()) {
+          alert("No esta permitido los espacios en blanco");
         }
       }
-
     }
   });
 
-  document.querySelectorAll(".dataEs").forEach(input => {
+  document.querySelectorAll(".dataEs").forEach((input) => {
     input.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
         e.preventDefault();
@@ -268,36 +375,43 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  function blankSpacesEspec() {
+    console.log("valor ", valorEspec);
 
+    return cap.trim().length > 0 && valorEspec.trim().length > 0;
+  }
   function catchData() {
     document.querySelectorAll(".dataEs").forEach((input, i) => {
-      let valor = input.value;
-      if (i % 2 !== 0 && i !== 0) {
-
-        let newObject = {
-          [cap]: valor
-        };
-        let isRepeat = valores.some(obj => obj.hasOwnProperty(cap));
-        //console.log(cap);
-        isnoEmpty = valor != "" && cap != "";
-        if (!isnoEmpty) {
-          //alert("Completa los campos");
-          validateEspec = false;
-        }
-
-        if (!isRepeat && isnoEmpty) {
-          valores.push({
-            [cap]: valor
-          });
-          //valoresSend.
-          //console.log(valores);
+      valorEspec = input.value;
+      console.log(valorEspec);
+      
+      if(parseInt(valorEspec)!==undefined){
+        
+        if(parseInt(valorEspec)<0){
+          alert("No se permiten numeros negativos");
+        }else{
+          if (i % 2 !== 0 && i !== 0) {
+            let isRepeat = valores.some((obj) => obj.hasOwnProperty(cap));
+            isnoEmpty = valorEspec != "" && cap != "" && blankSpacesEspec();
+            if (!isnoEmpty) {
+              validateEspec = false;
+            }
+    
+            if (!isRepeat && isnoEmpty) {
+              valores.push({
+                [cap]: valorEspec,
+              });
+              //valoresSend.
+            }
+            console.log(valores);
+          }
+          cap = valorEspec;
+          valorEspec = "";
         }
       }
-      cap = valor;
+
     });
   }
-
-
 
   function createOption(value, text) {
     const element = document.createElement("option");
@@ -305,7 +419,6 @@ document.addEventListener("DOMContentLoaded", () => {
     element.innerText = text;
     return element;
   }
-
 
   function selector(value) {
     return document.querySelector(`#${value}`);
@@ -337,6 +450,6 @@ document.addEventListener("DOMContentLoaded", () => {
     </div>`;
 
     contEspecificaciones = 2;
-    valores = []
+    valores = [];
   }
-})
+});

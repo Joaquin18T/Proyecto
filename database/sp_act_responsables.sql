@@ -110,8 +110,7 @@ BEGIN
 		WHERE idactivo = _idactivo AND es_responsable = 0;
     END IF;
 END $$
-CALL sp_max_colaboradores(@cantidad, 3);
-SELECT @cantidad as cantidad;
+
 DROP PROCEDURE IF EXISTS sp_repeat_responsable;
 DELIMITER $$
 CREATE PROCEDURE sp_repeat_responsable

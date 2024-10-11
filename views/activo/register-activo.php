@@ -11,40 +11,11 @@ require_once '../header.php'
       <div class="card-body">
         <form class="form-group mt-2" autocomplete="off" id="form-activo">
           <div class="row mb-3 mx-auto">
-            <div class="col-md-5">
-              <div class="row mb-5">
-                <div class="row mb-12 mb-2">
-                  <div class="container text-center">
-                    <div class="hr-text">
-                      <h6>ESPECIFICACIONES</h6>
-                    </div>
-                  </div>
-                </div>
-                <div id="list-es">
-                  <div class="row">
-                    <div class="col-6">
-                      <label for="">Especificacion 1</label>
-                      <input type="text" class="form-control w-75 dataEs" required>
-                    </div>
-                    <div class="col-6 mb-0">
-                      <label for="">Valor</label>
-                      <input type="text" class="form-control w-75 dataEs" required>
-                    </div>
-                    <div class="col-4 mt-2">
-                      <button class="btn btn-sm btn-primary btnAdd" type="button">AGREGAR</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-2 h-100">
-              <div class="v-line" style="border-left: 1px solid #ccc; height: 90%;"></div>
-            </div>
             <div class="col-md-5 ms-auto">
               <div class="row mb-12 mb-2">
                 <div class="container text-center">
                   <div class="hr-text">
-                    <h6>PERSONA</h6>
+                    <h6>DATOS DEL ACTIVO</h6>
                   </div>
                 </div>
               </div>
@@ -85,6 +56,35 @@ require_once '../header.php'
               <div class="row mb-6 mt-4">
                 <div class="col-6 mx-auto">
                   <button class="btn btn-sm btn-success w-75" type="submit" id="saveDatos">Save</button>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-2 h-100">
+              <div class="v-line" style="border-left: 1px solid #ccc; height: 90%;"></div>
+            </div>
+            <div class="col-md-5">
+              <div class="row mb-5">
+                <div class="row mb-12 mb-2">
+                  <div class="container text-center">
+                    <div class="hr-text">
+                      <h6>ESPECIFICACIONES</h6>
+                    </div>
+                  </div>
+                </div>
+                <div id="list-es">
+                  <div class="row">
+                    <div class="col-6">
+                      <label for="">Especificacion 1</label>
+                      <input type="text" class="form-control w-75 dataEs" required>
+                    </div>
+                    <div class="col-6 mb-0">
+                      <label for="">Valor</label>
+                      <input type="text" class="form-control w-75 dataEs" required>
+                    </div>
+                    <div class="col-4 mt-2">
+                      <button class="btn btn-sm btn-primary btnAdd" type="button">AGREGAR</button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

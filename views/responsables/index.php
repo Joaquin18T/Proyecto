@@ -11,8 +11,8 @@ require_once '../header.php';
       <div class="card-body">
         <table class="table table-striped" id="tb-activo-resp">
           <colgroup>
+            <col style="width: 0.5%;">
             <col style="width: 2%;">
-            <col style="width: 3%;">
             <col style="width: 5%;">
             <col style="width: 3%;">
             <col style="width: 3%;">

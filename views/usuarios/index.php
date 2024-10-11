@@ -1,5 +1,4 @@
 <?php require_once '../header.php' ?>
-<link href="https://unpkg.com/vanilla-datatables@latest/dist/vanilla-dataTables.min.css" rel="stylesheet" type="text/css">
 <h2>USUARIOS</h2>
 <div class="row">
   <div class="col-md-12">

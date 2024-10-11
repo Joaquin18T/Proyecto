@@ -50,8 +50,8 @@ if (isset($_POST['operation'])) {
         'especificaciones' => $_POST['especificaciones']
       ];
       $resp = $activo->add($getDatos);
-      if ($resp[0]['idactivo'] > 0) {
-        $estado['idactivo'] = $resp[0]['idactivo'];
+      if ($resp> 0) {
+        $estado['idactivo'] = $resp;
       } else {
         $estado['idactivo'] = -1;
       }

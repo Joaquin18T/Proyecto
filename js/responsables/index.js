@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     
     data.forEach((element,i) => {
       selector("tb-activo-resp tbody").innerHTML+=`
-      <tr class="text-center">
+      <tr>
         <td>${i+1}</td>
         <td>${element.cod_identificacion}</td>
         <td>${element.descripcion}</td>
@@ -25,8 +25,13 @@ document.addEventListener("DOMContentLoaded",()=>{
     if(!dataTable){
       dataTable =new DataTable("#tb-activo-resp", {
         searchable:false,
-        perPage: 5, // Número de filas por página
-        perPageSelect: [5, 10, 15] // Opciones para cambiar cantidad de filas
+        perPage: 5,
+        perPageSelect: [5, 10, 15],
+        labels:{
+          perPage:"{select} Filas por pagina",
+          noRows: "No econtrado",
+          info:"Mostrando {start} a {end} de {rows} filas"
+        }
       });
     }
     
@@ -87,7 +92,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     list.innerHTML="";
     data.forEach(x=>{
       const li = document.createElement("li");
-      li.classList.add('list-group-item');
+      li.classList.add('list-group-item', 'mt-2');
       li.innerHTML=`
         <strong>Usuario: </strong>${x.usuario}<br>
         <strong>Apellidos: </strong>${x.apellidos}<br>

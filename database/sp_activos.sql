@@ -1,8 +1,9 @@
--- ACTIVO
+-- ACTIVO 10/10
 DROP PROCEDURE IF EXISTS sp_add_activo;
 DELIMITER $$
 CREATE PROCEDURE sp_add_activo
 (
+	OUT _idactivo	INT,
 	IN _idsubcategoria INT,
 	IN _idmarca INT,
     IN _modelo VARCHAR(60),
@@ -12,11 +13,28 @@ CREATE PROCEDURE sp_add_activo
     IN _especificaciones JSON
 )
 BEGIN
+	DECLARE existe_error INT DEFAULT 0;
+    -- DECLARE repetido_cod INT DEFAULT 0;
+	DECLARE CONTINUE HANDLER FOR SQLEXCEPTION
+	BEGIN
+        SET existe_error = 1;
+	END;
+    
 	INSERT INTO activos(idsubcategoria, idmarca, modelo, cod_identificacion, fecha_adquisicion, descripcion, especificaciones) VALUES
 		(_idsubcategoria, _idmarca, _modelo, _cod_identificacion, _fecha_adquisicion, _descripcion, _especificaciones);
-	
-    SELECT last_insert_id() as idactivo;
-END $$
+        
+	-- SELECT cod_identificacion INTO repetido_cod
+	-- FROM activos;
+	-- IF repetido_cod = _cod_identificacion THEN
+	-- 	SET _idactivo = -2;
+	-- END IF;
+    
+    IF existe_error= 1 THEN
+		SET _idactivo = -1;
+	ELSE
+        SET _idactivo = last_insert_id();
+	END IF;
+END $$ 
 
 DROP PROCEDURE IF EXISTS searchby_code;
 DELIMITER $$
@@ -36,11 +54,12 @@ CREATE PROCEDURE sp_search_activo
 	IN _descripcion VARCHAR(40)
 )
 BEGIN
-	SELECT  ACT.idactivo, ACT.descripcion, SUB.subcategoria 
+	SELECT DISTINCT  ACT.idactivo, ACT.descripcion, SUB.subcategoria
 	FROM activos ACT
+    INNER JOIN activos_responsables RES ON ACT.idactivo = RES.idactivo
 	INNER JOIN subcategorias SUB ON ACT.idsubcategoria = SUB.idsubcategoria
     INNER JOIN marcas MAR ON ACT.idmarca = MAR.idmarca
-	WHERE ACT.descripcion LIKE CONCAT('%', _descripcion,'%') AND ACT.idestado!=4
+	WHERE ACT.descripcion LIKE CONCAT('%', _descripcion,'%') AND ACT.idestado!=4 
 	ORDER BY SUB.subcategoria ASC;
 END $$
 -- CALL sp_search_activo('D');
@@ -85,6 +104,7 @@ BEGIN
 		RES.idactivo_resp,
 		CONCAT(PER.apellidos,' ',PER.nombres) as nombres,
         ROL.rol,
+        RES.es_responsable,
         (SELECT COUNT(R.idactivo_resp) FROM activos_responsables R
 WHERE R.idusuario = RES.idusuario) as cantidad,
         USU.estado

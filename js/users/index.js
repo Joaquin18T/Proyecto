@@ -115,8 +115,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if(!dataTable){
       dataTable =new DataTable("#tb-usuarios", {
         searchable:false,
-        perPage: 3, // Número de filas por página
-        perPageSelect: [3, 5, 8] // Opciones para cambiar cantidad de filas
+        perPage: 3, 
+        perPageSelect: [3, 5, 8,10], 
+        labels:{
+          perPage: "{select} Filas por pagina",
+          noRows: "Registros no encontrados",
+          info: "Mostrando {start} a {end} de {rows} filas"
+        }
       });
     }
     loadUpdate();

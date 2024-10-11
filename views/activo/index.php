@@ -56,7 +56,7 @@
               <div class="table-responsive">
                 <table class="table" id="table-activos">
                   <colgroup>
-                    <col style="width:0.5%">
+                    <col style="width:0.2%">
                     <col style="width:1%">
                     <col style="width:1%">
                     <col style="width:1%">
@@ -73,7 +73,7 @@
                       <th>Acciones</th>
                     </tr>
                   </thead>
-                  <tbody class="align-text">
+                  <tbody>
                   </tbody>
                 </table>
 
@@ -101,3 +101,6 @@
 </div>
 <?php require_once '../footer.php' ?>
 <script src="../../js/activos/index.js"></script>
+<script src="https://unpkg.com/vanilla-datatables@latest/dist/vanilla-dataTables.min.js" type="text/javascript"></script>
+</body>
+</html>
