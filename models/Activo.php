@@ -2,9 +2,11 @@
 require_once 'ExecQuery.php';
 
 class Activo extends ExecQuery{
-  public function add($params=[]):array{
+  public function add($params=[]):int{
     try{
-      $cmd = parent::execQ("CALL  sp_add_activo(?,?,?,?,?,?,?)");
+      $pdo = parent::getConexion();
+
+      $cmd = $pdo->prepare("CALL sp_add_activo(@idactivo,?,?,?,?,?,?,?)");
       $cmd->execute(
         array(
           $params['idsubcategoria'],
@@ -16,9 +18,11 @@ class Activo extends ExecQuery{
           $params['especificaciones']
         )
       );
-      return $cmd->fetchAll(PDO::FETCH_ASSOC);
+      $respuesta = $pdo->query("SELECT @idactivo AS idactivo")->fetch(PDO::FETCH_ASSOC);
+      return $respuesta['idactivo'];
     }catch(Exception $e){
-      die($e->getMessage());
+      error_log("Error: ".$e->getMessage());
+      return -1;
     }
   }
 
@@ -165,7 +169,7 @@ class Activo extends ExecQuery{
   }
 }
 
-// $asc = new Activo();
+//$asc = new Activo();
 
 // echo json_encode($asc->searchActivoByUpdate(['idactivo'=>3]));
 
@@ -198,13 +202,14 @@ class Activo extends ExecQuery{
 //echo json_encode($asc->searchCode(['code'=>'D']));
 
 // $params=[
-//   'idsubcategoria'=>4,
-//   'idmarca'=>2,
+//   'idsubcategoria'=>1,
+//   'idmarca'=>1,
 //   'modelo'=>"EDR v5",
 //   'cod_identificacion'=>"RR45EA",
-//   'fecha_adquisicion'=>"15/09/2024",
+//   'fecha_adquisicion'=>"2024-10-04",
 //   'descripcion'=>"EDR V5 product",
 //   'especificaciones'=>'{"color":"Blanco"}'
 // ];
 
-// echo json_encode($asc->add($params));
+// $id = $asc->add($params);
+// echo json_encode($id);
