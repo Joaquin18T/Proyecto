@@ -36,7 +36,10 @@ require_once '../header.php'; ?>
   </style>
   <div class="col-md-12">
     <div class="card mb-5">
-      <div class="card-header">Asignar Responsable</div>
+      <div class="card-header d-flex justify-content-between m-0">
+        <p class="text-start m-0 pt-1">Asignar Responsable</p>
+        <a href="http://localhost/CMMS/views/responsables/" class="btn btn-outline-success btn-sm text-end">Volver</a>
+      </div>
       <div class="card-body">
         <form action="" id="form-responsables" autocomplete="off">
           <div class="row g-1 mb-1">

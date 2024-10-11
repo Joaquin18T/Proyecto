@@ -5,7 +5,10 @@
 <div class="row">
   <div class="col-md-12">
     <div class="card">
-      <div class="card-header">Crear un nuevo usuairo</div>
+      <div class="card-header card-header d-flex justify-content-between m-0">
+        <div class="text-start mb-0 pt-1">Crear un nuevo usuario</div>
+        <a href="http://localhost/CMMS/views/usuarios/" class="btn btn-outline-success btn-sm text-end" type="button">Regresar</a>
+      </div>
       <div class="card-body">
         <h5>Datos de la Persona</h5>
         <form action="" id="form-person-user">

@@ -8,6 +8,9 @@ require_once '../header.php'
 <div class="row">
   <div class="col-md-12">
     <div class="card h-100 mb-5">
+      <div class="card-header card-header d-flex justify-content-between m-0">
+        <a href="http://localhost/CMMS/views/activo/" class="btn btn-outline-success btn-sm">Volver</a>
+      </div>
       <div class="card-body">
         <form class="form-group mt-2" autocomplete="off" id="form-activo">
           <div class="row mb-3 mx-auto">

@@ -49,12 +49,7 @@ $host = "http://localhost/CMMS";
             <a class="nav-link" href="<?= $host ?>/views/activo/">
               <div class="sb-nav-link-icon">
               </div>
-              Lista
-            </a>
-            <a class="nav-link" href="<?= $host ?>/views/activo/register-activo.php">
-              <div class="sb-nav-link-icon"><i class="fa-solid fa-wallet"></i>
-              </div>
-              Registrar
+              Listar
             </a>
             <!-- FIN ACTIVOS -->
 
@@ -64,11 +59,6 @@ $host = "http://localhost/CMMS";
               <div class="sb-nav-link-icon">
               </div>
               Lista de Asignaciones
-            </a>
-            <a class="nav-link" href="<?= $host ?>/views/responsables/resp-activo.php">
-              <div class="sb-nav-link-icon">
-              </div>
-              Asignar
             </a>
             <a class="nav-link" href="<?= $host ?>/views/responsables/select-responsable.php">
               <div class="sb-nav-link-icon"><i class="fa-solid fa-wallet"></i>

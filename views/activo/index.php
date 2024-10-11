@@ -3,12 +3,16 @@
 <div class="row">
   <div class="col-md-12">
     <div class="card">
-      <div class="card-header">Activos Registrados
+      <div class="card-header card-header d-flex justify-content-between m-0">
+        <div class="mb-0 pt-1">Lista de Activos</div>
+        <a href="http://localhost/CMMS/views/activo/register-activo.php" class="btn btn-outline-success btn-sm text-end" type="button">Registrar</a>
       </div>
       <div class="card-body">
         <div class="row g-0 mb-3">
           <div class="card">
-            <div class="card-header">Filtros</div>
+            <div class="card-header">
+              Filtros
+            </div>
             <div class="card-body">
               <div class="row g-3 mb-3">
                 <div class="col-md-2">
@@ -104,4 +108,5 @@
 <script src="../../js/activos/index.js"></script>
 <script src="https://unpkg.com/vanilla-datatables@latest/dist/vanilla-dataTables.min.js" type="text/javascript"></script>
 </body>
+
 </html>
