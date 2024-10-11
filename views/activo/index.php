@@ -3,7 +3,8 @@
 <div class="row">
   <div class="col-md-12">
     <div class="card">
-      <div class="card-header">Activos Registrados</div>
+      <div class="card-header">Activos Registrados
+      </div>
       <div class="card-body">
         <div class="row g-0 mb-3">
           <div class="card">

@@ -107,8 +107,8 @@ CREATE TABLE activos
     CONSTRAINT fkidmarca	 FOREIGN KEY (idmarca)	REFERENCES marcas(idmarca),
     CONSTRAINT fk_actsubcategoria FOREIGN KEY(idsubcategoria) REFERENCES subcategorias(idsubcategoria),
     CONSTRAINT fk_idestado FOREIGN KEY (idestado) REFERENCES estados(idestado),
-    CONSTRAINT uk_cod_identificacion UNIQUE(cod_identificacion),
-    CONSTRAINT uk_activo UNIQUE(idsubcategoria, idmarca, modelo) -- 10/10
+    CONSTRAINT uk_cod_identificacion UNIQUE(cod_identificacion)
+    -- CONSTRAINT uk_activo UNIQUE(idsubcategoria, idmarca, modelo) -- 10/10
 )ENGINE=INNODB;
 
 -- TABLA AUN POR VERIFICAR

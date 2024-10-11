@@ -42,11 +42,6 @@ $host = "http://localhost/CMMS";
               </div>
               Usuarios
             </a>
-            <a class="nav-link" href="<?= $host ?>/views/usuarios/register.php">
-              <div class="sb-nav-link-icon"><i class="fa-solid fa-wallet"></i>
-              </div>
-              Registrar
-            </a>
             <!-- FIN USUARIOS -->
 
             <!-- ACTIVOS -->

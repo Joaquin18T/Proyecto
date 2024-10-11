@@ -82,6 +82,9 @@
           </div>
         </div>
       </div>
+      <div class="card-footer">
+        <a href="http://localhost/CMMS/views/usuarios/register.php" class="btn btn-primary btn-sm">Registrar</a>
+      </div>
     </div>
   </div>
   <div class="modal fade" id="modal-update-user" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">

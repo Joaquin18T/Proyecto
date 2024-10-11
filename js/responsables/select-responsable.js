@@ -84,6 +84,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if(data.length===0){
       selector("tb-colaboradores tbody").innerHTML=`<tr><td colspan=6 class="text-center">No hay resultados</td></tr>`;
     }
+    console.log(data);
+    
     data.forEach((x, index)=>{
       selector("tb-colaboradores tbody").innerHTML+=`
         <tr>
@@ -92,6 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <td class="text-center">${x.rol}</td>
           <td class="text-center">${x.cantidad}</td>
           <td class="text-center">${x.estado}</td>
+          <td class="text-center">${x.es_responsable==="0"?"Colaborador":"Responsable"}</td>
           <td class="text-center"><button type="button" class="btn btn-sm btn-success btn-add" data-idresp=${x.idactivo_resp}>Asignar</button></td>
         </tr>
       `;
