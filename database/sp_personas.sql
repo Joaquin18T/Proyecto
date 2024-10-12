@@ -1,3 +1,6 @@
+use gamp;
+
+DROP VIEW IF EXISTS v_personas;
 CREATE VIEW v_personas AS
 	SELECT * FROM personas;
 

@@ -1,3 +1,4 @@
+use gamp;
 -- LISTAR SOLICITUDES
 CREATE VIEW v_all_solicitudes AS
 	SELECT

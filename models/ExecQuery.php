@@ -12,4 +12,5 @@ class ExecQuery extends Conexion{
   public function execQ($query):PDOStatement{
     return $this->pdo->prepare($query);
   }
+  
 }

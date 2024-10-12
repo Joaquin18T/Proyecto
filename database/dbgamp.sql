@@ -187,3 +187,136 @@ CREATE TABLE bajas_activo
     CONSTRAINT uk_ruta_doc UNIQUE(ruta_doc) -- Modificacion 12-10
 )
 ENGINE=INNODB;
+
+-- ********************************* TABLAS ROYER *************************************
+-- 12/10/2024
+
+DROP TABLE IF EXISTS `plandetareas`;
+CREATE TABLE `plandetareas`
+(
+	idplantarea		int			auto_increment primary key,
+    descripcion		varchar(80)	not null,
+    create_at		datetime	not null default now(),
+    update_at		datetime	null,
+	borrador		boolean     default true,
+    eliminado		boolean 	default false,
+    CONSTRAINT uk_descripcion_plan UNIQUE(descripcion)
+)ENGINE=INNODB; -- CHECK
+
+DROP TABLE IF EXISTS `tipo_prioridades`;
+CREATE TABLE `tipo_prioridades`
+(
+	idtipo_prioridad	int	auto_increment primary key,
+    tipo_prioridad		varchar(10)	not null
+)ENGINE=INNODB;
+
+DROP TABLE IF EXISTS `tareas`;
+CREATE TABLE `tareas`
+(
+	idtarea				int	 			auto_increment 				primary key,
+    idplantarea			int				not null,
+    idtipo_prioridad	int 			not null,
+    descripcion			varchar(200)	not null,
+    fecha_inicio		datetime		not null,
+    fecha_vencimiento	datetime		not null,
+    cant_intervalo		int				not null,
+    frecuencia			varchar(10)		not null,
+    idestado			int				not null,
+    create_at			datetime		not null default now(),
+    update_at			datetime		null,
+    CONSTRAINT	fk_idplantarea		foreign key (idplantarea) 		REFERENCES plandetareas (idplantarea) ON DELETE CASCADE,
+    CONSTRAINT	fk_idtipo_prioridad	foreign key (idtipo_prioridad) 	REFERENCES tipo_prioridades (idtipo_prioridad),
+    CONSTRAINT	fk_idestado2		foreign key (idestado)			REFERENCES estados (idestado),
+    CONSTRAINT	fk_descripcion_tarea 		unique(descripcion)
+)ENGINE=INNODB;
+
+DROP TABLE IF EXISTS `odt`;
+CREATE TABLE `odt`
+(
+	idorden_trabajo		int		auto_increment		primary key,
+    idtarea				int	 	not null,
+    creado_por			int		not null,
+    idestado			int		null default 2,
+    borrador 			boolean null default true,
+    CONSTRAINT 			fk_idtarea4					FOREIGN KEY (idtarea)					REFERENCES tareas 	(idtarea),
+    CONSTRAINT			fk_creado_por				foreign key (creado_por) 				REFERENCES usuarios	(id_usuario),
+    CONSTRAINT			fk_idestado4				FOREIGN KEY	(idestado)					REFERENCES estados	(idestado)
+)ENGINE=INNODB;	
+
+DROP TABLE IF EXISTS `tipo_diagnosticos`;
+CREATE TABLE `tipo_diagnosticos`
+(
+	idtipo_diagnostico		int auto_increment primary key,
+    tipo_diagnostico		varchar(30)			not null
+)ENGINE=INNODB;
+
+DROP TABLE IF EXISTS `diagnosticos`;
+CREATE TABLE `diagnosticos`
+(
+	iddiagnostico		int	auto_increment primary key,
+    idorden_trabajo		int	not null,
+	idtipo_diagnostico	int	not null,
+    diagnostico			varchar(300)	not null,
+    CONSTRAINT			fk_idorden_trabajo3		foreign key (idorden_trabajo)	references odt (idorden_trabajo) ON DELETE CASCADE,
+    CONSTRAINT			fk_idtipo_diagnostico	foreign key (idtipo_diagnostico) references tipo_diagnosticos (idtipo_diagnostico)
+)ENGINE=INNODB;
+
+DROP TABLE IF EXISTS `evidencias_diagnostico`;
+CREATE TABLE `evidencias_diagnostico`
+(
+	idevidencias_diagnostico	int	auto_increment primary key,
+    iddiagnostico				int not null,
+    evidencia					varchar(100)	not null,
+	CONSTRAINT 					fk_iddiagnostico	foreign key (iddiagnostico) references diagnosticos (iddiagnostico) ON DELETE CASCADE
+)ENGINE=INNODB;	
+
+DROP TABLE IF EXISTS `responsables_asignados_odt`;
+CREATE TABLE `responsables_asignados_odt`
+(
+	idresponsable_asignado			int								auto_increment 			primary key,
+	idorden_trabajo					int not null,
+    idresponsable					int	not null,
+	CONSTRAINT 	fk_idodt			foreign key (idorden_trabajo)	REFERENCES odt 			(idorden_trabajo) ON DELETE CASCADE,
+    CONSTRAINT	fk_idresponsable	foreign key (idresponsable) 	REFERENCES usuarios 	(id_usuario)
+)ENGINE=INNODB;
+
+DROP TABLE IF EXISTS `activos_vinculados_tarea`;
+CREATE TABLE `activos_vinculados_tarea`
+(
+	idactivo_vinculado	int			auto_increment primary key,
+    idtarea				int 		not null,
+    idactivo			int 		not null,
+    create_at			datetime	not null default now(),
+    update_at			datetime	null,
+    CONSTRAINT fk_idtarea5		foreign key (idtarea) references tareas (idtarea) ON DELETE CASCADE,
+    CONSTRAINT fk_idactivo3		FOREIGN KEY (idactivo) REFERENCES activos (idactivo) 
+)ENGINE=INNODB;
+
+
+DROP TABLE IF EXISTS `detalle_odt`;
+CREATE TABLE `detalle_odt`
+(
+	iddetalleodt		int 		auto_increment 		primary key,
+    idorden_trabajo		int			not null,
+    fecha_inicial		datetime	not null default now(),
+    fecha_final 		datetime	null,
+    tiempo_ejecucion	time		null,
+    clasificacion		int			null,
+	CONSTRAINT			fk_orden_trabajo2	foreign key (idorden_trabajo) references odt (idorden_trabajo) ON DELETE CASCADE,
+    CONSTRAINT			fk_clasificacion	foreign key (clasificacion) references estados (idestado)
+)ENGINE=INNODB;
+
+DROP TABLE IF EXISTS `historial_estado_odt`;
+CREATE TABLE `historial_estado_odt`
+(
+	idhistorial			int			auto_increment		primary key,
+    idorden_trabajo		int			not null,
+    estado_anterior		int			null,
+    estado_nuevo		int			not null,
+    comentario			text 		null,
+    fecha_cambio		datetime	null default now(),
+    devuelto			boolean		null,
+    CONSTRAINT 			fk_idorden_trabajo	foreign key (idorden_trabajo) references odt (idorden_trabajo) ON DELETE CASCADE,
+    CONSTRAINT 			fk_idestado5		foreign key (estado_anterior) references estados (idestado),
+    CONSTRAINT 			fk_idestado6		foreign key (estado_nuevo) references estados (idestado)
+)ENGINE=INNODB;
