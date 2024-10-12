@@ -167,9 +167,25 @@ class Activo extends ExecQuery{
       error_log("Error: ".$e->getMessage());
     }
   }
+
+  public function getById($params=[]):array{
+    try{
+      $cmd = parent::execQ("CALL sp_get_activoById(?)");
+      $cmd->execute(
+        array(
+          $params['idactivo']
+        )
+      );
+      return $cmd->fetchAll(PDO::FETCH_ASSOC);
+    }catch(Exception $e){
+      error_log("Error: ".$e->getMessage());
+    }
+  }
 }
 
-//$asc = new Activo();
+// $asc = new Activo();
+
+// echo json_encode($asc->getById(['idactivo'=>2]));
 
 // echo json_encode($asc->searchActivoByUpdate(['idactivo'=>3]));
 

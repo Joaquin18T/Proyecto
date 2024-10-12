@@ -130,6 +130,8 @@ class ResponsableAct extends ExecQuery{
       die($e->getMessage());
     }
   }
+
+
 }
 
 //$resp = new ResponsableAct();
