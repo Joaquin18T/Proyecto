@@ -4,7 +4,10 @@
 <div class="row">
   <div class="col-md-12">
     <div class="card">
-      <div class="card-header">Actualizar datos del usuario</div>
+      <div class="card-header d-flex justify-content-between m-0">
+        <p class="mb-0 m-0">Actualizar datos del usuario</p>
+        <a href="http://localhost/CMMS/views/usuarios/" class="btn btn-sm btn-outline-warning">Volver</a>
+      </div>
       <div class="card-body">
         <h5>Datos de la Persona</h5>
         <form action="" autocomplete="off" class="mt-3" id="form-update-user">

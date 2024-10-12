@@ -31,6 +31,9 @@ if (isset($_GET['operation'])) {
     case 'searchByUpdate':
       echo json_encode($activo->searchActivoByUpdate(['idactivo'=>$activo->limpiarCadena($_GET['idactivo'])]));
       break;
+    case 'getById':
+      echo json_encode($activo->getById(['idactivo'=>$activo->limpiarCadena($_GET['idactivo'])]));
+      break;
   }
 }
 

@@ -216,5 +216,14 @@ BEGIN
 END $$
 -- CALL sp_update_activo(1, 1,1, 1,'D4 R', NOW(), 'Laptop D4 LG', '{"ram":"32GB", "disco":"solido", "color":"rojo"}');
 
-
-
+-- 12-10
+DROP PROCEDURE IF EXISTS sp_get_activoById;
+DELIMITER $$
+CREATE PROCEDURE sp_get_activoById
+(
+	IN _idactivo INT
+)
+BEGIN
+	SELECT descripcion FROM activos
+    WHERE idactivo = _idactivo;
+END $$

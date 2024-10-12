@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   })();
 
   (async()=>{
-    const data = await getDatos(`${host}estado.controller.php`, "operation=getAll");
+    const data = await getDatos(`${host}estado.controller.php`, "operation=getAllByActivo");
     //console.log(data);
     data.forEach(x=>{
       const element = createOption(x.idestado, x.nom_estado);
@@ -99,7 +99,7 @@ document.addEventListener("DOMContentLoaded",()=>{
         <td>${x.descripcion}</td>
         <td><div class="field-espec ms-auto"></div></td>
         <td>
-          ${x.nom_estado==="Baja"?'Sin Acciones':`
+          ${x.nom_estado==="Baja"||x.nom_estado==="Fuera de Servicio"?'Sin Acciones':`
             <button type="button" class="btn btn-sm btn-primary modal-update" data-id=${x.idactivo}>update</button>
           `}
         </td>

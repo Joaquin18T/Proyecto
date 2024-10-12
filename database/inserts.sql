@@ -63,6 +63,7 @@ INSERT INTO estados(tipo_estado, nom_estado)
 		('activo', 'Activo'),
 		('activo', 'En Mantenimiento'),
 		('activo', 'Fuera de Servicio'),
+        ('activo', 'Absoleto'),
 		('activo', 'Baja'),
 		('responsable', 'Asignado'),
 		('responsable', 'No Asignado'),

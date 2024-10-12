@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     params.append("idusuario",iduser);
 
     const data = await getDatos("http://localhost/CMMS/controllers/usuarios.controller.php", params);
-    console.log(data);
+    //console.log(data);
     
     if(data.length>0){
       showDatos(data[0]);
@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       const isblock = (data.length>0);
       blockCamps(isblock);
       
-      console.log(isblock);
+      //console.log(isblock);
       
       if(isblock){
         alert("Persona encontrada");
@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded",()=>{
         btnEnviar.disabled=false;
       }      
     }else{
-      console.log(isNumeric);
+      //console.log(isNumeric);
       
       if(selector("numDoc").value===""){alert("Escribe un Num de Doc.");}
       else if(!isNumeric){ alert("Ingresa solo Numeros");}
@@ -80,15 +80,14 @@ document.addEventListener("DOMContentLoaded",()=>{
     selector("telefono").value=data.telefono;
     selector("genero").value=data.genero;
     selector("nacionalidad").value=data.nacionalidad;
-    selector("rol").value = data.idrol;
     
-    if(data.usuario==undefined){
+    if(data.usuario!=undefined){
+      selector("usuario").value=data.usuario;
+      selector("rol").value=data.idrol;
+    }else{
       //selector("rol").disabled=false;
       alert("No tiene usuario");
       //limpiar los campos de usuario y desactivarlos
-    }else{
-      selector("usuario").value=data.usuario;
-      selector("rol").value=data.idrol;
     }
     
   }
@@ -113,7 +112,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   }
 
   async function updateDataPerson(idpersona){
-    console.log(idpersona);
+    //console.log(idpersona);
     
     const params = new FormData();
     params.append("operation", "updatePersona");
