@@ -1,3 +1,5 @@
+use gamp;
+
 CREATE VIEW v_subcategoria AS
 	SELECT 
 		SUB.idsubcategoria,

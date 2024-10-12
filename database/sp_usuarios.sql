@@ -1,4 +1,8 @@
+USE SIGEMAPRE;
+
 DROP PROCEDURE IF EXISTS sp_list_users;
+use gamp;
+
 DELIMITER $$
 CREATE PROCEDURE sp_list_users
 (

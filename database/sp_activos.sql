@@ -1,3 +1,5 @@
+use gamp;
+
 -- ACTIVO 10/10
 DROP PROCEDURE IF EXISTS sp_add_activo;
 DELIMITER $$

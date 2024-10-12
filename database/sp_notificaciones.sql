@@ -1,3 +1,5 @@
+use gamp;
+
 DROP PROCEDURE IF EXISTS sp_add_notificacion;
 DELIMITER $$
 CREATE PROCEDURE sp_add_notificacion
