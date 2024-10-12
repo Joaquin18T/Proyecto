@@ -51,19 +51,9 @@
         </div>
         <div class="card mt-3 content-table">
           <div class="card-body">
-            <div class="row g-3">
+            <div class="row g-3 p-2">
               <div class="table-responsive">
                 <table class="table table-striped" id="tb-usuarios">
-                  <colgroup>
-                    <col style="width: 0.5%;">
-                    <col style="width: 1%;">
-                    <col style="width: 1%;">
-                    <col style="width: 2%;">
-                    <col style="width: 1%;">
-                    <col style="width: 1%;">
-                    <col style="width: 1%;">
-                    <col style="width: 0.5%;">
-                  </colgroup>
                   <thead>
                     <tr>
                       <th>ID</th>

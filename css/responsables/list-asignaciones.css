@@ -1,0 +1,7 @@
+.dataTable-top{
+  display: flex;
+  justify-content:flex-end;
+}
+.dataTable-selector{
+  width: 60px;
+}

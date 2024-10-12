@@ -1,6 +1,6 @@
 <?php require_once '../header.php'; ?>
 
-<div class="container-fluid px-4">
+<div class="container-fluid px-4 h-100">
   <h2>ASIGNAR RESPONSABLE PRINCIPAL</h2>
   <style>
     .dropdown-menu li{
@@ -33,11 +33,11 @@
             <div class="col-md-3">
               <div class="form-floating mt-3">
                 <input class="form-control form-contro-sm" type="text" id="activo" name="activo" placeholder="Escribe Nombre activo" autocomplete="off" autofocus required>
-                <label for="activo">Buscar Activo (Descripcion)</label>
+                <label for="activo">Buscar Activo</label>
                 <ul id="list" class="dropdown-menu w-100"></ul>
               </div>
             </div>
-            <div class="col-md-8 ms-auto">
+            <div class="col-md-8 ms-auto table-responsive">
               <table class="table table-striped table-sm" id="tb-colaboradores">
                 <colgroup>
                   <col style="width: 3%;">
@@ -68,7 +68,6 @@
     </div>
   </div>
 </div>
-</main>
 <?php require_once '../footer.php' ?>
 <script src="../../js/responsables/select-responsable.js"></script>
 <script src="https://unpkg.com/vanilla-datatables@latest/dist/vanilla-dataTables.min.js" type="text/javascript"></script>

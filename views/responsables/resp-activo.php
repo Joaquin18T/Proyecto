@@ -66,7 +66,7 @@ require_once '../header.php'; ?>
             </div>
           </div>
           <div class="row g-1 mb-1 mt-4">
-            <div class="col-md-2">
+            <div class="col-md-3">
               <button class="btn btn-outline-secondary w-100" id="modalResp" type="button">Asignar Responsable</button>
             </div>
             <div class="col-md-4">
@@ -159,7 +159,5 @@ require_once '../header.php'; ?>
 
 </div>
 
-
-</main>
 <?php require_once '../footer.php' ?>
 <script src="../../js/responsables/resp-activo.js"></script>

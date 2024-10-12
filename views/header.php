@@ -1,91 +1,371 @@
-<?php
-session_start();
-//require_once '../models/Permiso.php';
-
-if (!isset($_SESSION['login']) || (isset($_SESSION['login']) && !$_SESSION['login']['permitido'])) {
-  header('Location:http://localhost/CMMS');
-}
-$usuario = $_SESSION['login'];
-// Permiso::setRol($usuario['rol']);
-// $permisos = Permiso::getPermisos();
-
-// $modulos = Module::getModules($permisos);
-$host = "http://localhost/CMMS";
-?>
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-  <link rel="stylesheet" href="<?= $host ?>/css/sidebar.css">
-  <link href="https://unpkg.com/vanilla-datatables@latest/dist/vanilla-dataTables.min.css" rel="stylesheet" type="text/css">
+  <!-- Bootstrap -->
+  <link
+  href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+  rel="stylesheet"
+  integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+  crossorigin="anonymous" />
+  <!-- Volt CSS -->
+  <link type="text/css" href="http://localhost/CMMS/css/dashboard/volt.css" rel="stylesheet" />
+  <!-- Estilos personalizados -->
+   <!-- Asignaciones -->
+    <link rel="stylesheet" href="http://localhost/CMMS/css/responsables/list-asignaciones.css">
+   <!-- Usuarios -->
+
 </head>
 
 <body>
-  <div class="container-fluid">
-    <div class="row flex-nowrap">
-      <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark">
-        <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
-          <a href="<?= $host ?>/views/" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-            <span class="fs-5 d-none d-sm-inline">Menu</span>
+  <!-- BOTON HAMBURGUESA EN RESPONSIVE -->
+  <nav class="navbar navbar-dark navbar-theme-primary px-4 col-12 d-lg-none">
+    <div class="d-flex align-items-center ms-auto">
+      <button
+        class="navbar-toggler d-lg-none collapsed "
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#sidebarMenu"
+        aria-controls="sidebarMenu"
+        aria-expanded="false"
+        aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </div>
+  </nav>
+  <!-- BOTON HAMBURGUESA EN RESPONSIVE-->
 
+  <!-- SIDEBAR -->
+  <nav
+    id="sidebarMenu"
+    class="sidebar d-lg-block bg-gray-800 text-white collapse"
+    data-simplebar>
+    <div class="sidebar-inner px-4 pt-3">
+      <div
+        class="user-card d-flex d-md-none align-items-center justify-content-between justify-content-md-center pb-4">
+        <div class="collapse-close d-md-none">
+          <a
+            href="#sidebarMenu"
+            data-bs-toggle="collapse"
+            data-bs-target="#sidebarMenu"
+            aria-controls="sidebarMenu"
+            aria-expanded="true"
+            aria-label="Toggle navigation">
+            <svg
+              class="icon icon-xs"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+              xmlns="http://www.w3.org/2000/svg">
+              <path
+                fill-rule="evenodd"
+                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                clip-rule="evenodd"></path>
+            </svg>
           </a>
-          <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
-            <!-- USUARIOS -->
-            <div class="sb-sidenav-menu-heading">Usuarios</div>
-            <a class="nav-link" href="<?= $host ?>/views/usuarios/">
-              <div class="sb-nav-link-icon">
-              </div>
-              Usuarios
-            </a>
-            <!-- FIN USUARIOS -->
-
-            <!-- ACTIVOS -->
-            <div class="sb-sidenav-menu-heading">Activos</div>
-            <a class="nav-link" href="<?= $host ?>/views/activo/">
-              <div class="sb-nav-link-icon">
-              </div>
-              Listar
-            </a>
-            <!-- FIN ACTIVOS -->
-
-            <!-- ASIGNACION -->
-            <div class="sb-sidenav-menu-heading">Asignaciones</div>
-            <a class="nav-link" href="<?= $host ?>/views/responsables/">
-              <div class="sb-nav-link-icon">
-              </div>
-              Lista de Asignaciones
-            </a>
-            <a class="nav-link" href="<?= $host ?>/views/responsables/select-responsable.php">
-              <div class="sb-nav-link-icon"><i class="fa-solid fa-wallet"></i>
-              </div>
-              Responsable Principal
-            </a>
-            <!-- FIN ASIGNACION -->
-          </ul>
-          <hr>
-          <div class="dropdown pb-4">
-            <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-              <img src="#" alt="hugenerd" width="30" height="30" class="rounded-circle">
-              <span class="d-none d-sm-inline mx-1" id="nomuser"><?= $usuario['usuario'] ?></span>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-              <li><a class="dropdown-item" href="#">New project...</a></li>
-              <li><a class="dropdown-item" href="#">Settings</a></li>
-              <li><a class="dropdown-item" href="#" id="rolUser"><?= $usuario['rol'] ?></a></li>
-              <li>
-                <hr class="dropdown-divider">
-              </li>
-              <li><a class="dropdown-item" href="#">Sign out</a></li>
-            </ul>
-          </div>
         </div>
       </div>
-      <div class="col py-3">
+      <!-- OPCIONES SIDEBAR -->
+      <ul class="nav flex-column pt-3 pt-md-0" id="options-sidebar">
+        <li class="nav-item mb-3">
+          <a href="#" class="nav-link d-flex align-items-center">
+            <span class="sidebar-icon">
+              <!-- LOGO -->
+            </span>
+            <span class="mt-1 ms-1 sidebar-text">SISGEMAPRE</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="http://localhost/CMMS/views/usuarios" class="nav-link">
+            <span class="sidebar-icon">
+              <!-- LOGO -->
+            </span>
+            <span class="sidebar-text">USUARIOS</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="http://localhost/CMMS/views/activo" class="nav-link d-flex justify-content-between">
+            <span>
+              <span class="sidebar-icon">
+                <!-- ICONO -->
+              </span>
+              <span class="sidebar-text">Activos</span>
+            </span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="http://localhost/CMMS/views/responsables" class="nav-link">
+            <span class="sidebar-icon">
+            </span>
+            <span class="sidebar-text">Asignar Resp.</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <span
+            class="nav-link collapsed d-flex justify-content-between align-items-center"
+            data-bs-toggle="collapse"
+            data-bs-target="#submenu-app">
+            <span>
+              <span class="sidebar-icon">
+                <svg
+                  class="icon icon-xs me-2"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    fill-rule="evenodd"
+                    d="M5 4a3 3 0 00-3 3v6a3 3 0 003 3h10a3 3 0 003-3V7a3 3 0 00-3-3H5zm-1 9v-1h5v2H5a1 1 0 01-1-1zm7 1h4a1 1 0 001-1v-1h-5v2zm0-4h5V8h-5v2zM9 8H4v2h5V8z"
+                    clip-rule="evenodd"></path>
+                </svg>
+              </span>
+              <span class="sidebar-text">Tables</span>
+            </span>
+            <span class="link-arrow">
+              <svg
+                class="icon icon-sm"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg">
+                <path
+                  fill-rule="evenodd"
+                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                  clip-rule="evenodd"></path>
+              </svg>
+            </span>
+          </span>
+          <div
+            class="multi-level collapse"
+            role="list"
+            id="submenu-app"
+            aria-expanded="false">
+            <ul class="flex-column nav">
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  href="../../pages/tables/bootstrap-tables.html">
+                  <span class="sidebar-text">Bootstrap Tables</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </li>
+        <li class="nav-item">
+          <span
+            class="nav-link collapsed d-flex justify-content-between align-items-center"
+            data-bs-toggle="collapse"
+            data-bs-target="#submenu-pages">
+            <span>
+              <span class="sidebar-icon">
+                <svg
+                  class="icon icon-xs me-2"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    fill-rule="evenodd"
+                    d="M2 5a2 2 0 012-2h8a2 2 0 012 2v10a2 2 0 002 2H4a2 2 0 01-2-2V5zm3 1h6v4H5V6zm6 6H5v2h6v-2z"
+                    clip-rule="evenodd"></path>
+                  <path
+                    d="M15 7h1a2 2 0 012 2v5.5a1.5 1.5 0 01-3 0V7z"></path>
+                </svg>
+              </span>
+              <span class="sidebar-text">Page examples</span>
+            </span>
+            <span class="link-arrow">
+              <svg
+                class="icon icon-sm"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg">
+                <path
+                  fill-rule="evenodd"
+                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                  clip-rule="evenodd"></path>
+              </svg>
+            </span>
+          </span>
+          <div
+            class="multi-level collapse"
+            role="list"
+            id="submenu-pages"
+            aria-expanded="false">
+            <ul class="flex-column nav">
+              <li class="nav-item">
+                <a class="nav-link" href="../../pages/examples/sign-in.html">
+                  <span class="sidebar-text">Sign In</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="../../pages/examples/sign-up.html">
+                  <span class="sidebar-text">Sign Up</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  href="../../pages/examples/forgot-password.html">
+                  <span class="sidebar-text">Forgot password</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  href="../../pages/examples/reset-password.html">
+                  <span class="sidebar-text">Reset password</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="../../pages/examples/lock.html">
+                  <span class="sidebar-text">Lock</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="../../pages/examples/404.html">
+                  <span class="sidebar-text">404 Not Found</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="../../pages/examples/500.html">
+                  <span class="sidebar-text">500 Not Found</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+      <!--/ OPCIONES SIDEBAR -->
+    </div>
+  </nav>
+  <!-- FIN SIDEBAR -->
 
+  <main class="content">
+    <!-- NAVBAR-HEADER -->
+    <nav
+      class="navbar navbar-top navbar-expand navbar-dashboard navbar-dark ps-0 pe-2 pb-0">
+      <div class="container-fluid px-0">
+        <div
+          class="d-flex justify-content-between w-100"
+          id="navbarSupportedContent">
+          <div class="d-flex align-items-center"></div>
+          <!-- Navbar links (PERFIL USUARIO) -->
+          <ul class="navbar-nav align-items-center">
+            <!-- LOGO NOTIFICACION -->
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link text-dark notification-bell unread dropdown-toggle"
+                data-unread-notifications="true"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                data-bs-display="static"
+                aria-expanded="false">
+                <svg
+                  class="icon icon-sm text-gray-900"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"></path>
+                </svg>
+              </a>
+              <div
+                class="dropdown-menu dropdown-menu-lg dropdown-menu-center mt-2 py-0">
+                <div class="list-group list-group-flush">
+                  <a
+                    href="#"
+                    class="text-center text-primary fw-bold border-bottom border-light py-3">Notifications</a>
+                  <a
+                    href="#"
+                    class="list-group-item list-group-item-action border-bottom">
+                    <div class="row align-items-center">
+                      <div class="col-auto">
+                        <!-- Avatar -->
+                        <img
+                          alt="Image placeholder"
+                          src="../../assets/img/team/profile-picture-2.jpg"
+                          class="avatar-md rounded" />
+                      </div>
+                      <div class="col ps-0 ms-2">
+                        <div
+                          class="d-flex justify-content-between align-items-center">
+                          <div>
+                            <h4 class="h6 mb-0 text-small">Neil Sims</h4>
+                          </div>
+                          <div class="text-end">
+                            <small class="text-danger">2 hrs ago</small>
+                          </div>
+                        </div>
+                        <p class="font-small mt-1 mb-0">
+                          You've been assigned a task for "Awesome new
+                          project".
+                        </p>
+                      </div>
+                    </div>
+                  </a>
+                  <a
+                    href="#"
+                    class="dropdown-item text-center fw-bold rounded-bottom py-3">
+                    <svg
+                      class="icon icon-xxs text-gray-400 me-1"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg">
+                      <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
+                      <path
+                        fill-rule="evenodd"
+                        d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                        clip-rule="evenodd"></path>
+                    </svg>
+                    View all
+                  </a>
+                </div>
+              </div>
+            </li>
+            <!-- FIN LOGO NOTIFICACION -->
 
-        <main>
+            <!-- USER - LOGOUT -->
+            <li class="nav-item dropdown ms-lg-3">
+              <a
+                class="nav-link dropdown-toggle pt-1 px-0"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false">
+                <div class="media d-flex align-items-center">
+                  <img
+                    class="avatar rounded-circle"
+                    alt="Image placeholder"
+                    src="../html&css/assets/img/team/profile-picture-3.jpg" />
+                  <div
+                    class="media-body ms-2 text-dark align-items-center d-none d-lg-block">
+                    <span class="mb-0 font-small fw-bold text-gray-900">Bonnie Green</span>
+                  </div>
+                </div>
+              </a>
+              <div
+                class="dropdown-menu dashboard-dropdown dropdown-menu-end mt-2 py-1">
+                <a class="dropdown-item d-flex align-items-center" href="#">
+                  <svg
+                    class="dropdown-icon text-danger me-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                  </svg>
+                  Logout
+                </a>
+              </div>
+            </li>
+            <!-- USER - LOGOUT -->
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <!-- /NAVBAR-HEADER -->

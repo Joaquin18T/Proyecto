@@ -25,14 +25,15 @@
                 </div>
                 <div class="col-md-2">
                   <div class="form-floating">
-                    <input type="text" class="form-control filter" id="cod_identificacion" placeholder="cod. identificacion" autocomplete="off">
+                    <input type="text" class="form-control filter" id="cod_identificacion" autocomplete="off">
                     <label for="cod_identificacion">Cod. Identificacion</label>
                   </div>
                 </div>
                 <div class="col-md-2">
                   <div class="form-floating">
-                    <input type="date" class="form-control filter" id="fecha_adquisicion" placeholder="Fecha adquisicion">
-                    <label for="fecha_adquisicion">Fecha adquisicion</label>
+                    <input type="date" class="form-control filter" id="fecha_adquisicion">
+                    <label for="fecha_adquisicion">Fecha</label>
+
                   </div>
                 </div>
                 <div class="col-md-2">

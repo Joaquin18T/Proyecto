@@ -13,17 +13,17 @@ require_once '../header.php'
       </div>
       <div class="card-body">
         <form class="form-group mt-2" autocomplete="off" id="form-activo">
-          <div class="row mb-3 mx-auto">
-            <div class="col-md-5 ms-auto">
-              <div class="row mb-12 mb-2">
+          <div class="row mb-1">
+            <div class="col-md-5">
+              <div class="row mb-3 mb-2">
                 <div class="container text-center">
                   <div class="hr-text">
                     <h6>DATOS DEL ACTIVO</h6>
                   </div>
                 </div>
               </div>
-              <div class="row mb-12 mt-2">
-                <div class="col-6">
+              <div class="row mb-3 mt-2">
+                <div class="col-md-6">
                   <label for="subcategoria">SubCategorias</label>
                   <select name="subcategorias" id="subcategoria" class="form-control w-75" required>
                     <option value="">Selecciona</option>
@@ -36,7 +36,7 @@ require_once '../header.php'
                   </select>
                 </div>
               </div>
-              <div class="row mb-6 mt-4">
+              <div class="row mb-3 mt-4">
                 <div class="col-6">
                   <label for="modelo">Modelo</label>
                   <input type="text" class="form-control w-75" placeholder="Modelo" id="modelo" minlength="5" required>
@@ -67,7 +67,7 @@ require_once '../header.php'
             </div>
             <div class="col-md-5">
               <div class="row mb-5">
-                <div class="row mb-12 mb-2">
+                <div class="row mb-3 mb-2">
                   <div class="container text-center">
                     <div class="hr-text">
                       <h6>ESPECIFICACIONES</h6>
