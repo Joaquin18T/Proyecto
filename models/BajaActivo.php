@@ -47,7 +47,7 @@ class BajaActivo extends ExecQuery{
   }
 }
 
-// $baja = new BajaActivo();
+//$baja = new BajaActivo();
 
 // echo json_encode($baja->activosBaja(['idestado'=>null]));
 
