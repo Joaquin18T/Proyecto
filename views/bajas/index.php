@@ -75,26 +75,28 @@
     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
   <div class="offcanvas-body">
-    <div class="form-floating">
-      <input type="text" class="form-control" id="activo" disabled>
-      <label for="activo" class="form-label">Activo Seleccionado</label>
-    </div>
-
-    <div class="form-floating mt-2 h-25">
-      <textarea name="motivo" id="motivo" class="form-control h-100" style="text-decoration: none; resize:none"></textarea>
-      <label for="motivo" class="form-label">Motivo</label>
-    </div>
-    <div class="form-floating mt-2 h-25">
-      <textarea name="comentario" id="comentario" class="form-control h-100" style="text-decoration: none; resize:none"></textarea>
-      <label for="comentario" class="form-label">Comentarios adicionales</label>
-    </div>
-    <div class="form-floating mt-2">
-      <input type="file" class="form-control" id="documentacion" accept=".pdf">
-      <label for="documentacion" class="form-label">Documentacion </label>
-    </div>
-    <div class="mt-2">
-      <button type="button" class="btn btn-sm btn-outline-success">Dar de baja</button>
-    </div>
+    <form action="" id="register-baja">
+      <div class="form-floating">
+        <input type="text" class="form-control" id="activo" disabled>
+        <label for="activo" class="form-label">Activo Seleccionado</label>
+      </div>
+  
+      <div class="form-floating mt-2 h-25">
+        <textarea name="motivo" id="motivo" class="form-control h-100" style="text-decoration: none; resize:none" required></textarea>
+        <label for="motivo" class="form-label">Motivo</label>
+      </div>
+      <div class="form-floating mt-2 h-25">
+        <textarea name="comentario" id="comentario" class="form-control h-100" style="text-decoration: none; resize:none"></textarea>
+        <label for="comentario" class="form-label">Comentarios adicionales</label>
+      </div>
+      <div class="form-floating mt-2">
+        <input type="file" class="form-control h-75" id="documentacion" accept=".pdf" required>
+        <label for="documentacion" class="form-label">Documentacion </label>
+      </div>
+      <div class="mt-2">
+        <button type="submit" class="btn btn-sm btn-outline-success" id="dar-baja">Dar de baja</button>
+      </div>
+    </form>
   </div>
 </div>
 <?php require_once '../footer.php' ?>

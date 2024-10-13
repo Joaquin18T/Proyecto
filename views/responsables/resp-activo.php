@@ -1,5 +1,4 @@
 <?php
-
 require_once '../header.php'; ?>
 <script src="../../node_modules/tinymce/tinymce.min.js" referrerpolicy="origin"></script>
 <link rel="stylesheet" href="http://localhost/CMMS/css/responsables/asignar-resp.css">
@@ -161,3 +160,5 @@ require_once '../header.php'; ?>
 
 <?php require_once '../footer.php' ?>
 <script src="../../js/responsables/resp-activo.js"></script>
+</body>
+</html>

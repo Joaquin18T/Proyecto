@@ -101,7 +101,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     btnRegistrar.forEach(x=>{
       x.addEventListener("click",async()=>{
         idactivo= x.getAttribute("data-id");
-
+        
         const valor = await getActivoById(parseInt(idactivo));
         selector("activo").value=valor.descripcion;
 
@@ -112,6 +112,56 @@ document.addEventListener("DOMContentLoaded",()=>{
       })
     });
   }  
+  async function saveFile(){
+    let params = new FormData();
+    let fileInput = selector("documentacion");
+    let file = fileInput.files[0];
+  
+    params.append("operation", "saveFile");
+    params.append("file", file);
+  
+    const data = await fetch(`${host}bajaActivo.controller.php`,{
+      method:'POST',
+      body:params
+    });
+    const respuesta = await data.json();
+    return respuesta;
+  }
+
+  selector("register-baja").addEventListener("submit",async(e)=>{
+    e.preventDefault();
+    const path = await saveFile();
+    if(path.respuesta!==''){
+      const iduser = await getIdUser();
+      const params = new FormData();
+      params.append("operation", "add");
+      params.append("idactivo", idactivo);
+      params.append("motivo", selector("motivo").value);
+      params.append("coment_adicionales", selector("comentario").value);
+      params.append("ruta_doc", path.respuesta);
+      params.append("aprobacion", iduser);
+
+      console.log("idactivo", idactivo);
+      console.log("motivo", selector("motivo").value);
+      console.log("comentario", selector("comentario").value);
+      console.log("ruta", path.respuesta);
+      console.log("aprobacion", iduser);
+      
+
+      const data = await fetch(`${host}bajaActivo.controller.php`,{
+        method:'POST',
+        body:params
+      });
+
+      const msg = await data.json();
+      console.log(msg);
+      
+
+    }else{
+      alert("Hubo un error al obtener la ruta del archivo");
+    }
+
+  });
 
   async function getActivoById(idactivo){
     const params = new URLSearchParams();
@@ -119,7 +169,15 @@ document.addEventListener("DOMContentLoaded",()=>{
     params.append("idactivo", idactivo);
 
     const data = await getDatos(`${host}activo.controller.php`, params);
-    
     return data[0];
+  }
+
+  async function getIdUser(){
+    const params = new URLSearchParams();
+    params.append("operation", "searchUser");
+    params.append("usuario", selector("nomuser").textContent);
+    
+    const data = await getDatos(`${host}usuarios.controller.php`, params);
+    return data[0].id_usuario;
   }
 });

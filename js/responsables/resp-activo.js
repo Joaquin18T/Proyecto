@@ -433,8 +433,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         
         console.log(userList);
         
-        const myModal = bootstrap.Modal.getOrCreateInstance('#modalResponsables');
+        const myModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalResponsables'));
         myModal.hide();
+        
       }
 
     }
@@ -443,8 +444,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   //Boton de cerrar modal de usuarios
   selector("btn-modalRes-cerrar").addEventListener("click",()=>{
     userList=[];
-    const myModal = bootstrap.Modal.getOrCreateInstance('#modalResponsables');
+    console.log("a");
+    
+    const myModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalResponsables'));
     myModal.hide();
+    
   });
 
   function validateCheckBox(){
