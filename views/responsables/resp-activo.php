@@ -155,7 +155,7 @@ require_once '../header.php'; ?>
     </div>
   </div>
   <!-- FIN MODAL IMAGENES -->
-
+  <!-- <img src="" alt="" id="imgtest"> -->
 </div>
 
 <?php require_once '../footer.php' ?>

@@ -181,6 +181,18 @@ class Activo extends ExecQuery{
       error_log("Error: ".$e->getMessage());
     }
   }
+
+  public function searchActivoResp($params):array{
+    try{
+      $cmd = parent::execQ("CALL sp_search_activo_resp(?)");
+      $cmd->execute(
+        array($params['descripcion'])
+      );
+      return $cmd->fetchAll(PDO::FETCH_ASSOC);
+    }catch(Exception $e){
+      die($e->getMessage());
+    }
+  }
 }
 
 // $asc = new Activo();

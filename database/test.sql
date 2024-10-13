@@ -4,6 +4,7 @@ delete from notificaciones WHERE idnotificacion>=1;
 
 ALTER TABLE historial_activos AUTO_INCREMENT = 1;
 
+
 select *from activos_responsables;
 select*from historial_activos;
 select*from notificaciones;
@@ -14,5 +15,6 @@ select*from estados;
 select*from bajas_activo;
 
 DELETE FROM bajas_activo where idbaja_activo>=1;
+UPDATE activos SET idestado = 3 WHERE idactivo = 2;    
+ALTER TABLE bajas_activo AUTO_INCREMENT = 1;
 
-    

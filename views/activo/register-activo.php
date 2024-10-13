@@ -39,7 +39,7 @@ require_once '../header.php'
               <div class="row mb-3 mt-4">
                 <div class="col-6">
                   <label for="modelo">Modelo</label>
-                  <input type="text" class="form-control w-75" placeholder="Modelo" id="modelo" minlength="5" required>
+                  <input type="text" class="form-control w-75" placeholder="Modelo" id="modelo" minlength="3" required>
                 </div>
                 <div class="col-6">
                   <label for="codigo">Codigo Ident.</label>

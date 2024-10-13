@@ -58,7 +58,7 @@ BEGIN
         ACT.fecha_adquisicion,
         ACT.cod_identificacion,
         ACT.descripcion,
-        (SELECT CONCAT(U.usuario,' ', P.apellidos, ' ', P.nombres) FROM usuarios U
+        (SELECT CONCAT(U.usuario,'|', P.apellidos, ' ', P.nombres) FROM usuarios U
         INNER JOIN personas P ON u.idpersona = P.id_persona WHERE
         U.id_usuario = RES.idusuario AND RES.es_responsable='1') as dato,
         UBI.ubicacion
@@ -69,6 +69,6 @@ BEGIN
     INNER JOIN estados EST ON ACT.idestado = EST.idestado
     AND (ACT.fecha_adquisicion = _fecha_adquisicion OR _fecha_adquisicion IS NULL)
     AND (EST.idestado = _idestado OR _idestado IS NULL)
-    WHERE EST.idestado >1 AND EST.idestado<5;
+    WHERE EST.idestado >1 AND EST.idestado<5 AND EST.idestado !=4;
 END $$
-CALL sp_activos_sin_servicio(NULL, NULL);
+

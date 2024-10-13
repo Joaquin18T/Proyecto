@@ -49,7 +49,9 @@ if (isset($_POST['operation'])) {
       $fileSize = $_FILES['file']['size'];
       $fileError = $_FILES['file']['error'];
 
-      $ukFileName = "testFile" . "-" . $fileName;
+      $code = $_POST['code'];
+
+      $ukFileName = $code . "-" . $fileName; //Nombre al archivo
       $path = $dir . $ukFileName;
 
       $msg = ['respuesta'=>''];
