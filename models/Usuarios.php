@@ -186,6 +186,6 @@ class Usuario extends ExecQuery{
 // echo json_encode($user->getDataUsuario(['nom_usuario'=>'pablo35a']));
 //echo json_encode($user->login(['usuario'=>'a.smith']));
 //echo password_hash("contrasena4", PASSWORD_BCRYPT);
-//echo json_encode($user->searchUser((['usuario'=>'pablo3a'])));
+// echo json_encode($user->searchUser((['usuario'=>'j.gonzalez'])));
 
 //echo json_encode($user->getUserById(['idusuario'=>2]));
