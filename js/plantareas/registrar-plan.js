@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const host = "http://localhost/CMMS/controllers/";
     let idplantarea_generado = -1;
+    let idtarea_generado = -1;
     const btnGuardarPlanTarea = $("#btnGuardarPlanTarea");
 
     if (window.localStorage.getItem("idplantarea")) {
@@ -83,8 +84,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         const fechaInicioTarea = $("#fecha-inicio");
         const fechaVencimiento = $("#fecha-vencimiento");
 
-        let formTarea = new formTareaData();
-        formTarea.append("operation", "tarea")
+        let formTarea = new FormData();
+        formTarea.append("operation", "add")
         formTarea.append("idplantarea", idplantarea_generado);
         formTarea.append("idtipo_prioridad", tipoPrioridadTarea.value);
         formTarea.append("descripcion", descripcionTarea.value);
@@ -150,8 +151,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         e.preventDefault()
         let permitir = true
         const formtarea = $("#form-tarea");
-        //const ulTareasAgregadas = $(".listaTareasAgregadas");
-        const tareasExistentes = await getDatos(`${host}tareas.controller.php`, `operation=obtenerTareas`)
+        const ulTareasAgregadas = $(".listaTareasAgregadas");
+        const tareasExistentes = await getDatos(`${host}tarea.controller.php`, `operation=obtenerTareas`)
         console.log("tareasExistentes: ", tareasExistentes)
         for (let i = 0; i < tareasExistentes.length; i++) {
             if ($("#txtDescripcionTarea").value == tareasExistentes[i].descripcion) {
@@ -162,10 +163,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         }
         if (permitir) {
-            const data = await agregarTareas();
-            console.log("id obtenido: ", data);
-            /* idtarea_generado = data[0].id;
-            recursosSeleccionados.forEach(async (recurso) => {
+            const agregado = await agregarTareas();
+            const dataId = await agregado.json()
+            console.log("id obtenido: ",dataId.id) 
+            idtarea_generado = dataId.id;
+            /* recursosSeleccionados.forEach(async (recurso) => {
                 recurso.idtarea = idtarea_generado;
                 console.log(recurso);
                 const formRecursos = new FormData();
@@ -177,32 +179,33 @@ document.addEventListener("DOMContentLoaded", async () => {
                     formRecursos
                 );
             });
-
-            console.log(recursosSeleccionados);
+ */
+            /* console.log(recursosSeleccionados);
             recursosSeleccionados = [];
-            console.log(recursosSeleccionados);
-            const ultimaTareaAgregada = await axios.get(
-                `/transparenciawsrest/consulta/tarea/${idtarea_generado}`
-            );
-            console.log("la ultima tarea agregada: ", ultimaTareaAgregada.data);
+            console.log(recursosSeleccionados); */
+            const params = new URLSearchParams()
+            params.append("operation", "obtenerTareaPorId")
+            params.append("idtarea", idtarea_generado)
+            const ultimaTareaAgregada = await getDatos(`${host}tarea.controller.php`,params)
+            console.log("la ultima tarea agregada: ", ultimaTareaAgregada);
 
             //Agregar la tarea a la lista de tareas agregadas
             ulTareasAgregadas.innerHTML += `
                 <div>
-                  <li data-tarea-id="${ultimaTareaAgregada.data[0]?.idtarea}" class="tarea-agregada">
-                    ${ultimaTareaAgregada.data[0]?.descripcion} - Tarea: ${ultimaTareaAgregada.data[0]?.idtarea}
-                    <button class="btn-eliminar-tarea" data-tarea-id="${ultimaTareaAgregada.data[0]?.idtarea}">Eliminar</button>
+                  <li data-tarea-id="${ultimaTareaAgregada[0]?.idtarea}" class="tarea-agregada">
+                    ${ultimaTareaAgregada[0]?.descripcion} - Tarea: ${ultimaTareaAgregada[0]?.idtarea}
+                    <button class="btn-eliminar-tarea" data-tarea-id="${ultimaTareaAgregada[0]?.idtarea}">Eliminar</button>
                   </li>  						
                 </div>
               `;
 
             //ESTO RENDERIZA LA NUEVA TAREA HACIA EL SELECT DE SELECCIONAR TAREAR PARA ACTIVOS ( ASIGNACION DE ACTIVOS A TAREAS)
-            selectElegirTareaParaActivo.innerHTML += `
-                <option value="${ultimaTareaAgregada.data[0]?.idtarea}">${ultimaTareaAgregada.data[0]?.descripcion}</option>
-              `;
+            /* selectElegirTareaParaActivo.innerHTML += `
+                <option value="${ultimaTareaAgregada[0]?.idtarea}">${ultimaTareaAgregada[0]?.descripcion}</option>
+            `; */
             formtarea.reset()
             habilitarCamposActivos(false)
-            confirmarEliminacionTarea() */
+            //confirmarEliminacionTarea()
         }
 
     })
