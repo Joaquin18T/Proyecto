@@ -238,7 +238,7 @@ CREATE TABLE `odt`
     creado_por			int		not null,
     idestado			int		null default 2,
     borrador 			boolean null default true,
-    CONSTRAINT 			fk_idtarea4					FOREIGN KEY (idtarea)					REFERENCES tareas 	(idtarea),
+    CONSTRAINT 			fk_idtarea4					FOREIGN KEY (idtarea)					REFERENCES tareas 	(idtarea) ON DELETE CASCADE,
     CONSTRAINT			fk_creado_por				foreign key (creado_por) 				REFERENCES usuarios	(id_usuario),
     CONSTRAINT			fk_idestado4				FOREIGN KEY	(idestado)					REFERENCES estados	(idestado)
 )ENGINE=INNODB;	

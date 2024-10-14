@@ -129,7 +129,7 @@ $host = "http://localhost/CMMS/";
                     clip-rule="evenodd"></path>
                 </svg>
               </span>
-              <span class="sidebar-text">Tables</span>
+              <span class="sidebar-text">Tareas</span>
             </span>
             <span class="link-arrow">
               <svg
@@ -153,8 +153,8 @@ $host = "http://localhost/CMMS/";
               <li class="nav-item">
                 <a
                   class="nav-link"
-                  href="../../pages/tables/bootstrap-tables.html">
-                  <span class="sidebar-text">Bootstrap Tables</span>
+                  href="http://localhost/CMMS/views/plantareas">
+                  <span class="sidebar-text">Plan de tareas</span>
                 </a>
               </li>
             </ul>

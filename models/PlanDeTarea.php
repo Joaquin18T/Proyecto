@@ -57,7 +57,7 @@ class PlanDeTarea extends ExecQuery
         }
     } // INTEGRADO ✔
 
-    public function actualizarPlanDeTareas($params = []): bool
+    public function actualizarPlanDeTareas($params = []): bool // USARE ESTE MISMO PARA CUANDO TERMINEN DE HACER EL PLAN
     {
         try {
             $status = false;
