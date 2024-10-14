@@ -27,9 +27,8 @@ SELECT PT.idplantarea,
        PT.descripcion, 
        COUNT(DISTINCT TAR.idtarea) AS tareas_totales, 
        COUNT(DISTINCT AV.idactivo_vinculado) AS activos_vinculados, 
-       PT.borrador ,
-       PT.eliminado
-FROM plandetareas PT
+       PT.borrador 
+       FROM plandetareas PT
 LEFT JOIN tareas TAR ON TAR.idplantarea = PT.idplantarea
 LEFT JOIN activos_vinculados_tarea AV ON AV.idtarea = TAR.idtarea
 GROUP BY PT.idplantarea, PT.descripcion, PT.borrador
@@ -76,10 +75,11 @@ BEGIN
 	SELECT * FROM tareas WHERE idtarea = _idtarea;
 END $$
 
+DROP PROCEDURE IF EXISTS `obtenerTareasPorPlanTarea`
 DELIMITER $$
-CREATE PROCEDURE obtenerTareasPorPlanTarea(IN _idplantarea INT)
+CREATE PROCEDURE `obtenerTareasPorPlanTarea`(IN _idplantarea INT)
 BEGIN
-	SELECT TAR.idtarea, PT.descripcion as plan_tarea, TP.tipo_prioridad, TAR.descripcion, TAR.cant_intervalo, TAR.frecuencia ,ES.estado FROM tareas TAR
+	SELECT TAR.idtarea, PT.descripcion as plan_tarea, TP.tipo_prioridad, TAR.descripcion, TAR.cant_intervalo, TAR.frecuencia ,ES.nom_estado FROM tareas TAR
     INNER JOIN plandetareas PT ON TAR.idplantarea = PT.idplantarea -- quitar esta linea luego pq no es necesario mostrar el plan de tareas al que pertenece
     INNER JOIN tipo_prioridades TP ON TAR.idtipo_prioridad = TP.idtipo_prioridad
     INNER JOIN estados ES ON TAR.idestado = ES.idestado
@@ -95,10 +95,9 @@ END $$
 --   INNER JOIN recursos RE ON RVT.idrecurso = RE.idrecurso
 --    WHERE RVT.idtarea = _idtarea;
 -- END $$
-
-
+DROP PROCEDURE IF EXISTS `obtenerActivosPorTarea`
 DELIMITER $$
-CREATE PROCEDURE obtenerActivosPorTarea(IN _idtarea INT)
+CREATE PROCEDURE `obtenerActivosPorTarea`(IN _idtarea INT)
 BEGIN
 	SELECT ACTV.idactivo_vinculado, SCAT.subcategoria, MAR.marca, ACT.modelo FROM activos_vinculados_tarea ACTV
     INNER JOIN activos ACT ON ACTV.idactivo = ACT.idactivo
@@ -107,6 +106,8 @@ BEGIN
     WHERE ACTV.idtarea = _idtarea;
 END $$
 
+
+DROP PROCEDURE IF EXISTS `obtenerUnActivoVinculadoAtarea`
 DELIMITER $$
 create PROCEDURE obtenerUnActivoVinculadoAtarea(IN _idactivo_vinculado INT)
 BEGIN

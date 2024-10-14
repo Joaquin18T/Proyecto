@@ -2,7 +2,6 @@
 
 require_once 'ExecQuery.php';
 
-
 class Categoria extends ExecQuery{
 
   public function getAll():array{
@@ -15,7 +14,6 @@ class Categoria extends ExecQuery{
       die($e->getMessage());
     }
   }
-
 }
 
 // $test = new Categoria();

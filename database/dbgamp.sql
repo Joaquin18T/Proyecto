@@ -197,7 +197,7 @@ CREATE TABLE `plandetareas`
     create_at		datetime	not null default now(),
     update_at		datetime	null,
 	borrador		boolean     default true,
-    eliminado		boolean 	default false,
+--    eliminado		boolean 	default false,
     CONSTRAINT uk_descripcion_plan UNIQUE(descripcion)
 )ENGINE=INNODB; -- CHECK
 
@@ -264,7 +264,7 @@ CREATE TABLE `evidencias_diagnostico`
 (
 	idevidencias_diagnostico	int	auto_increment primary key,
     iddiagnostico				int not null,
-    evidencia					varchar(100)	not null,
+    evidencia					BLOB	not null,
 	CONSTRAINT 					fk_iddiagnostico	foreign key (iddiagnostico) references diagnosticos (iddiagnostico) ON DELETE CASCADE
 )ENGINE=INNODB;	
 

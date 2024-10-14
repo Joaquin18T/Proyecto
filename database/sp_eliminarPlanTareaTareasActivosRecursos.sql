@@ -3,14 +3,17 @@ use gamp;
 -- ESTO SERA ELIMINACION LOGICA
 DROP PROCEDURE IF EXISTS `eliminarPlanDeTarea`
 DELIMITER $$
-CREATE PROCEDURE `eliminarPlanDeTarea`(IN _idplantarea INT, IN _eliminado BOOLEAN)
+CREATE PROCEDURE `eliminarPlanDeTarea`(
+	IN _idplantarea INT
+    -- IN _eliminado BOOLEAN
+)
 BEGIN
-	-- DELETE FROM plandetareas WHERE idplantarea = _idplantarea;
-   UPDATE plandetareas 
-    SET 
-		eliminado = _eliminado,
-        update_at = NOW()
-    WHERE idplantarea = _idplantarea;
+	DELETE FROM plandetareas WHERE idplantarea = _idplantarea;
+   -- UPDATE plandetareas 
+   -- SET 
+	-- eliminado = _eliminado,
+     --   update_at = NOW()
+    -- WHERE idplantarea = _idplantarea;
 END $$
 DELIMITER ;
 
