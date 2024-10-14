@@ -131,10 +131,33 @@ class ResponsableAct extends ExecQuery{
     }
   }
 
-
+  public function searchActivoResponsable($params=[]):array{
+    try{
+      $defaultParams=[
+        'idsubcategoria'=>null,
+        'idubicacion'=>null,
+        'cod_identificacion'=>null
+      ];
+      $realArray = array_merge($defaultParams, $params);
+      $cmd = parent::execQ("CALL sp_search_activo_responsable(?,?,?)");
+      $cmd->execute(
+        array(
+          $realArray['idsubcategoria'],
+          $realArray['idubicacion'],
+          $realArray['cod_identificacion']
+        )
+      );
+      return $cmd->fetchAll(PDO::FETCH_ASSOC);
+    }catch(Exception $e){
+      error_log("Error: ".$e->getMessage());
+    }
+  }
 }
 
-//$resp = new ResponsableAct();
+// $resp = new ResponsableAct();
+
+// echo json_encode($resp->searchActivoResponsable(['cod_identificacion'=>'5']));
+
 // $valor = $resp->test(['idactivo_resp'=>6]);
 // var_dump(count($valor));
 // echo json_encode($resp->usersByActivo(['idactivo'=>7]));
