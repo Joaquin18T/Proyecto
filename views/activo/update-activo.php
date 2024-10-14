@@ -6,11 +6,14 @@
   <div class="col-md-12">
     <div class="card mb-5">
       <form action="" class="form-group mt-2" id="form-update">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <h6>Actulizacion de datos del activo</h6>
-        <button type="submit" class="btn btn-sm btn-primary right" id="update-activo">Actualizar</button>
-      </div>
-      <div class="card-body">
+        <div class="card-header d-flex justify-content-flex-end  align-items-center">
+          <h6>Actulizacion de datos del activo</h6>
+          <div class="ms-auto">
+            <a href="<?= $host ?>views/activo/" class="btn btn-sm btn-outline-warning ms-auto me-1">Volver</a>
+            <button type="submit" class="btn btn-sm btn-primary ms-auto" id="update-activo">Actualizar</button>
+          </div>
+        </div>
+        <div class="card-body">
           <div class="row g-4 mb-3">
             <div class="col-md-3">
               <div class="form-floating">
@@ -64,13 +67,13 @@
                 <div class="row">
                   <div class="col-md-6">
                     <div class="form-floating">
-                      <input type="text" class="form-control w-75 dataEs" required>
+                      <input type="text" class="form-control w-75 dataEs" disabled required>
                       <label for="">Especificacion 1</label>
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="form-floating h-75">
-                      <input type="text" class="form-control w-75 dataEs" required>
+                      <input type="text" class="form-control w-75 dataEs" disabled required>
                       <label for="">Valor</label>
                     </div>
                   </div>
@@ -83,12 +86,15 @@
 
             </div>
           </div>
-        </form>
-      </div>
+      </form>
     </div>
   </div>
+</div>
 </div>
 
 
 <?php require_once '../footer.php' ?>
 <script src="http://localhost/CMMS/js/activos/update-activo.js"></script>
+</body>
+
+</html>

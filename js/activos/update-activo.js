@@ -155,7 +155,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const inputsEspec = allSelector("dataEs");
     const countInputs = allSelector("dataEs").length;
 
-    if(cont>1){
+    if(cont>2){
       const maxBtnRemove = 4;
       const btnRemove = allSelector("btnRemove");
       const countRemove = allSelector("btnRemove").length;

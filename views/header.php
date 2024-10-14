@@ -264,11 +264,9 @@ $host = "http://localhost/CMMS/";
             <li class="nav-item dropdown">
               <a
                 class="nav-link text-dark notification-bell unread dropdown-toggle"
-                data-unread-notifications="true"
                 href="#"
                 role="button"
                 data-bs-toggle="dropdown"
-                data-bs-display="static"
                 aria-expanded="false">
                 <svg
                   class="icon icon-sm text-gray-900"
@@ -279,26 +277,19 @@ $host = "http://localhost/CMMS/";
                     d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"></path>
                 </svg>
               </a>
-              <div
-                class="dropdown-menu dropdown-menu-lg dropdown-menu-center mt-2 py-0">
+              <div class="dropdown-menu dropdown-menu-lg dropdown-menu-center mt-2 py-0">
                 <div class="list-group list-group-flush">
-                  <a
-                    href="#"
-                    class="text-center text-primary fw-bold border-bottom border-light py-3">Notifications</a>
-                  <a
-                    href="#"
-                    class="list-group-item list-group-item-action border-bottom">
+                  <a href="#" class="text-center text-primary fw-bold border-bottom border-light py-3">
+                    Notifications
+                  </a>
+                  <a href="#" class="list-group-item list-group-item-action border-bottom">
                     <div class="row align-items-center">
                       <div class="col-auto">
                         <!-- Avatar -->
-                        <img
-                          alt="Image placeholder"
-                          src="#"
-                          class="avatar-md rounded" />
+                        <img alt="Image placeholder" src="#" class="avatar-md rounded" />
                       </div>
                       <div class="col ps-0 ms-2">
-                        <div
-                          class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex justify-content-between align-items-center">
                           <div>
                             <h4 class="h6 mb-0 text-small">Neil Sims</h4>
                           </div>
@@ -307,15 +298,12 @@ $host = "http://localhost/CMMS/";
                           </div>
                         </div>
                         <p class="font-small mt-1 mb-0">
-                          You've been assigned a task for "Awesome new
-                          project".
+                          You've been assigned a task for "Awesome new project".
                         </p>
                       </div>
                     </div>
                   </a>
-                  <a
-                    href="#"
-                    class="dropdown-item text-center fw-bold rounded-bottom py-3">
+                  <a href="#" class="dropdown-item text-center fw-bold rounded-bottom py-3">
                     <svg
                       class="icon icon-xxs text-gray-400 me-1"
                       fill="currentColor"
@@ -343,45 +331,47 @@ $host = "http://localhost/CMMS/";
                 data-bs-toggle="dropdown"
                 aria-expanded="false">
                 <div class="media d-flex align-items-center">
-                  <img
-                    class="avatar rounded-circle"
-                    alt="Image placeholder"
-                    src="#" />
-                  <div
-                    class="media-body ms-2 text-dark align-items-center d-none d-lg-block">
+                  <img class="avatar rounded-circle" alt="Image placeholder" src="#" />
+                  <div class="media-body ms-2 text-dark align-items-center d-none d-lg-block">
                     <span class="mb-0 font-small fw-bold text-gray-900" id="nomuser"><?= $idusuario ?></span>
                   </div>
                 </div>
               </a>
               <!-- Menú desplegable unificado -->
-              <div class="dropdown-menu dropdown-menu-end mt-2 py-1">
+              <ul class="dropdown-menu dropdown-menu-end mt-2 py-1">
                 <!-- Opción de rol de usuario -->
-                <a class="dropdown-item d-flex align-items-center" id="rolUser">
-                  <?= $rol ?>
-                </a>
+                <li>
+                  <a class="dropdown-item d-flex align-items-center" id="rolUser">
+                    <?= $rol ?>
+                  </a>
+                </li>
                 <!-- Separador -->
-                <div class="dropdown-divider"></div>
+                <li>
+                  <hr class="dropdown-divider">
+                </li>
                 <!-- Opción de logout -->
-                <a class="dropdown-item d-flex align-items-center" href="#">
-                  <svg
-                    class="dropdown-icon text-danger me-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                  </svg>
-                  Logout
-                </a>
-              </div>
+                <li>
+                  <a class="dropdown-item d-flex align-items-center" href="#">
+                    <svg
+                      class="dropdown-icon text-danger me-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                    </svg>
+                    Logout
+                  </a>
+                </li>
+              </ul>
             </li>
-
-            <!-- USER - LOGOUT -->
+            <!-- FIN USER - LOGOUT -->
           </ul>
+
         </div>
       </div>
     </nav>

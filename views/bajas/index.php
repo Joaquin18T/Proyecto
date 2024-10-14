@@ -33,7 +33,7 @@
         </div>
         <div class="card">
           <div class="card-body">
-            <div class="row g-5">
+            <div class="row g-5 pe-2">
               <div class="table-responsive">
                 <table class="table" id="table-activos">
                   <colgroup>
@@ -71,7 +71,7 @@
 </div>
 <div class="offcanvas offcanvas-end" tabindex="-1" id="sidebar-baja" aria-labelledby="offcanvasRightLabel">
   <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="offcanvasRightLabel">Offcanvas right</h5>
+    <h5 class="offcanvas-title" id="offcanvasRightLabel">REGISTRAR BAJA DEL ACTIVO</h5>
     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
   <div class="offcanvas-body">
