@@ -37,6 +37,14 @@ if(isset($_GET['operation'])){
     case 'showImages':
       echo json_encode($respAct->test(['idactivo_resp'=>$_GET['idactivo_resp']]));
       break;
+    case 'searchActivoResp':
+      $valoresBuscar = [
+        'idsubcategoria'=>$_GET['idsubcategoria']==""?null:$respAct->limpiarCadena($_GET['idsubcategoria']),
+        'idubicacion'=>$_GET['idubicacion']==""?null:$respAct->limpiarCadena($_GET['idubicacion']),
+        'cod_identificacion'=>$_GET['cod_identificacion']==""?null:$respAct->limpiarCadena($_GET['cod_identificacion'])
+      ];
+      echo json_encode($respAct->searchActivoResponsable($valoresBuscar));
+      break;
   }
 }
 

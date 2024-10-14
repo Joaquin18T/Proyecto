@@ -1,13 +1,57 @@
 document.addEventListener("DOMContentLoaded",()=>{
+  const host = "http://localhost/CMMS/controllers/";
   let dataTable = null;
   function selector(value) {
     return document.querySelector(`#${value}`);
   }
+  function createOption(value, text) {
+    const element = document.createElement("option");
+    element.value = value;
+    element.innerText = text;
+    return element;
+  }
+
+  (async () => {
+    const data = await getDatos(`${host}subcategoria.controller.php`, "operation=getSubCategoria");
+    //console.log(data);
+    data.forEach(x => {
+      const element = createOption(x.idsubcategoria, x.subcategoria);
+      selector("subcategoria").appendChild(element);
+    })
+  })();
+
+  (async () => {
+    const data = await getDatos("http://localhost/CMMS/controllers/ubicacion.controller.php", "operation=getAll");
+    data.forEach(x => {
+      //console.log(x);
+
+      const element = createOption(x.idubicacion, x.ubicacion);
+      selector("ubicacion").appendChild(element);
+    });
+  })();
 
   (async()=>{
-    const data = await getDatos(`http://localhost/CMMS/controllers/respActivo.controller.php`,"operation=getAll");
+    await showData();
+    await usersByActivo();
+  })();
+  
+  async function showData(){
+    const params = new URLSearchParams();
+    params.append("operation", "searchActivoResp");
+    params.append("idsubcategoria", selector("subcategoria").value);
+    params.append("idubicacion", selector("ubicacion").value);
+    params.append("cod_identificacion", selector("cod_identificacion").value);
+    const data = await getDatos(`http://localhost/CMMS/controllers/respActivo.controller.php`,params);
     //selector("imgTest").src=Object.values(JSON.parse(data[1].imagenes))[0].url;
-    
+    console.log(data);
+    selector("tb-activo-resp tbody").innerHTML="";
+    if(data.length===0){
+      selector("tb-activo-resp tbody").innerHTML=`
+      <tr>
+        <td colspan="6">No encontrado</td>
+      </tr>
+      `;
+    }
     data.forEach((element,i) => {
       selector("tb-activo-resp tbody").innerHTML+=`
       <tr>
@@ -43,8 +87,24 @@ document.addEventListener("DOMContentLoaded",()=>{
     });
 
     buttonDetail();
-    await usersByActivo();
-  })();
+  
+  }
+  searchActivoResponsable();
+
+  function searchActivoResponsable(){
+    const filters = document.querySelectorAll(".filter");
+
+    filters.forEach(x=>{
+      x.addEventListener("change",async()=>{
+        await showData();
+      });
+      if(x.id==="cod_identificacion"){
+        x.addEventListener("keyup",async()=>{
+          await showData();
+        });
+      }
+    });
+  }
 
   function buttonDetail(){
     const data = listOfButtons("btn-det");
