@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let valor = selector("activo").value;
 
     const params = new URLSearchParams();
-    params.append("operation", "searchDescripcion");
+    params.append("operation", "searchActivoResp");
     params.append("descripcion", valor);
     const data = await getDatos(`${host}/activo.controller.php`, params);
     //console.log(data);

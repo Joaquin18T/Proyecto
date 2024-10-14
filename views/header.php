@@ -1,3 +1,12 @@
+<?php
+session_start();
+if (!isset($_SESSION['login']) || (isset($_SESSION['login']) && !$_SESSION['login']['permitido'])) {
+  header('Location:http://localhost/CMMS/');
+}
+$idusuario = $_SESSION['login']['usuario'];
+$rol = $_SESSION['login']['rol'];
+$host = "http://localhost/CMMS/";
+?>
 <!DOCTYPE html>
 <html lang="es">
 
@@ -7,16 +16,16 @@
   <title>Document</title>
   <!-- Bootstrap -->
   <link
-  href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
-  rel="stylesheet"
-  integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
-  crossorigin="anonymous" />
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+    crossorigin="anonymous" />
   <!-- Volt CSS -->
   <link type="text/css" href="http://localhost/CMMS/css/dashboard/volt.css" rel="stylesheet" />
   <!-- Estilos personalizados -->
-   <!-- Asignaciones -->
-    <link rel="stylesheet" href="http://localhost/CMMS/css/responsables/list-asignaciones.css">
-   <!-- Usuarios -->
+  <!-- Asignaciones -->
+  <link rel="stylesheet" href="http://localhost/CMMS/css/responsables/list-asignaciones.css">
+  <!-- Usuarios -->
 
 </head>
 
@@ -284,7 +293,7 @@
                         <!-- Avatar -->
                         <img
                           alt="Image placeholder"
-                          src="../../assets/img/team/profile-picture-2.jpg"
+                          src="#"
                           class="avatar-md rounded" />
                       </div>
                       <div class="col ps-0 ms-2">
@@ -337,15 +346,22 @@
                   <img
                     class="avatar rounded-circle"
                     alt="Image placeholder"
-                    src="../html&css/assets/img/team/profile-picture-3.jpg" />
+                    src="#" />
                   <div
                     class="media-body ms-2 text-dark align-items-center d-none d-lg-block">
-                    <span class="mb-0 font-small fw-bold text-gray-900">Bonnie Green</span>
+                    <span class="mb-0 font-small fw-bold text-gray-900" id="nomuser"><?= $idusuario ?></span>
                   </div>
                 </div>
               </a>
-              <div
-                class="dropdown-menu dashboard-dropdown dropdown-menu-end mt-2 py-1">
+              <!-- Menú desplegable unificado -->
+              <div class="dropdown-menu dropdown-menu-end mt-2 py-1">
+                <!-- Opción de rol de usuario -->
+                <a class="dropdown-item d-flex align-items-center" id="rolUser">
+                  <?= $rol ?>
+                </a>
+                <!-- Separador -->
+                <div class="dropdown-divider"></div>
+                <!-- Opción de logout -->
                 <a class="dropdown-item d-flex align-items-center" href="#">
                   <svg
                     class="dropdown-icon text-danger me-2"
@@ -363,6 +379,7 @@
                 </a>
               </div>
             </li>
+
             <!-- USER - LOGOUT -->
           </ul>
         </div>

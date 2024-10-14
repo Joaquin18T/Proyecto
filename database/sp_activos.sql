@@ -56,7 +56,23 @@ CREATE PROCEDURE sp_search_activo
 	IN _descripcion VARCHAR(40)
 )
 BEGIN
-	SELECT DISTINCT  ACT.idactivo, ACT.descripcion, SUB.subcategoria
+	SELECT ACT.idactivo, ACT.descripcion, SUB.subcategoria
+	FROM activos ACT
+	INNER JOIN subcategorias SUB ON ACT.idsubcategoria = SUB.idsubcategoria
+    INNER JOIN marcas MAR ON ACT.idmarca = MAR.idmarca
+	WHERE ACT.descripcion LIKE CONCAT('%', _descripcion,'%') AND ACT.idestado!=4 
+	ORDER BY SUB.subcategoria ASC;
+END $$
+-- CALL sp_search_activo('D');
+
+DROP PROCEDURE IF EXISTS sp_search_activo_resp;
+DELIMITER $$
+CREATE PROCEDURE sp_search_activo_resp
+(
+	IN _descripcion VARCHAR(40)
+)
+BEGIN
+	SELECT DISTINCT ACT.idactivo, ACT.descripcion, SUB.subcategoria
 	FROM activos ACT
     INNER JOIN activos_responsables RES ON ACT.idactivo = RES.idactivo
 	INNER JOIN subcategorias SUB ON ACT.idsubcategoria = SUB.idsubcategoria
@@ -64,7 +80,6 @@ BEGIN
 	WHERE ACT.descripcion LIKE CONCAT('%', _descripcion,'%') AND ACT.idestado!=4 
 	ORDER BY SUB.subcategoria ASC;
 END $$
--- CALL sp_search_activo('D');
 
 DROP VIEW IF EXISTS v_all_activos;
 CREATE VIEW v_all_activos AS
@@ -152,7 +167,7 @@ BEGIN
 END $$
 -- CALL sp_list_activos('','','','','');
 
--- HACER SABADO
+
 DROP PROCEDURE IF EXISTS sp_update_estado_activo;
 DELIMITER $$
 CREATE PROCEDURE sp_update_estado_activo
@@ -216,7 +231,16 @@ BEGIN
 		INNER JOIN estados EST ON ACT.idestado = EST.idestado
         WHERE ACT.idactivo = _idactivo;
 END $$
--- CALL sp_update_activo(1, 1,1, 1,'D4 R', NOW(), 'Laptop D4 LG', '{"ram":"32GB", "disco":"solido", "color":"rojo"}');
 
 
-
+-- 12-10
+DROP PROCEDURE IF EXISTS sp_get_activoById;
+DELIMITER $$
+CREATE PROCEDURE sp_get_activoById
+(
+	IN _idactivo INT
+)
+BEGIN
+	SELECT descripcion, cod_identificacion FROM activos
+    WHERE idactivo = _idactivo;
+END $$

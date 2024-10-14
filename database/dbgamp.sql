@@ -172,17 +172,19 @@ CREATE TABLE historial_activos
 	CONSTRAINT fk_idubicacion	FOREIGN KEY(idubicacion) REFERENCES ubicaciones(idubicacion)
 )ENGINE=INNODB;
 
--- 10/10
+
 CREATE TABLE bajas_activo
 (
 	idbaja_activo	INT AUTO_INCREMENT PRIMARY KEY,
     idactivo		INT NOT NULL,
     fecha_baja		DATETIME NOT NULL DEFAULT NOW(),
     motivo			VARCHAR(250) NOT NULL,
-    comet_adicionales VARCHAR(250) NOT NULL,
+    coment_adicionales VARCHAR(250) NULL,
+    ruta_doc		VARCHAR(250) NOT NULL,
     aprobacion		INT NOT NULL, -- QUIEN APROBO LA BAJA
     CONSTRAINT fk_activo_baja_activo FOREIGN KEY (idactivo) REFERENCES activos(idactivo),
-    CONSTRAINT fk_usuario_baja_activo FOREIGN KEY (aprobacion) REFERENCES usuarios(id_usuario)
+    CONSTRAINT fk_usuario_baja_activo FOREIGN KEY (aprobacion) REFERENCES usuarios(id_usuario),
+    CONSTRAINT uk_ruta_doc UNIQUE(ruta_doc) -- Modificacion 12-10
 )
 ENGINE=INNODB;
 

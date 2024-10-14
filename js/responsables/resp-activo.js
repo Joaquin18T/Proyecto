@@ -117,8 +117,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-
-
   function startText(select) {
     select.setSelectionRange(0, 0); //Ubicar el cursor al principio
   }
@@ -433,8 +431,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         
         console.log(userList);
         
-        const myModal = bootstrap.Modal.getOrCreateInstance('#modalResponsables');
+        const myModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalResponsables'));
         myModal.hide();
+        
       }
 
     }
@@ -443,8 +442,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   //Boton de cerrar modal de usuarios
   selector("btn-modalRes-cerrar").addEventListener("click",()=>{
     userList=[];
-    const myModal = bootstrap.Modal.getOrCreateInstance('#modalResponsables');
+    console.log("a");
+    
+    const myModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalResponsables'));
     myModal.hide();
+    
   });
 
   function validateCheckBox(){
@@ -541,9 +543,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   // (async()=>{
   //   const params = new URLSearchParams();
   //   params.append("operation", "showImages");
-  //   params.append("idactivo_resp", 8);
+  //   params.append("idactivo_resp", 2);
   //   const data = await getDatos("http://localhost/CMMS/controllers/respActivo.controller.php", params);
-  //   console.log(JSON.parse(data[0].imagenes));
+  //   console.log(JSON.parse(data[0].imagenes).image1.url);
+  //   selector("imgtest").src=JSON.parse(data[0].imagenes).image1.url;
   // })();
 //modalResponsables
 })
