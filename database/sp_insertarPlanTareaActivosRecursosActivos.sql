@@ -101,14 +101,27 @@ DELIMITER ;
 DROP PROCEDURE IF EXISTS `insertarActivoPorTarea`
 DELIMITER $$
 CREATE PROCEDURE `insertarActivoPorTarea`(
+	OUT _idactivo_vinculado INT,
     IN _idactivo INT,
     IN _idtarea INT
 )
 BEGIN
+	DECLARE existe_error INT DEFAULT 0;
+    
+    -- Manejador de excepciones
+	DECLARE CONTINUE HANDLER FOR SQLEXCEPTION
+		BEGIN
+        SET existe_error = 1;
+	END;
+    
     INSERT INTO activos_vinculados_tarea (idactivo, idtarea)
     VALUES (_idactivo, _idtarea);
     
-    SELECT MAX(idactivo_vinculado) as id from activos_vinculados_tarea;
+    IF existe_error = 1 THEN
+		SET _idactivo_vinculado = -1;
+	ELSE
+        SET _idactivo_vinculado = LAST_INSERT_ID();
+    END IF;
 END $$
 DELIMITER ;
 
