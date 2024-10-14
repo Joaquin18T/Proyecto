@@ -12,29 +12,66 @@ require_once '../header.php';
         <a href="http://localhost/CMMS/views/responsables/resp-activo.php" class="btn btn-outline-success btn-sm text-end">Asignar</a>
       </div>
       <div class="card-body">
-        <table class="table table-striped" id="tb-activo-resp">
-          <colgroup>
-            <col style="width: 0.5%;">
-            <col style="width: 2%;">
-            <col style="width: 5%;">
-            <col style="width: 3%;">
-            <col style="width: 3%;">
-            <col style="width: 5%;">
-          </colgroup>
-          <thead>
-            <tr class="text-center">
-              <th>ID</th>
-              <th>Cod. Identificación</th>
-              <th>Descripción</th>
-              <th>Ubicacion</th>
-              <th>Responsable</th>
-              <th>Ver Detalles</th>
-            </tr>
-          </thead>
-          <tbody>
-
-          </tbody>
-        </table>
+        <div class="card">
+          <div class="card-header">Filtros</div>
+          <div class="card-body mb-2">
+            <div class="row g-3">
+              <div class="col-md-3">
+                <div class="form-floating">
+                  <input type="text" class="form-control filter" id="cod_identificacion" autocomplete="off">
+                  <label for="cod_identificacion">Cod. Identificacion</label>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-floating">
+                  <select name="subcategoria" id="subcategoria" class="form-control filter">
+                    <option value="">Selecciona</option>
+                  </select>
+                  <label for="subcategoria" class="form-label">Subcategorias</label>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-floating">
+                  <select name="ubicacion" id="ubicacion" class="form-control filter">
+                    <option value="">Selecciona</option>
+                  </select>
+                  <label for="ubicacion" class="form-label">Ubicacion</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card mt-2">
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="table-responsive">
+                <table class="table" id="tb-activo-resp">
+                  <colgroup>
+                    <col style="width: 0.5%;">
+                    <col style="width: 2%;">
+                    <col style="width: 5%;">
+                    <col style="width: 3%;">
+                    <col style="width: 3%;">
+                    <col style="width: 5%;">
+                  </colgroup>
+                  <thead>
+                    <tr class="text-center">
+                      <th>ID</th>
+                      <th>Cod. Identificación</th>
+                      <th>Descripción</th>
+                      <th>Ubicacion</th>
+                      <th>Responsable</th>
+                      <th>Ver Detalles</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+        
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <!-- INICIO MODAL -->
         <div class="modal fade" id="modal-activo-resp" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">

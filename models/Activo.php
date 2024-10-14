@@ -195,7 +195,7 @@ class Activo extends ExecQuery{
   }
 }
 
-// $asc = new Activo();
+//$asc = new Activo();
 
 // echo json_encode($asc->getById(['idactivo'=>2]));
 
@@ -219,7 +219,7 @@ class Activo extends ExecQuery{
 //   'idestado'=>4
 // ]));
 
-// echo json_encode($asc->listOfFilters(['fecha_adquisicion'=>'2024-10-03']));
+// echo json_encode($asc->listOfFilters(['fecha_adquisicion'=>'2024-10-12']));
 
 // echo json_encode($asc->filterBySubcategoria(['idsubcategoria'=>7]));
 

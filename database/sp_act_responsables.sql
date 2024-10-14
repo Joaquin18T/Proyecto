@@ -159,6 +159,50 @@ BEGIN
     WHERE RES.idactivo = _idactivo;
 END $$
 
+DROP PROCEDURE IF EXISTS sp_search_activo_responsable;
+DELIMITER $$
+CREATE PROCEDURE sp_search_activo_responsable
+(
+	IN _idsubcategoria	INT,
+    IN _idubicacion	    INT,
+    IN _cod_identificacion CHAR(40)
+)
+BEGIN
+		SELECT 
+	  RES.idactivo_resp,
+	  ACT.idactivo,
+	  ACT.cod_identificacion,
+	  ACT.descripcion,
+      SUB.subcategoria,
+      ACT.modelo,
+      MAR.marca,
+	  MAX(UBI.ubicacion) ubicacion,
+	  ACT.fecha_adquisicion,
+	  MAX(RES.condicion_equipo) condicion_equipo,
+	  EST.nom_estado,
+      RES.autorizacion,
+      RES.descripcion despresp,
+      ACT.especificaciones,
+	  MAX(RES.imagenes) imagenes
+	FROM activos_responsables RES
+	INNER JOIN activos ACT ON RES.idactivo = ACT.idactivo
+    INNER JOIN marcas MAR ON ACT.idmarca = MAR.idmarca
+	INNER JOIN usuarios USU ON RES.idusuario = USU.id_usuario
+    INNER JOIN subcategorias SUB ON ACT.idsubcategoria = SUB.idsubcategoria
+	INNER JOIN estados EST ON ACT.idestado = EST.idestado
+	INNER JOIN (
+		SELECT H.idactivo_resp, MAX(H.idubicacion) AS idubicacion
+		FROM historial_activos H
+		GROUP BY H.idactivo_resp
+    )HIS ON HIS.idactivo_resp = RES.idactivo_resp
+	INNER JOIN ubicaciones UBI ON HIS.idubicacion = UBI.idubicacion
+    WHERE (SUB.idsubcategoria = _idsubcategoria OR _idsubcategoria IS NULL) AND
+    (UBI.idubicacion = _idubicacion OR _idubicacion IS NULL) AND
+    (ACT.cod_identificacion LIKE CONCAT('%', _cod_identificacion, '%') OR _cod_identificacion IS NULL) AND ACT.idestado=1
+    GROUP BY ACT.idactivo
+    ORDER BY RES.fecha_asignacion DESC;
+END $$
 
+-- CALL sp_search_activo_responsable(null,null,null)
 
 
