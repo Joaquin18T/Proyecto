@@ -1,4 +1,4 @@
-USE SIGEMAPRE;
+USE gamp;
 
 
 DROP PROCEDURE IF EXISTS `verificarOrdenInconclusa`

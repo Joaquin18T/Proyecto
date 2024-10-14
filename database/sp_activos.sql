@@ -165,8 +165,6 @@ BEGIN
     AND (EST.idestado = _idestado OR _idestado IS NULL)
     AND (MAR.idmarca = _idmarca OR _idmarca IS NULL);
 END $$
--- CALL sp_list_activos('','','','','');
-
 
 DROP PROCEDURE IF EXISTS sp_update_estado_activo;
 DELIMITER $$

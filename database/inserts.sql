@@ -75,9 +75,10 @@ INSERT INTO estados(tipo_estado, nom_estado)
 		('activo', 'Baja'),
 		('responsable', 'Asignado'),
 		('responsable', 'No Asignado'),
-		('orden', 'Abierta'),
-		('orden', 'En Proceso'),
-		('orden', 'Cerrada');
+		('orden', 'pendiente'),
+		('orden', 'proceso'),
+		('orden', 'revision'),
+        ('orden', 'finalizado');
 
 INSERT INTO activos(idsubcategoria, idmarca, modelo, cod_identificacion, fecha_adquisicion, descripcion, especificaciones, idestado)
 	VALUES

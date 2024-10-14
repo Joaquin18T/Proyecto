@@ -17,6 +17,8 @@ BEGIN
 END $$
 DELIMITER ;
 
+CALL eliminarPlanDeTarea(1)
+
 DELIMITER $$
 CREATE PROCEDURE eliminarTarea(IN _idtarea INT)
 BEGIN
