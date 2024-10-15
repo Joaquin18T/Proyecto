@@ -99,8 +99,9 @@ document.addEventListener("DOMContentLoaded",()=>{
         <td>${x.descripcion}</td>
         <td><div class="field-espec ms-auto"></div></td>
         <td>
-          ${x.nom_estado==="Baja"||x.nom_estado==="Fuera de Servicio"?'Sin Acciones':`
-            <button type="button" class="btn btn-sm btn-primary modal-update" data-id=${x.idactivo}>update</button>
+          ${x.nom_estado==="Fuera de Servicio"?'Sin Acciones':
+            x.nom_estado==="Baja"?`<button type="button" class="btn btn-sm btn-primary btn-baja" data-id=${x.idactivo}>Detalles</button>`:
+            `<button type="button" class="btn btn-sm btn-primary modal-update" data-id=${x.idactivo}>update</button>
           `}
         </td>
       </tr>
@@ -121,6 +122,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       });
     }
     buttonsUpdate();
+    showDetalleBaja();
   }
   
   changeByFilters();
@@ -167,5 +169,66 @@ document.addEventListener("DOMContentLoaded",()=>{
     });
   }
 
+  function showDetalleBaja(){
+    const btnBajas = document.querySelectorAll(".btn-baja");
 
-})
+    btnBajas.forEach(x=>{
+      x.addEventListener("click",async()=>{
+        const id = parseInt(x.getAttribute("data-id"));
+
+        const dataBaja = await dataActivoBaja(id);
+        await getUser(dataBaja.aprobacion);
+        console.log(dataBaja.ruta_doc);
+        
+        showPDF(dataBaja.ruta_doc);
+
+        const sidebar = selector("activo-baja-detalle");
+        const offCanvas = new bootstrap.Offcanvas(sidebar);
+
+        offCanvas.show();
+      });
+    });
+  }
+
+  async function dataActivoBaja(idactivo){
+    const params = new URLSearchParams();
+    params.append("operation", "dataBajaActivo");
+    params.append("idactivo", idactivo);
+
+    const data = await getDatos(`${host}bajaActivo.controller.php`, params);
+    return data[0];
+    
+  }
+
+  function showPDF(route){
+    let cont=0;
+    let index=0;
+    for(let i=0; i<route.length; i++){
+      if(route[i]==="/"){
+        cont++;
+      }
+      if(cont===3){
+        index = i;
+        break;
+      }
+    }
+    //console.log(index);
+    
+    const newRoute =`http://localhost${route.slice(index, route.length)}`;
+    console.log(newRoute);
+    
+    selector("view-pdf-baja").href = newRoute;
+    cont=0;
+    index=0;
+  }
+
+  async function getUser(iduser){
+    const params = new URLSearchParams();
+    params.append("operation", "getUserById");
+    params.append("idusuario", iduser);
+
+    const data = await getDatos(`${host}usuarios.controller.php`, params);
+    console.log(data);
+  }
+
+});

@@ -12,6 +12,10 @@ if (isset($_GET['operation'])) {
       ];
       echo json_encode($baja->activosBaja($params));
       break;
+    case 'dataBajaActivo':
+      //metodo intval: convierte una cadena en entero
+      echo json_encode($baja->dataBajaActivo(['idactivo'=>$baja->limpiarCadena($_GET['idactivo'])]));
+      break;
   }
 }
 
