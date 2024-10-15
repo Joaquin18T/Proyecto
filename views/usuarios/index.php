@@ -5,7 +5,7 @@
     <div class="card">
       <div class="card-header card-header d-flex justify-content-between m-0">
         <p class="pt-1 mb-0">Lista de usuarios</p>
-        <a href="http://localhost/CMMS/views/usuarios/register.php" class="btn btn-primary btn-sm ms-auto">Registrar</a>
+        <a href="http://localhost/CMMS/views/usuarios/register" class="btn btn-primary btn-sm ms-auto">Registrar</a>
       </div>
       <div class="card-body">
         <div class="row g-0 md-3">

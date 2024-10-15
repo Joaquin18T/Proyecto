@@ -9,7 +9,7 @@ require_once '../header.php';
     <div class="card">
       <div class="card-header d-flex justify-content-between m-0">
         <p class="text-start m-0 mt-0 pt-1">Asignaciones Registradas</p>
-        <a href="http://localhost/CMMS/views/responsables/resp-activo.php" class="btn btn-outline-success btn-sm text-end">Asignar</a>
+        <a href="http://localhost/CMMS/views/responsables/resp-activo" class="btn btn-outline-success btn-sm text-end">Asignar</a>
       </div>
       <div class="card-body">
         <div class="card">

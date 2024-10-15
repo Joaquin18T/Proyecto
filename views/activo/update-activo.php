@@ -94,7 +94,7 @@
 
 
 <?php require_once '../footer.php' ?>
-<script src="http://localhost/CMMS/js/activos/update-activo.js"></script>
+<script src="<?= $host ?>js/activos/update-activo.js"></script>
 </body>
 
 </html>

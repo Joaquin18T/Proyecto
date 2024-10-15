@@ -100,5 +100,5 @@
   </div>
 </div>
 <?php require_once '../footer.php' ?>
-<script src="http://localhost/CMMS/js/bajas/list-activos.js"></script>
+<script src="<?= $host ?>js/bajas/list-activos.js"></script>
 <script src="https://unpkg.com/vanilla-datatables@latest/dist/vanilla-dataTables.min.js" type="text/javascript"></script>

@@ -5,7 +5,7 @@
     <div class="card">
       <div class="card-header card-header d-flex justify-content-between m-0">
         <div class="mb-0 pt-1">Lista de Activos</div>
-        <a href="http://localhost/CMMS/views/activo/register-activo.php" class="btn btn-outline-success btn-sm text-end" type="button">Registrar</a>
+        <a href="<?= $host ?>views/activo/register-activo" class="btn btn-outline-success btn-sm text-end" type="button">Registrar</a>
       </div>
       <div class="card-body">
         <div class="row g-0 mb-3">
@@ -99,7 +99,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <a class="btn btn-sm btn-success" href="http://localhost/CMMS/views/activo/update-activo.php">Actualizar</a>
+          <a class="btn btn-sm btn-success" href="<?= $host ?>views/activo/update-activo">Actualizar</a>
         </div>
       </div>
     </div>
