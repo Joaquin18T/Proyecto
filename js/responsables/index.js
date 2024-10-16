@@ -24,9 +24,11 @@ document.addEventListener("DOMContentLoaded",()=>{
     const data = await getDatos("http://localhost/CMMS/controllers/ubicacion.controller.php", "operation=getAll");
     data.forEach(x => {
       //console.log(x);
-
       const element = createOption(x.idubicacion, x.ubicacion);
       selector("ubicacion").appendChild(element);
+
+      const elementSB = createOption(x.idubicacion, x.ubicacion);
+      selector("sb-ubicacion").appendChild(elementSB);
     });
   })();
 
@@ -60,8 +62,12 @@ document.addEventListener("DOMContentLoaded",()=>{
         <td>${element.descripcion}</td>
         <td>${element.ubicacion}</td>
         <td><button type="button" data-idactivo=${element.idactivo} class="btn btn-sm btn-primary btn-colab">Ver colab</button></td>
-        <td><button type="button" data-idresp=${element.idactivo_resp} class="btn btn-sm btn-primary btn-det" data-bs-toggle="modal" 
-        data-bs-target="#modal-activo-resp">Click me</button></td>
+        <td>
+          <button type="button" data-idresp=${element.idactivo_resp} class="btn btn-sm btn-primary btn-det" data-bs-toggle="modal" 
+          data-bs-target="#modal-activo-resp">Click me</button>
+
+          <button type="button" data-idresp=${element.idactivo_resp} class="btn btn-sm btn-primary btn-update-ubicacion">Edt. Ub.</button>
+        </td>
       </tr>
       `;
     });
@@ -78,7 +84,7 @@ document.addEventListener("DOMContentLoaded",()=>{
         }
       });
     }
-    
+
     data.forEach(x => {
       const option = document.createElement("option");
       option.textContent = x.descripcion;
@@ -87,7 +93,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     });
 
     buttonDetail();
-  
+    btnUpdateUbicacion();
   }
   searchActivoResponsable();
 
@@ -251,4 +257,15 @@ document.addEventListener("DOMContentLoaded",()=>{
     selector("espec").appendChild(contain);
   }
 
-})
+  //ACTUALIZAR UBICACION
+  function btnUpdateUbicacion() {
+    const buttons = document.querySelectorAll(".btn-update-ubicacion");
+    buttons.forEach(x=>{
+      x.addEventListener("click",()=>{
+        const sidebar = selector("sb-ubicacion-update");
+        const offCanvas = new bootstrap.Offcanvas(sidebar);
+        offCanvas.show();//me quede aki
+      });
+    });
+  }
+});

@@ -12,6 +12,10 @@ if (isset($_GET['operation'])) {
       ];
       echo json_encode($baja->activosBaja($params));
       break;
+    case 'dataBajaActivo':
+      //metodo intval: convierte una cadena en entero
+      echo json_encode($baja->dataBajaActivo(['idactivo'=>$baja->limpiarCadena($_GET['idactivo'])]));
+      break;
   }
 }
 
@@ -46,17 +50,21 @@ if (isset($_POST['operation'])) {
       //Obtener Informacion del archivo
       $fileName = basename($_FILES['file']['name']);
       $fileTempName = $_FILES['file']['tmp_name'];
-      $fileSize = $_FILES['file']['size'];
+      $fileSize = $_FILES['file']['size']; //maximo 30MB  
       $fileError = $_FILES['file']['error'];
 
-      $code = $_POST['code'];
-
-      $ukFileName = $code . "-" . $fileName; //Nombre al archivo
-      $path = $dir . $ukFileName;
-
       $msg = ['respuesta'=>''];
-      if (move_uploaded_file($fileTempName, $path)) {
-        $msg['respuesta'] = $path;
+      if($fileSize<6){
+        $code = $_POST['code'];
+  
+        $ukFileName = $code . "-" . $fileName; //Nombre al archivo
+        $path = $dir . $ukFileName;
+  
+        if (move_uploaded_file($fileTempName, $path)) {
+          $msg['respuesta'] = $path;
+        }
+      }else{
+        $msg['respuesta']="max";
       }
       echo json_encode($msg);
       break;

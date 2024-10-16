@@ -14,7 +14,7 @@ select*from personas;
 select*from estados;
 select*from bajas_activo;
 
-DELETE FROM bajas_activo where idbaja_activo=5;
-UPDATE activos SET idestado = 3 WHERE idactivo = 2;    
+DELETE FROM bajas_activo where idbaja_activo>=1;
+UPDATE activos SET idestado = 3 WHERE idactivo = 1;    
 ALTER TABLE bajas_activo AUTO_INCREMENT = 1;
 

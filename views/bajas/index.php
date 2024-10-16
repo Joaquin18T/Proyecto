@@ -92,6 +92,7 @@
       <div class="form-floating mt-2">
         <input type="file" class="form-control h-75" id="documentacion" accept=".pdf" required>
         <label for="documentacion" class="form-label">Documentacion </label>
+        <p class="text-end"><strong style="font-size: small;">(Max. 6 MB)</strong></p>
       </div>
       <div class="mt-2">
         <button type="submit" class="btn btn-sm btn-outline-success" id="dar-baja">Dar de baja</button>

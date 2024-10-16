@@ -197,6 +197,17 @@ BEGIN
     ORDER BY RES.fecha_asignacion DESC;
 END $$
 
--- CALL sp_search_activo_responsable(null,1,null)
+DROP PROCEDURE IF EXISTS sp_list_resp_activo;
+DELIMITER $$
+CREATE PROCEDURE sp_list_resp_activo
+(
+
+)
+BEGIN
+	SELECT R.idactivo_resp, A.descripcion
+    FROM activos_responsables R
+    INNER JOIN activos A ON R.idactivo = A.idactivo
+    WHERE A.idestado >=3 AND A.idestado<=4;
+END $$
 
 select * from activos_responsables;

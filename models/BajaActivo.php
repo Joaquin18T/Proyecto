@@ -45,9 +45,25 @@ class BajaActivo extends ExecQuery{
       error_log("Error: ".$e->getMessage());
     }
   }
+
+  public function dataBajaActivo($params=[]):array{
+    try{
+      $cmd = parent::execQ("CALL sp_data_baja_activo(?)");
+      $cmd->execute(
+        array(
+          $params['idactivo']
+        )
+      );
+      return $cmd->fetchAll(PDO::FETCH_ASSOC);
+    }catch(Exception $e){
+      error_log("Error: ", $e->getMessage());
+    }
+  }
 }
 
-//$baja = new BajaActivo();
+// $baja = new BajaActivo();
+
+// echo json_encode($baja->dataBajaActivo(['idactivo'=>1]));
 
 // echo json_encode($baja->activosBaja(['idestado'=>null]));
 

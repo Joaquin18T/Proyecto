@@ -105,6 +105,52 @@
     </div>
   </div>
 </div>
+<!-- SIDEBAR DE DETALLES DE LA BAJA DE UN ACTIVO-->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="activo-baja-detalle" aria-labelledby="offcanvasRightLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="offcanvasRightLabel">DETALLES DE LA BAJA</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body g-3">
+    <div class="row">
+      <div class="col-md-6 pt-2">
+        <p id="desc">Descrip. Activo</p>
+      </div>
+      <div class="col-md-3 pt-1">
+        <button class="btn btn-sm btn-info w-75 text-first" type="button">+</button>
+      </div>
+    </div>
+    <div class="row mt-3">
+      <div class="col-md-12">
+        <p id="fecha-baja">12/09/2018</p>
+        <p id="aprobacion">Pedro Diaz (pedro3f)</p>
+      </div>
+    </div>
+    <div class="row mt-3">
+      <div class="col-md-12">
+        <div>
+          <strong>Motivo:</strong>
+          <p class="text-break" id="motivo">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Architecto repellendus velit
+            exercitationem vitae placeat necessitatibus voluptas aut quod deserunt magnam.
+          </p>
+        </div>
+        <div class="pt-2">
+          <strong>Comentario Adicional:</strong>
+          <p class="text-break" id="comentario">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Architecto repellendus velit
+            exercitationem vitae placeat necessitatibus voluptas aut quod deserunt magnam.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-5">
+        <a class="btn btn-sm btn-success" id="view-pdf-baja" target="_blank">ver PDF</a>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ./SIDEBAR DE DETALLES DE LA BAJA DE UN ACTIVO-->
+
 <?php require_once '../footer.php' ?>
 <script src="../../js/activos/index.js"></script>
 <script src="https://unpkg.com/vanilla-datatables@latest/dist/vanilla-dataTables.min.js" type="text/javascript"></script>

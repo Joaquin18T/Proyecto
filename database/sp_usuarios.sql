@@ -103,7 +103,10 @@ CREATE PROCEDURE sp_getUser_by_id
 	IN _idusuario INT
 )
 BEGIN
-	SELECT usuario FROM usuarios WHERE id_usuario = _idusuario;
+	SELECT U.usuario, CONCAT(P.apellidos, ' ', P.nombres) as dato 
+    FROM usuarios U
+    INNER JOIN personas P ON U.idpersona = P.id_persona
+    WHERE id_usuario = _idusuario;
 END $$
 
 

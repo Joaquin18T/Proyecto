@@ -148,6 +148,21 @@ $host = "http://localhost/CMMS/";
               <li class="nav-item">
                 <a
                   class="nav-link"
+                  href="<?= $host ?>views/responsables/">
+                  <span class="sidebar-text">Lista de Asig.</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div
+            class="multi-level collapse"
+            role="list"
+            id="submenu-app"
+            aria-expanded="false">
+            <ul class="flex-column nav">
+              <li class="nav-item">
+                <a
+                  class="nav-link"
                   href="<?= $host ?>views/responsables/resp-activo">
                   <span class="sidebar-text">Asignar Resp.</span>
                 </a>
