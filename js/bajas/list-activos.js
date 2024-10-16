@@ -151,7 +151,9 @@ document.addEventListener("DOMContentLoaded",()=>{
 
     if(confirm("¿Estas seguro de dar de baja al activo?")){
       const path = await saveFile();
-      if(path.respuesta!==''){
+      //console.log(path);
+      
+      if(path.respuesta!=='max'){
         const iduser = await getIdUser(selector("nomuser").textContent);
         const params = new FormData();
         params.append("operation", "add");
@@ -189,7 +191,11 @@ document.addEventListener("DOMContentLoaded",()=>{
 
         }
       }else{
-        alert("Hubo un error al obtener la ruta del archivo");
+        if(path.respuesta==="max"){
+          alert("Tu archivo pesa mas de lo permitido");
+        }else{
+          alert("Hubo un error al obtener la ruta del archivo");
+        }
       }
     }
 

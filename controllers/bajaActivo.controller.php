@@ -53,14 +53,18 @@ if (isset($_POST['operation'])) {
       $fileSize = $_FILES['file']['size']; //maximo 30MB  
       $fileError = $_FILES['file']['error'];
 
-      $code = $_POST['code'];
-
-      $ukFileName = $code . "-" . $fileName; //Nombre al archivo
-      $path = $dir . $ukFileName;
-
       $msg = ['respuesta'=>''];
-      if (move_uploaded_file($fileTempName, $path)) {
-        $msg['respuesta'] = $path;
+      if($fileSize<6){
+        $code = $_POST['code'];
+  
+        $ukFileName = $code . "-" . $fileName; //Nombre al archivo
+        $path = $dir . $ukFileName;
+  
+        if (move_uploaded_file($fileTempName, $path)) {
+          $msg['respuesta'] = $path;
+        }
+      }else{
+        $msg['respuesta']="max";
       }
       echo json_encode($msg);
       break;
