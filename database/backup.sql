@@ -85,13 +85,21 @@ CREATE TABLE `activos_responsables` (
   CONSTRAINT `fk_solicitud` FOREIGN KEY (`solicitud`) REFERENCES `usuarios` (`id_usuario`),
   CONSTRAINT `fk_user_resp` FOREIGN KEY (`idusuario`) REFERENCES `usuarios` (`id_usuario`),
   CONSTRAINT `chk_es_responsable` CHECK (`es_responsable` in ('1','0'))
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `activos_responsables` */
 
 insert  into `activos_responsables`(`idactivo_resp`,`idactivo`,`idusuario`,`es_responsable`,`fecha_asignacion`,`fecha_designacion`,`condicion_equipo`,`imagenes`,`descripcion`,`autorizacion`,`solicitud`) values 
 (1,1,2,'0','2024-10-16',NULL,'En perfectas condiciones','{\"imagen1\":\"http://nose/que/poner\"}','equipo de trabajo',1,1),
-(2,1,8,'0','2024-10-16',NULL,'Nuevo','{\"imagen1\":\"https://ejemplo.com/imagenes/lg_ultragear.jpg\"}','Asignación a usuario',6,1);
+(2,1,8,'0','2024-10-16',NULL,'Nuevo','{\"imagen1\":\"https://ejemplo.com/imagenes/lg_ultragear.jpg\"}','Asignación a usuario',6,1),
+(3,2,9,'0','2024-10-16',NULL,'Este activo esta sin problemas','{\"imagen1\":\"https://ejemplo.com/imagenes/hp_pavilion.jpg\"}','Uso diario',1,1),
+(4,3,10,'0','2024-10-16',NULL,'En buenas condiciones','{\"imagen1\":\"https://ejemplo.com/imagenes/caterpillar_320.jpg\"}','Asignación a proyecto',8,1),
+(5,4,11,'0','2024-10-16',NULL,'Tienes fallos en el motor','{\"imagen1\":\"https://ejemplo.com/imagenes/nissan_frontier.jpg\"}','Camioneta de trabajo',14,1),
+(6,5,12,'0','2024-10-16',NULL,'Nuevo','{\"imagen1\":\"https://ejemplo.com/imagenes/hyundai_generator.jpg\"}','Generador de respaldo',12,1),
+(7,6,13,'0','2024-10-16',NULL,'Nuevo','{\"imagen1\":\"https://ejemplo.com/imagenes/hp_laserjet.jpg\"}','Impresión de documentos',8,1),
+(8,7,14,'0','2024-10-16',NULL,'Usado','{\"imagen1\":\"https://ejemplo.com/imagenes/lg_gram.jpg\"}','Laptop para administración',10,1),
+(9,8,15,'0','2024-10-16',NULL,'Nuevo','{\"imagen1\":\"https://ejemplo.com/imagenes/abb_robot_irb.jpg\"}','Robot para automatización',14,1),
+(10,9,8,'0','2024-10-16',NULL,'Usado','{\"imagen1\":\"https://ejemplo.com/imagenes/fenwick_forklift.jpg\"}','Montacargas para logística',14,1);
 
 /*Table structure for table `activos_vinculados_tarea` */
 
@@ -250,12 +258,21 @@ CREATE TABLE `historial_activos` (
   KEY `fk_idubicacion` (`idubicacion`),
   CONSTRAINT `fk_idactivo_resp` FOREIGN KEY (`idactivo_resp`) REFERENCES `activos_responsables` (`idactivo_resp`),
   CONSTRAINT `fk_idubicacion` FOREIGN KEY (`idubicacion`) REFERENCES `ubicaciones` (`idubicacion`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `historial_activos` */
 
 insert  into `historial_activos`(`idhistorial_activo`,`idactivo_resp`,`idubicacion`,`fecha_movimiento`) values 
-(1,1,1,'2024-10-16 14:35:53');
+(1,1,1,'2024-10-16 14:35:53'),
+(2,2,3,'2024-10-16 18:07:39'),
+(3,3,2,'2024-10-16 18:07:39'),
+(4,4,1,'2024-10-16 18:07:39'),
+(5,5,4,'2024-10-16 18:07:39'),
+(6,6,2,'2024-10-16 18:07:39'),
+(7,7,3,'2024-10-16 18:07:39'),
+(8,8,4,'2024-10-16 18:07:39'),
+(9,9,5,'2024-10-16 18:07:39'),
+(10,10,2,'2024-10-16 18:07:39');
 
 /*Table structure for table `historial_estado_odt` */
 

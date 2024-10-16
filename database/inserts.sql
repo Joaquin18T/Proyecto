@@ -128,10 +128,9 @@ INSERT INTO solicitudes_activos(idusuario, idactivo, fecha_solicitud, motivo_sol
 
 INSERT INTO activos_responsables(idactivo, idusuario, condicion_equipo, imagenes, descripcion, autorizacion, solicitud) 
 	VALUES
-		-- (1,2,'En perfectas condiciones', '{"imagen1":"http://nose/que/poner"}', 'equipo de trabajo',1,1),
-        
-        -- (1, 8, 'Nuevo', '{"imagen1":"https://ejemplo.com/imagenes/lg_ultragear.jpg"}', 'Asignación a usuario', 6,1),
-		(2, 9, 'Este activo esta sin problemas', '{"imagen1":"https://ejemplo.com/imagenes/hp_pavilion.jpg"}', 'Uso diario', 'Autorizado', 1,1),
+		(1,2,'En perfectas condiciones', '{"imagen1":"http://nose/que/poner"}', 'equipo de trabajo',1,1),
+        (1, 8, 'Nuevo', '{"imagen1":"https://ejemplo.com/imagenes/lg_ultragear.jpg"}', 'Asignación a usuario', 6,1),
+		(2, 9, 'Este activo esta sin problemas', '{"imagen1":"https://ejemplo.com/imagenes/hp_pavilion.jpg"}', 'Uso diario', 1,1),
 		(3, 10, 'En buenas condiciones', '{"imagen1":"https://ejemplo.com/imagenes/caterpillar_320.jpg"}', 'Asignación a proyecto',8,1),
 		(4, 11, 'Tienes fallos en el motor', '{"imagen1":"https://ejemplo.com/imagenes/nissan_frontier.jpg"}', 'Camioneta de trabajo', 14, 1),
 		(5, 12, 'Nuevo', '{"imagen1":"https://ejemplo.com/imagenes/hyundai_generator.jpg"}', 'Generador de respaldo', 12, 1),
@@ -144,7 +143,16 @@ INSERT INTO activos_responsables(idactivo, idusuario, condicion_equipo, imagenes
  -- SELECT*FROM activos_responsables;
 INSERT INTO historial_activos (idactivo_resp,idubicacion)
 	VALUES
-		(1,1);
+		-- (1,1),
+		(2,3),
+		(3,2),
+		(4,1),
+		(5,4),
+		(6,2),
+		(7,3),
+		(8,4),
+		(9,5),
+		(10,2);
         
 
 -- SELECT VERSION(); -- saber la version de mysql
