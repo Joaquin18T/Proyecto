@@ -17,11 +17,6 @@
     <button class="btn btn-primary" id="btnInterfazNuevoPlanTarea">Nuevo</button>
 </main>
 
-<script>
-    const rol = "<?php echo $_SESSION['login']['rol'] ?>"
-    console.log("rol: ", rol)
-</script>
-
 <?php require_once '../footer.php' ?>
 
 

@@ -11,13 +11,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         return data.json();
     }
 
+    let idplangenerado = -1
+
     await loadFunctions();
 
-    async function loadFunctions(params) {
+    async function loadFunctions() {
         await renderPlanesDeTarea();
     }
 
-    async function renderPlanesDeTarea(params) {
+    async function renderPlanesDeTarea() {
 
         const planes = await getDatos(`http://localhost/CMMS/controllers/plandetarea.controller.php`, `operation=getPlanesDeTareas`)
         console.log("planes: ", planes)
@@ -46,8 +48,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 info: "Mostrando {start} a {end} de {rows} filas"
             }
         });
-
-
     }
 
     document.querySelectorAll(".btnEditarPlanTarea").forEach((btnPlan) => {

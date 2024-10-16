@@ -37,6 +37,14 @@ if (isset($_GET['operation'])) {
     case 'searchActivoResp':
       echo json_encode($activo->searchActivoResp(['descripcion' => $_GET['descripcion']]));
       break;
+    case 'searchActivoResponsable':
+      $datosEnviar = [
+        'idsubcategoria'  => $_GET['idsubcategoria']=="" ? null : $_GET['idsubcategoria'],
+        'idubicacion' => $_GET['idubicacion']=="" ? null : $_GET['idubicacion'],
+        'cod_identificacion' => $_GET['cod_identificacion']=="" ? null : $_GET['cod_identificacion']
+      ];
+      echo json_encode($activo->searchActivoResponsable($datosEnviar));
+      break;
   }
 }
 

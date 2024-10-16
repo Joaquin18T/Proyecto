@@ -7,7 +7,6 @@ BEGIN
 	SELECT 
         pt.idplantarea, 
         pt.descripcion, 
-        pt.borrador,
         COUNT(t.idtarea) AS cantidad_tareas,
         COUNT(a.idactivo) AS cantidad_activos
     FROM plandetareas pt
@@ -25,12 +24,11 @@ BEGIN
 SELECT PT.idplantarea, 
        PT.descripcion, 
        COUNT(DISTINCT TAR.idtarea) AS tareas_totales, 
-       COUNT(DISTINCT AV.idactivo_vinculado) AS activos_vinculados, 
-       PT.borrador 
+       COUNT(DISTINCT AV.idactivo_vinculado) AS activos_vinculados
        FROM plandetareas PT
 LEFT JOIN tareas TAR ON TAR.idplantarea = PT.idplantarea
 LEFT JOIN activos_vinculados_tarea AV ON AV.idtarea = TAR.idtarea
-GROUP BY PT.idplantarea, PT.descripcion, PT.borrador
+GROUP BY PT.idplantarea, PT.descripcion
 ORDER BY PT.idplantarea DESC;
 END $$
 

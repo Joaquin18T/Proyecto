@@ -171,19 +171,13 @@ BEGIN
 		SELECT 
 	  RES.idactivo_resp,
 	  ACT.idactivo,
-	  ACT.cod_identificacion,
 	  ACT.descripcion,
       SUB.subcategoria,
       ACT.modelo,
       MAR.marca,
 	  MAX(UBI.ubicacion) ubicacion,
-	  ACT.fecha_adquisicion,
-	  MAX(RES.condicion_equipo) condicion_equipo,
 	  EST.nom_estado,
-      RES.autorizacion,
-      RES.descripcion despresp,
-      ACT.especificaciones,
-	  MAX(RES.imagenes) imagenes
+      RES.autorizacion
 	FROM activos_responsables RES
 	INNER JOIN activos ACT ON RES.idactivo = ACT.idactivo
     INNER JOIN marcas MAR ON ACT.idmarca = MAR.idmarca
@@ -203,6 +197,6 @@ BEGIN
     ORDER BY RES.fecha_asignacion DESC;
 END $$
 
--- CALL sp_search_activo_responsable(null,null,null)
+-- CALL sp_search_activo_responsable(null,1,null)
 
-
+select * from activos_responsables;

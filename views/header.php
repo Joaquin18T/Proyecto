@@ -25,6 +25,8 @@ $host = "http://localhost/CMMS/";
   <!-- Estilos personalizados -->
   <!-- Asignaciones -->
   <link rel="stylesheet" href="http://localhost/CMMS/css/responsables/list-asignaciones.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <!-- Usuarios -->
 
 </head>
@@ -172,7 +174,7 @@ $host = "http://localhost/CMMS/";
           <span
             class="nav-link collapsed d-flex justify-content-between align-items-center"
             data-bs-toggle="collapse"
-            data-bs-target="#submenu-app">
+            data-bs-target="#submenu-tareas">
             <span>
               <span class="sidebar-icon">
                 <svg
@@ -204,7 +206,7 @@ $host = "http://localhost/CMMS/";
           <div
             class="multi-level collapse"
             role="list"
-            id="submenu-app"
+            id="submenu-tareas"
             aria-expanded="false">
             <ul class="flex-column nav">
               <li class="nav-item">

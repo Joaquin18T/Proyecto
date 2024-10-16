@@ -198,8 +198,6 @@ CREATE TABLE `plandetareas`
     descripcion		varchar(80)	not null,
     create_at		datetime	not null default now(),
     update_at		datetime	null,
-	borrador		boolean     default true,
---    eliminado		boolean 	default false,
     CONSTRAINT uk_descripcion_plan UNIQUE(descripcion)
 )ENGINE=INNODB; -- CHECK
 

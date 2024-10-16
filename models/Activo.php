@@ -193,6 +193,30 @@ class Activo extends ExecQuery{
       die($e->getMessage());
     }
   }
+  
+  public function searchActivoResponsable($params=[]):array{
+    try{
+      //Inicializar los parametros con valores por defecto
+      $defaultParams=[
+        'idsubcategoria'=>null,
+        'idubicacion'=>null,
+        'cod_identificacion'=>null,
+      ];
+
+      $realParams = array_merge($defaultParams, $params);
+      $cmd = parent::execQ("CALL sp_search_activo_responsable(?,?,?)");
+      $cmd->execute(
+        array(
+          $realParams['idsubcategoria'],
+          $realParams['idubicacion'],
+          $realParams['cod_identificacion']
+        )
+      );
+      return $cmd->fetchAll(PDO::FETCH_ASSOC);
+    }catch(Exception $e){
+      die($e->getMessage());
+    }
+  }
 }
 
 //$asc = new Activo();

@@ -20,37 +20,37 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control filters" id="txtDescripcionTarea" placeholder="Descripcion" disabled required>
+                            <input type="text" class="form-control" id="txtDescripcionTarea" placeholder="Descripcion" disabled required>
                             <label for="txtDescripcionTarea" class="form-label">Descripcion</label>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating mb-3">
-                            <input type="date" class="form-control filters" id="fecha-inicio" placeholder="Fecha de inicio" disabled required>
+                            <input type="date" class="form-control" id="fecha-inicio" placeholder="Fecha de inicio" disabled required>
                             <label for="fecha-inicio" class="form-label">Fecha de inicio</label>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating mb-3">
-                            <input type="date" class="form-control filters" id="fecha-vencimiento" placeholder="Fecha de vencimiento" disabled required>
+                            <input type="date" class="form-control" id="fecha-vencimiento" placeholder="Fecha de vencimiento" disabled required>
                             <label for="fecha-vencimiento" class="form-label">Fecha de vencimiento</label>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control filters" id="txtIntervaloTarea" placeholder="Intervalo" disabled required>
+                            <input type="text" class="form-control" id="txtIntervaloTarea" placeholder="Intervalo" disabled required>
                             <label for="txtIntervaloTarea" class="form-label">Intervalo</label>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control filters" id="txtFrecuenciaTarea" placeholder="Frecuencia" disabled required>
+                            <input type="text" class="form-control" id="txtFrecuenciaTarea" placeholder="Frecuencia" disabled required>
                             <label for="txtFrecuenciaTarea" class="form-label">Frecuencia</label>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <select class="form-select" id="tipoPrioridadTarea" disabled required>
-                            
+
                         </select>
                     </div>
                 </div>
@@ -58,7 +58,7 @@
                 <button type="submit" id="btnGuardarTarea" class="btn btn-primary" disabled>Guardar</button>
             </form>
         </div>
-        <div class="col-md-6 bg-success">
+        <div class="col-md-6">
             <h4 class="text-center">Tareas agregadas</h4>
             <ul class="listaTareasAgregadas"></ul>
         </div>
@@ -73,9 +73,6 @@
                     <tr>
                         <th></th>
                         <th>Activo</th>
-                        <th>Código</th>
-                        <th>Categoria</th>
-                        <th>Subcategoria</th>
                         <th>Marca</th>
                         <th>Modelo</th>
                     </tr>
@@ -83,37 +80,38 @@
                 <tbody id="activosBodyTable"></tbody>
                 <tfoot>
                     <div class="row">
-                        <div class="col-md-6 d-flex justify-content-center">
-                            <select name="" id="elegirTareaParaActivo" disabled></select>
+                        <!--  filtros -->
+                        <div class="col-md-6 mb-3">
+                            <select class="form-select" name="" id="elegirTareaParaActivo" disabled></select>
                         </div>
+                        <div class="col-md-6 mb-3">
+                            <select class="form-select filter" name="" id="elegirSubCategoria" disabled></select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <select class="form-select filter" name="" id="elegirUbicacion" disabled></select>
+                        </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-6 d-flex justify-content-center">
-                            <button type="button" class="btn btn-primary btn-agregar-activos" disabled>Agregar</button>
+                            <button type="button" class="btn btn-primary" id="btnAgregarActivos" disabled>Agregar</button>
                         </div>
                     </div>
                 </tfoot>
             </table>
         </div>
-        <div class="col-md-6">
-            <div class="row">
-                <div class="col-md-6 d-flex justify-content-center">
-                    <h4>Activos agregadas</h4>
-                    <ul class="listaActivosAsignados"></ul>
-                </div>
-                <div class="col-md-6 d-flex justify-content-center">
-                    <h4>Activos para agregar (VISTA PREVIA)</h4>
-                    <ul class="listaActivosAsignadosPrevia"></ul>
-                </div>
-            </div>
+        <div class="col-md-6 text-center">
+            <h4>Activos agregadas</h4>
+            <ul class="listaActivosAsignados"></ul>
         </div>
     </div>
-    <button type="button" class="btn btn-primary" id="btnConfirmarCambios">Confirmar cambios</button>
-
 </main>
 
 <?php require_once '../footer.php' ?>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Luego, el archivo de DataTables -->
+<script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
 <script src="http://localhost/CMMS/js/plantareas/registrar-plan.js"></script>
-<script src="https://unpkg.com/vanilla-datatables@latest/dist/vanilla-dataTables.min.js" type="text/javascript"></script>
 </body>
 
 </html>
