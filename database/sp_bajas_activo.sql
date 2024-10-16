@@ -72,3 +72,13 @@ BEGIN
     WHERE EST.idestado >1 AND EST.idestado<5 AND EST.idestado !=4;
 END $$
 
+DROP PROCEDURE IF EXISTS sp_data_baja_activo;
+DELIMITER $$
+CREATE PROCEDURE sp_data_baja_activo
+(
+	IN _idactivo INT
+)
+BEGIN
+	SELECT idbaja_activo, fecha_baja, motivo, coment_adicionales, ruta_doc, aprobacion FROM bajas_activo
+    WHERE idactivo = _idactivo;
+END $$

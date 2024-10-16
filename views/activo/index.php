@@ -113,30 +113,30 @@
   </div>
   <div class="offcanvas-body g-3">
     <div class="row">
-      <div class="col-md-5 pt-2">
-        <p>Descrip. Activo</p>
+      <div class="col-md-6 pt-2">
+        <p id="desc">Descrip. Activo</p>
       </div>
       <div class="col-md-3 pt-1">
-        <button class="btn btn-sm btn-info w-75" type="button">+</button>
+        <button class="btn btn-sm btn-info w-75 text-first" type="button">+</button>
       </div>
     </div>
     <div class="row mt-3">
       <div class="col-md-12">
-        <p><strong>Fecha: </strong>12/09/2018</p>
-        <p><strong>Aprobado por: </strong>Pedro Diaz (pedro3f)</p>
+        <p id="fecha-baja">12/09/2018</p>
+        <p id="aprobacion">Pedro Diaz (pedro3f)</p>
       </div>
     </div>
     <div class="row mt-3">
       <div class="col-md-12">
         <div>
           <strong>Motivo:</strong>
-          <p class="text-break">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Architecto repellendus velit
+          <p class="text-break" id="motivo">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Architecto repellendus velit
             exercitationem vitae placeat necessitatibus voluptas aut quod deserunt magnam.
           </p>
         </div>
         <div class="pt-2">
           <strong>Comentario Adicional:</strong>
-          <p class="text-break">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Architecto repellendus velit
+          <p class="text-break" id="comentario">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Architecto repellendus velit
             exercitationem vitae placeat necessitatibus voluptas aut quod deserunt magnam.
           </p>
         </div>

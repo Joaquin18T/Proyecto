@@ -175,11 +175,11 @@ document.addEventListener("DOMContentLoaded",()=>{
     btnBajas.forEach(x=>{
       x.addEventListener("click",async()=>{
         const id = parseInt(x.getAttribute("data-id"));
+        const desc = await getDescripcion(id);
+        selector("desc").textContent=desc;
 
         const dataBaja = await dataActivoBaja(id);
-        await getUser(dataBaja.aprobacion);
-        console.log(dataBaja.ruta_doc);
-        
+        await showDataBajaActivo(dataBaja);
         showPDF(dataBaja.ruta_doc);
 
         const sidebar = selector("activo-baja-detalle");
@@ -200,6 +200,15 @@ document.addEventListener("DOMContentLoaded",()=>{
     
   }
 
+  async function showDataBajaActivo(data){
+    const aprobacion = await getUser(data.aprobacion);
+
+    selector("fecha-baja").innerHTML =`<strong>Fecha de Baja: </strong>${data.fecha_baja}`;
+    selector("aprobacion").innerHTML = `<strong>Aprobado por: </strong>${aprobacion.dato} (${aprobacion.usuario})`;
+    selector("motivo").textContent = data.motivo;
+    selector("comentario").textContent = data.coment_adicionales==null?"Sin ningun comentario":data.coment_adicionales;
+  }
+
   function showPDF(route){
     let cont=0;
     let index=0;
@@ -212,8 +221,6 @@ document.addEventListener("DOMContentLoaded",()=>{
         break;
       }
     }
-    //console.log(index);
-    
     const newRoute =`http://localhost${route.slice(index, route.length)}`;
     console.log(newRoute);
     
@@ -228,7 +235,17 @@ document.addEventListener("DOMContentLoaded",()=>{
     params.append("idusuario", iduser);
 
     const data = await getDatos(`${host}usuarios.controller.php`, params);
-    console.log(data);
+    
+    return data[0];
+  }
+
+  async function getDescripcion(idactivo){
+    const params = new URLSearchParams();
+    params.append("operation", "getById");
+    params.append("idactivo", idactivo);
+    const data = await getDatos(`${host}activo.controller.php`,params);
+  
+    return data[0].descripcion
   }
 
 });

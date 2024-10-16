@@ -50,7 +50,7 @@ if (isset($_POST['operation'])) {
       //Obtener Informacion del archivo
       $fileName = basename($_FILES['file']['name']);
       $fileTempName = $_FILES['file']['tmp_name'];
-      $fileSize = $_FILES['file']['size'];
+      $fileSize = $_FILES['file']['size']; //maximo 30MB  
       $fileError = $_FILES['file']['error'];
 
       $code = $_POST['code'];
