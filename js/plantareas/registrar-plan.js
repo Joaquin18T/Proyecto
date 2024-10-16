@@ -19,7 +19,7 @@ $(document).ready(async () => {
     const btnGuardarPlanTarea = $q("#btnGuardarPlanTarea");
     const filters = $all(".filter")
     //UL
-    //const listaActivosAsignadosPrevia = $q(".listaActivosAsignadosPrevia")
+    const listaActivosAsignados = $q(".listaActivosAsignados")
     // LISTAS
     let activosElegidos = []
     //let activosElegidosPrevia = []
@@ -28,37 +28,12 @@ $(document).ready(async () => {
     const selectSubCategoria = $q("#elegirSubCategoria")
     const selectUbicacion = $q("#elegirUbicacion")
     //BOTONES
-    //const btnConfirmarCambios = $q("#btnConfirmarCambios")
     const btnAgregarActivos = $q("#btnAgregarActivos")
+    const btnTerminarPlan = $q("#btnTerminarPlan")
     //ESTADOS
-
-    /* if (window.localStorage.getItem("idplantarea")) {
-        (async () => {
-            const params = new URLSearchParams()
-            params.append("operation", "verificarPlanInconcluso")
-            params.append("idplantarea", window.localStorage.getItem("idplantarea"))
-            const data = await getDatos(`${host}plandetarea.controller.php`, params);
-            console.log("verificarTareaInconclusa: ", data);
-            if (data.length > 0) {
-                if (data[0].cantidad_tareas < 1 || data[0].cantidad_activos < 1) {
-                    if (confirm("Tienes un plan de tareas inconcluso, deseas retomarlo?")) {
-                        console.log("retomado");
-                        idplantarea_generado = data[0].idplantarea;
-                        renderPlanTarea(data[0].descripcion);
-                        await loadFunctions()
-                        habilitarCamposTarea(false);
-                        habilitarCamposActivo(false)
-                        $q("#btnGuardarPlanTarea").remove()
-                        $q("#txtDescripcionPlanTarea").disabled = true
-                        console.log("ID PLANTAREA GENERADO DSPUES DE RETOMAR: ", idplantarea_generado)
-                        return;
-                    }
-                    window.localStorage.clear()
-                    console.log("borrando y creando uno nuevo ...");
-                }
-            }
-        })();
-    } */
+    let registrarTareasOk = false
+    let registrarActivosOk = false
+    let btnTerminarPlanHabilitado = false
 
     function habilitarCamposTarea(habilitado = true) {
         $q("#txtDescripcionTarea").disabled = habilitado
@@ -245,24 +220,6 @@ $(document).ready(async () => {
             })
         })
 
-
-        //const chkActivo = $all(".activo-checkbox:checked")
-
-    }
-
-    function agregarActivosTarea() {
-        /* activosElegidos.forEach(activo => {
-            activosElegidosPrevia.push({
-                idact_resp: parseInt(activo.idact_resp),
-                idactivo: parseInt(activo.idactivo),
-                descripcion: activo.descripcion,
-                idtarea: parseInt(activo.idtarea)
-            })
-        })
-        activosElegidos = []
-        console.log("ACTIVS ELEGIDOS YA ELIMNADOS PQ YA PASARON A PREVIA: ", activosElegidos)
-        console.log("Activos agregados a la nueva lista previa:", activosElegidosPrevia); */
-        //LOGICA DE AGREGADO DE ACTIVOS VINCULADOS A TAREA A LA BD
     }
 
     filters.forEach(select => {
@@ -271,41 +228,6 @@ $(document).ready(async () => {
         })
     })
 
-    /* function renderActivosPrevia() {
-        console.log("aaaaaaaaaaaaaaa: ", activosElegidosPrevia)
-        activosElegidosPrevia.forEach((activo, key) => {
-            listaActivosAsignadosPrevia.innerHTML += `
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    ${activo.descripcion}
-                    <span class="badge bg-primary rounded-pill btn-eliminar " data-id="${key}" data-idactresp="${activo.idact_resp}">
-                        <i class="fa-solid fa-trash"></i>
-                    </span>
-                </li>
-            `
-        });
-        const btnsEliminar = document.querySelectorAll(".btn-eliminar");
-        btnsEliminar.forEach(btn => {
-            btn.addEventListener("click", function () {
-                const idActivoResp = parseInt(this.getAttribute("data-idactresp"));
-                console.log("ID ACTIVO RESP CLICKEADO: ", idActivoResp)
-                const li = this.closest("li");
-                li.remove();
-                activosElegidosPrevia = activosElegidosPrevia.filter(activo => activo.idact_resp !== idActivoResp);
-                console.log("Lista de activos actualizada: ", activosElegidosPrevia);
-            });
-        });
-        console.log("LISTA DE ACTIVOS ELEGIDOS PREVIA ACTUALIZADA DESPUES DE ELMINAR: ", activosElegidosPrevia)
-    } */
-    /* *************** SECCION DE RENDERIZADOS SI HAY PLANES EXISTENTES *************** */
-    /* async function renderPlanTarea(txtDescripcion) {
-        const descripcionPlanTarea = $q("#txtDescripcionPlanTarea");
-        descripcionPlanTarea.value = txtDescripcion;
-    }
- */
-
-    function renderActivosVinculadosAgregados() {
-
-    }
     /* ********************** EVENTOS *************************************************** */
     //AGREGAR NUEVA TAREA, FORMATEAR EL FORMULARIO TAREA, HABILITAR CAMPOS ACTIVOS Y RENDERIZAR LA TAREA AGREGADA AL SELECT
     $q("#form-tarea").addEventListener("submit", async (e) => {
@@ -333,14 +255,14 @@ $(document).ready(async () => {
             params.append("idtarea", idtarea_generado)
             const ultimaTareaAgregada = await getDatos(`${host}tarea.controller.php`, params)
             console.log("la ultima tarea agregada: ", ultimaTareaAgregada);
-
+            //AGREGA LAS TAREAS AGREGADAS A LA INTERFAZ DE LA LISTA
             ulTareasAgregadas.innerHTML += `
-                <div>
-                  <li data-tarea-id="${ultimaTareaAgregada[0]?.idtarea}" class="tarea-agregada">
-                    ${ultimaTareaAgregada[0]?.descripcion} - Tarea: ${ultimaTareaAgregada[0]?.idtarea}
-                    <button class="btn-eliminar-tarea" data-tarea-id="${ultimaTareaAgregada[0]?.idtarea}">Eliminar</button>
-                  </li>  						
-                </div>
+                    <li class="list-group-item d-flex justify-content-between align-items-center tarea-agregada mb-3" data-tarea-id="${ultimaTareaAgregada[0]?.idtarea}">
+                        ${ultimaTareaAgregada[0]?.descripcion} - Tarea: ${ultimaTareaAgregada[0]?.idtarea}
+                        <span class="badge bg-primary rounded-pill btn-eliminar-tarea" data-tarea-id="${ultimaTareaAgregada[0]?.idtarea}">
+                            <i class="fa-solid fa-trash"></i>
+                        </span>
+                    </li>
               `;
 
             formtarea.reset()
@@ -348,7 +270,26 @@ $(document).ready(async () => {
             await renderTareasSelect()
             await renderSubCategorias()
             await renderUbicacion()
+            registrarTareasOk = true
+            habilitarBtnTerminar()
             //confirmarEliminacionTarea()
+
+            const btnsEliminarTarea = $all(".btn-eliminar-tarea")
+            btnsEliminarTarea.forEach(btn => {
+                btn.addEventListener("click", async ()=>{
+                    console.log("eliminado")
+                    console.log("data-tarea-id: ", btn.getAttribute("data-tarea-id"))
+                    const idTarea = parseInt(btn.getAttribute("data-tarea-id"));
+                    console.log("ID tarea CLICKEADO: ", idTarea)
+                    const li = btn.closest("li");
+                    li.remove();
+                    const paramsEliminacion = new URLSearchParams();
+                    paramsEliminacion.append("operation", "eliminarTarea")
+                    const eliminado = await fetch(`${host}tarea.controller.php/${idTarea}`, {method: 'POST', body:paramsEliminacion } )
+                    const elim = await eliminado.json()
+                    console.log("eliminado?: ", elim)
+                })
+            })
         }
 
     })
@@ -364,10 +305,7 @@ $(document).ready(async () => {
             alert("Solo se permite letras y espacios");
             return;
         }
-        //const formPlanTarea = new FormData();
-        //formPlanTarea.append("descripcion", descripcionPlanTarea.value);
-        //formPlanTarea.append("borrador", 1) //cuando se registra un nuevo plan se genera en forma borrador
-
+    
         //PRIMER PASO: VERIFICAR SI EL PLAN A REGISTRAR YA EXISTE
         const obtenerPlanDeTareas = await getDatos(`${host}plandetarea.controller.php`, `operation=getPlanesDeTareas`)
         for (let i = 0; i < obtenerPlanDeTareas.length; i++) {
@@ -392,7 +330,7 @@ $(document).ready(async () => {
             window.localStorage.clear();
             window.localStorage.setItem("idplantarea", idplantarea_generado);
             await loadFunctions();
-            habilitarCamposTarea(false);
+            habilitarCamposTarea(false);            
         }
     });
 
@@ -408,17 +346,43 @@ $(document).ready(async () => {
             formAVT.append("idtarea", activosElegidos[e].idtarea)
             const fAvt = await fetch(`${host}activosvinculados.controller.php`, { method: 'POST', body: formAVT })
             const id = await fAvt.json()
-            console.log("ID ACTIVO VINCULADO CREADO: ", id)
+            console.log("ID ACTIVO VINCULADO CREADO: ", id.id)
 
             const params = new URLSearchParams()
             params.append("operation", "obtenerUnActivoVinculadoAtarea")
-            params.append("idactivovinculado", id)
+            params.append("idactivovinculado", id.id)
             const activoVinculadoTareaObtenido = await getDatos(`${host}activosvinculados.controller.php`,params)
-            console.log("activoVinculadoTareaObtenido: ", activoVinculadoTareaObtenido) // me quede aca
+            console.log("activoVinculadoTareaObtenido: ", await activoVinculadoTareaObtenido) // me quede aca
+
+            //RENDERIZAR ACTIVOS VINCULADOS AGREGADOS AL INTERFAZ
+
+            activoVinculadoTareaObtenido.forEach((avt) => {
+                listaActivosAsignados.innerHTML += `
+                    <li class="list-group-item d-flex justify-content-between align-items-center mb-3">
+                        ${avt.descripcion}
+                        <span class="badge bg-primary rounded-pill btn-eliminar" data-idactivovinculado="${avt.idactivo_vinculado}">
+                            <i class="fa-solid fa-trash"></i>
+                        </span>
+                    </li>
+                `
+            });
+
+            const btnsEliminar = document.querySelectorAll(".btn-eliminar");
+            btnsEliminar.forEach(btn => {
+                btn.addEventListener("click", async () => {
+                    const idActivoResp = parseInt(btn.getAttribute("data-idactivovinculado"));
+                    console.log("ID ACTIVO RESP CLICKEADO: ", idActivoResp)
+                    const li = btn.closest("li");
+                    li.remove();
+                    
+
+                    /* activosElegidosPrevia = activosElegidosPrevia.filter(activo => activo.idact_resp !== idActivoResp);
+                    console.log("Lista de activos actualizada: ", activosElegidosPrevia); */
+                });
+            });
         }
 
-        //agregarActivosTarea()
-        //console.log("lista de activos agregados: ", activosElegidosPrevia)
+        registrarActivosOk = true
         activosElegidos = []
         selectElegirTareaParaActivo.value = ""
         selectSubCategoria.value = ""
@@ -427,7 +391,7 @@ $(document).ready(async () => {
         checkboxes.forEach(chk => {
             chk.checked = false;  // Deselecciona el checkbox
         });
-        //renderActivosPrevia()
+        habilitarBtnTerminar()
     })
 
     //ESTE EVENTO SERVIRA SI SE CAMBIA A ULTIMA MINUTO LA TAREA SELECCIONADA con Activos YA SELECCIONADOS
@@ -442,6 +406,31 @@ $(document).ready(async () => {
         })
         console.log("activosElegidos actualizados con la nueva tarea: ", activosElegidos);
 
+    })
+
+    function habilitarBtnTerminar(){
+        console.log("registrarActivosOk: ",registrarActivosOk)
+        console.log("registrarTareasOk: ", registrarTareasOk)
+        if(registrarTareasOk && registrarActivosOk){
+            console.log("habilitando el btn terminar ...")
+            btnTerminarPlanHabilitado = true
+            btnTerminarPlan.disabled = false
+            return true            
+        }
+        
+    }
+
+    btnTerminarPlan.addEventListener("click", ()=>{
+        console.log("estando cuando de click al btn terminar plan")
+        if(habilitarBtnTerminar() == true){
+            console.log("pasando por el btn terminar plan")
+            if(!btnTerminarPlanHabilitado){
+                alert("completa los registros primero")
+                return
+            }         
+            window.location.href = `http://localhost/CMMS/views/plantareas`               
+        }
+        
     })
 
 })
