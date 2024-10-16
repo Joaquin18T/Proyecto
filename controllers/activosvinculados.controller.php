@@ -39,7 +39,6 @@ if (isset($_POST['operation'])) {
       $idEliminar = explode("/", $path);
       $idactivovinculado = ($path != '/') ? end($idEliminar) : null;
       $eliminado = $activosvinculados->eliminarActivosVinculadosTarea(["idactivovinculado" => $idactivovinculado]);
-      echo $eliminado;
       echo json_encode(["eliminado" => $eliminado]);
       break;
   }
