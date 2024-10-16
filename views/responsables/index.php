@@ -61,7 +61,7 @@ require_once '../header.php';
                       <th>Descripción</th>
                       <th>Ubicacion</th>
                       <th>Responsable</th>
-                      <th>Ver Detalles</th>
+                      <th>Acciones</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -103,9 +103,10 @@ require_once '../header.php';
 </div>
 <!-- <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="offcanvasRight">Toggle right offcanvas</button> -->
 
+<!-- SIDEBAR DE USUARIOS ASIGNADOS A UN ACTIVO -->
 <div class="offcanvas offcanvas-end" tabindex="-1" id="sidebar" aria-labelledby="offcanvasRightLabel">
   <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="offcanvasRightLabel">Offcanvas right</h5>
+    <h5 class="offcanvas-title" id="offcanvasRightLabel">Usuarios asignados a un activo</h5>
     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
   <div class="offcanvas-body" id="content-data">
@@ -124,6 +125,32 @@ require_once '../header.php';
     </ul>
   </div>
 </div>
+<!-- ./SIDEBAR DE USUARIOS ASIGNADOS A UN ACTIVO -->
+
+<!-- SIDEBAR DE ACTUALIZAR LA UBICACION -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="sb-ubicacion-update" aria-labelledby="offcanvasRightLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="offcanvasRightLabel">Offcanvas right</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <div class="form-floating">
+      <select name="sb-ubicacion" id="sb-ubicacion" class="form-control w-75">
+        <option value="">Selecciona</option>
+      </select>
+      <label for="sb-ubicacion" class="form-label">Ubicacion</label>
+    </div>
+    <div class="form-floating mt-2">
+      <select name="sb-responsable" id="sb-responsable" class="form-control w-75">
+        <option value="">Selecciona</option>
+      </select>
+      <label for="sb-responsable" class="form-label">Activo y responsable</label>
+    </div>
+
+  </div>
+</div>
+<!-- ./SIDEBAR DE ACTUALIZAR LA UBICACION -->
+
 <?php require_once '../footer.php' ?>
 <script src="https://unpkg.com/vanilla-datatables@latest/dist/vanilla-dataTables.min.js" type="text/javascript"></script>
 <script src="../../js/responsables/index.js"></script>

@@ -45,6 +45,9 @@ if(isset($_GET['operation'])){
       ];
       echo json_encode($respAct->searchActivoResponsable($valoresBuscar));
       break;
+    case 'listRespActivo':
+      echo json_encode($respAct->listResp_activo());
+      break;
   }
 }
 

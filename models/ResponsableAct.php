@@ -2,6 +2,7 @@
 
 require_once 'ExecQuery.php';
 
+
 class ResponsableAct extends ExecQuery{
   public function add($params=[]):array{
     try{
@@ -152,9 +153,15 @@ class ResponsableAct extends ExecQuery{
       error_log("Error: ".$e->getMessage());
     }
   }
+
+  public function listResp_activo(){
+    return parent::getData("sp_list_resp_activo");
+  }
 }
 
 // $resp = new ResponsableAct();
+
+// echo json_encode($resp->listResp_activo());
 
 // echo json_encode($resp->searchActivoResponsable(['cod_identificacion'=>'5']));
 
