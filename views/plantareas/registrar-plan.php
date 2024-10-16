@@ -12,7 +12,7 @@
     <div class="contenedor-info-plan">
         <div class="row text-end">
             <div class="input-group mb-3 ">
-                <input type="text" class="form-control" id="txtDescripcionPlanTarea" pattern="[a-zA-Z\s]+" title="Solo se permiten letras y espacios" placeholder="Descripcion" aria-label="Descripcion" required>
+                <input type="text" class="form-control" id="txtDescripcionPlanTarea" pattern="[a-zA-Z\s]+" title="Solo se permiten letras y espacios" placeholder="Descripcion" aria-label="Descripcion" required autocomplete="off">
                 <button class="btn btn-primary" type="button" id="btnGuardarPlanTarea">Guardar Plan</button>
             </div>
         </div>
@@ -31,7 +31,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" id="txtDescripcionTarea" placeholder="Descripcion" disabled required>
+                                    <input type="text" class="form-control" id="txtDescripcionTarea" placeholder="Descripcion" disabled required autocomplete="off">
                                     <label for="txtDescripcionTarea" class="form-label">Descripcion</label>
                                 </div>
                             </div>
@@ -59,7 +59,7 @@
                                     <label for="txtFrecuenciaTarea" class="form-label">Frecuencia</label>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6 form-floating">
                                 <select class="form-select" id="tipoPrioridadTarea" disabled required>
 
                                 </select>

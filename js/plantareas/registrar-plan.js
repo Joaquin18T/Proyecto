@@ -18,6 +18,8 @@ $(document).ready(async () => {
     let idtarea_generado = -1;
     const btnGuardarPlanTarea = $q("#btnGuardarPlanTarea");
     const filters = $all(".filter")
+    //TABLAS
+    const activosList = $q("#activosBodyTable");
     //UL
     const listaActivosAsignados = $q(".listaActivosAsignados")
     // LISTAS
@@ -34,6 +36,8 @@ $(document).ready(async () => {
     let registrarTareasOk = false
     let registrarActivosOk = false
     let btnTerminarPlanHabilitado = false
+
+    renderTablaActivos()
 
     function habilitarCamposTarea(habilitado = true) {
         $q("#txtDescripcionTarea").disabled = habilitado
@@ -80,6 +84,30 @@ $(document).ready(async () => {
             selectElegirTareaParaActivo.innerHTML += `
                 <option value="${data[i].idtarea}">${data[i].descripcion}</option>
             `;
+        }
+    }
+
+    function renderTablaActivos(){
+        if (tbActivos) {
+            tbActivos.clear().rows.add($(activosList).find('tr')).draw();
+        } else {
+            // Inicializa DataTable si no ha sido inicializado antes
+            tbActivos = $('#tablaActivos').DataTable({
+                paging: true,
+                searching: false,
+                lengthMenu: [10, 25, 50, 100],
+                pageLength: 10,
+                language: {
+                    lengthMenu: "Mostrar _MENU_ filas por página",
+                    paginate: {
+                        previous: "Anterior",
+                        next: "Siguiente"
+                    },
+                    emptyTable: "No hay datos disponibles",
+                    search: "Buscar:",
+                    info: "Mostrando _START_ a _END_ de _TOTAL_ registros"
+                }
+            });
         }
     }
 
@@ -145,8 +173,7 @@ $(document).ready(async () => {
         params.append("idubicacion", selectUbicacion.value) //
         params.append("cod_identificacion", "")
 
-        const data = await getDatos(`${host}activo.controller.php`, params)
-        const activosList = $q("#activosBodyTable");
+        const data = await getDatos(`${host}activo.controller.php`, params)        
         activosList.innerHTML = "";
         //        activosList.innerHTML = ""
         console.log("activos fitlrados", data);
@@ -161,29 +188,9 @@ $(document).ready(async () => {
                 <td>${data[i].modelo}</td>
             </tr>
             `;
-        }
+        }        
 
-        if (tbActivos) {
-            tbActivos.clear().rows.add($(activosList).find('tr')).draw();
-        } else {
-            // Inicializa DataTable si no ha sido inicializado antes
-            tbActivos = $('#tablaActivos').DataTable({
-                paging: true,
-                searching: false,
-                lengthMenu: [10, 25, 50, 100],
-                pageLength: 10,
-                language: {
-                    lengthMenu: "Mostrar _MENU_ filas por página",
-                    paginate: {
-                        previous: "Anterior",
-                        next: "Siguiente"
-                    },
-                    emptyTable: "No hay datos disponibles",
-                    search: "Buscar:",
-                    info: "Mostrando _START_ a _END_ de _TOTAL_ registros"
-                }
-            });
-        }
+        renderTablaActivos()
 
         const chkActivo = $all(".activo-checkbox")
         chkActivo.forEach(chk => {
@@ -283,9 +290,9 @@ $(document).ready(async () => {
                     console.log("ID tarea CLICKEADO: ", idTarea)
                     const li = btn.closest("li");
                     li.remove();
-                    const paramsEliminacion = new URLSearchParams();
-                    paramsEliminacion.append("operation", "eliminarTarea")
-                    const eliminado = await fetch(`${host}tarea.controller.php/${idTarea}`, {method: 'POST', body:paramsEliminacion } )
+                    const formEliminacionTarea = new FormData();
+                    formEliminacionTarea.append("operation", "eliminarTarea")
+                    const eliminado = await fetch(`${host}tarea.controller.php/${idTarea}`, {method: 'POST', body:formEliminacionTarea } )
                     const elim = await eliminado.json()
                     console.log("eliminado?: ", elim)
                 })
@@ -334,12 +341,31 @@ $(document).ready(async () => {
         }
     });
 
+    //AGREGAR UN ACTIVO VINCULADO TAREA
     $q("#btnAgregarActivos").addEventListener("click", async () => {
+        estado = false
+        const paramsAVTsearch = new URLSearchParams()
+        paramsAVTsearch.append("operation", "listarActivosPorTareaYPlan")
+        paramsAVTsearch.append("idplantarea", idplantarea_generado)
+        const avtdata = await getDatos(`${host}activosvinculados.controller.php`,paramsAVTsearch)
+        console.log("avtdata: ", avtdata)
+
         if (parseInt(selectElegirTareaParaActivo.value) === -1) { // si es que manipulan el console de google
             console.log("eliga una tarea valida")
             return
         }
         for (let e = 0; e < activosElegidos.length; e++) {
+            for (let f = 0; f < avtdata.length; f++) {                
+                if(avtdata[f].idactivo == activosElegidos[e].idactivo && avtdata[f].idtarea == activosElegidos[e].idtarea){
+                    alert("este activo ya esta registrado a esa tarea .....")
+                    estado = true;
+                    break;
+                }
+            }
+            if(estado){
+                return
+            }
+
             const formAVT = new FormData()
             formAVT.append("operation", "insertarActivoPorTarea")
             formAVT.append("idactivo", activosElegidos[e].idactivo)
@@ -374,8 +400,11 @@ $(document).ready(async () => {
                     console.log("ID ACTIVO RESP CLICKEADO: ", idActivoResp)
                     const li = btn.closest("li");
                     li.remove();
-                    
-
+                    const formEliminacionAVT = new FormData();
+                    formEliminacionAVT.append("operation", "eliminarActivosVinculadosTarea")
+                    const eliminado = await fetch(`${host}activosvinculados.controller.php/${idActivoResp}`, {method: 'POST', body:formEliminacionAVT } )
+                    const elim = await eliminado.json()
+                    console.log("eliminado?: ", elim)
                     /* activosElegidosPrevia = activosElegidosPrevia.filter(activo => activo.idact_resp !== idActivoResp);
                     console.log("Lista de activos actualizada: ", activosElegidosPrevia); */
                 });
@@ -388,6 +417,7 @@ $(document).ready(async () => {
         selectSubCategoria.value = ""
         selectUbicacion.value = ""
         const checkboxes = document.querySelectorAll(".activo-checkbox:checked");
+        activosList.innerHTML = ""
         checkboxes.forEach(chk => {
             chk.checked = false;  // Deselecciona el checkbox
         });
