@@ -59,7 +59,7 @@
                   pattern="[0-9]+"
                   maxlength="9"
                   minlength="9"
-                  required>
+                  >
                 <label for="telefono" class="form-label">Telefono</label>
               </div>
             </div>
@@ -73,24 +73,18 @@
                 <label for="genero" class="form-label">Genero</label>
               </div>
             </div>
-            <div class="col-md-3 ms-2">
-              <div class="form-floating">
-                <input type="text" class="form-control" id="nacionalidad" placeholder="Nacionalidad" autocomplete="off" required>
-                <label for="nacionalidad" class="form-label">Nacionalidad</label>
-              </div>
-            </div>
           </div>
           <div class="row g-2 mb-3 mt-4">
             <h5>Datos del Usuario</h5>
             <div class="col-md-3">
               <div class="form-floating">
-                <input type="text" id="usuario" class="form-control w-75" placeholder="Nom. Usuario">
+                <input type="text" id="usuario" class="form-control w-75" placeholder="Nom. Usuario" required>
                 <label for="usuario">Nombre Usuario</label>
               </div>
             </div>
             <div class="col-md-2 ms-4">
               <div class="form-floating">
-                <select name="rol" id="rol" class="form-control">
+                <select name="rol" id="rol" class="form-control" required>
                   <option value="">Select rol</option>
                 </select>
                 <label for="rol">Rol</label>
@@ -99,7 +93,7 @@
           </div>
           <div class="row g-2 mb-2 mt-2">
             <div class="col-md-3">
-              <button type="submit" class="form-control btn btn-primary w-50" id="btnEnviar" disabled>
+              <button type="submit" class="form-control btn btn-primary w-50" id="btnEnviar">
                 Registrar
               </button>
             </div>

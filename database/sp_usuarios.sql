@@ -1,4 +1,4 @@
-USE SIGEMAPRE;
+-- USE SIGEMAPRE;
 
 DROP PROCEDURE IF EXISTS sp_list_users;
 use gamp;
@@ -35,8 +35,7 @@ BEGIN
         CONCAT(P.apellidos,' ',P.nombres) as nombres,
         P.num_doc,
         P.telefono,
-        P.genero,
-        P.nacionalidad
+        P.genero
 	FROM usuarios U
     INNER JOIN roles R ON U.idrol = R.idrol
     INNER JOIN personas P ON U.idpersona = P.id_persona
@@ -171,8 +170,7 @@ BEGIN
         P.nombres,
         P.num_doc,
         P.telefono,
-        P.genero,
-        P.nacionalidad
+        P.genero
 			FROM usuarios U
 			INNER JOIN roles R ON U.idrol = R.idrol
 			INNER JOIN personas P ON U.idpersona = P.id_persona

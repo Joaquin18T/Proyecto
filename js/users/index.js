@@ -90,8 +90,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const data = await getDatos(`${host}usuarios.controller.php`, params);
     //resetTable();
-    console.log(data);
-    
     selector("tb-usuarios tbody").innerHTML = "";
     data.forEach((x) => {
       selector("tb-usuarios tbody").innerHTML += `
@@ -102,7 +100,6 @@ document.addEventListener("DOMContentLoaded", () => {
           <td>${x.nombres}</td>
           <td>${x.num_doc}</td>
           <td>${x.genero}</td>
-          <td>${x.nacionalidad}</td>
           <td>
               ${parseInt(x.estado)===0?'Ninguna Accion':
                 `<button type="button" class="btn btn-sm btn-outline-secondary update-user" data-iduser=${x.id_usuario}>Update</button>`
@@ -111,12 +108,12 @@ document.addEventListener("DOMContentLoaded", () => {
         </tr>
       `;
     });
-
+    
     if(!dataTable){
       dataTable =new DataTable("#tb-usuarios", {
         searchable:false,
-        perPage: 3, 
-        perPageSelect: [3, 5, 8,10], 
+        perPage: 5, 
+        perPageSelect: [5, 10, 15], 
         labels:{
           perPage: "{select} Filas por pagina",
           noRows: "Registros no encontrados",
@@ -125,7 +122,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
     loadUpdate();
-
   }
 
   
@@ -157,22 +153,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const modalImg = new bootstrap.Modal(selector("modal-update-user"));
         modalImg.show();
-        ActionButtonUpdate();
       });
     });
   }
 
-  function ActionButtonUpdate() {
-    const buttonsAceppt = document.querySelectorAll(".aceppt-update");
-    buttonsAceppt.forEach((x) => {
-      x.addEventListener("click", () => {
-        const myModal =
-          bootstrap.Modal.getOrCreateInstance("#modal-update-user");
-        myModal.hide();
-        window.location.href =
-          "http://localhost/CMMS/views/usuarios/update.php";
-      });
-    });
-  }
+  selector("aceppt-update").addEventListener("click",()=>{
+    window.location.href = "http://localhost/CMMS/views/usuarios/update";
+  });
   filtersData();
 });

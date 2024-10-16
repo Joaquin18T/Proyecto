@@ -170,6 +170,7 @@ CREATE PROCEDURE sp_search_activo_responsable
 BEGIN
 		SELECT 
 	  RES.idactivo_resp,
+      ACT.cod_identificacion,
 	  ACT.idactivo,
 	  ACT.descripcion,
       SUB.subcategoria,
@@ -209,5 +210,3 @@ BEGIN
     INNER JOIN activos A ON R.idactivo = A.idactivo
     WHERE A.idestado >=3 AND A.idestado<=4;
 END $$
-
-select * from activos_responsables;

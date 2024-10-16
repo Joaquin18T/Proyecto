@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded",()=>{
-
-  blockCamps(true);
+  selector("usuario").disabled=true;
+  //blockCamps(true);
   function selector(value) {
     return document.querySelector(`#${value}`);
   }
@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       if(isblock){
         alert("Persona encontrada");
         blockCamps(true);
-        btnEnviar.disabled=true;
+        //btnEnviar.disabled=true;
         showDatos(data[0]);
       }else{
         resetUI();
@@ -79,11 +79,13 @@ document.addEventListener("DOMContentLoaded",()=>{
     selector("nombres").value=data.nombres;
     selector("telefono").value=data.telefono;
     selector("genero").value=data.genero;
-    selector("nacionalidad").value=data.nacionalidad;
+    selector("rol").value=parseInt(data.idrol);
+    selector("usuario").value=data.usuario;
+    selector("rol").value=data.idrol;
     
-    if(data.usuario!=undefined){
+    if(data.usuario!==null){
+      //selector("rol").value=data.idrol;
       selector("usuario").value=data.usuario;
-      selector("rol").value=data.idrol;
     }else{
       //selector("rol").disabled=false;
       alert("No tiene usuario");
@@ -104,9 +106,8 @@ document.addEventListener("DOMContentLoaded",()=>{
     selector("tipodoc").disabled=isblock;
     selector("apellidos").disabled=isblock;
     selector("nombres").disabled=isblock;
-    selector("telefono").disabled=isblock;
+    //selector("telefono").disabled=isblock;
     selector("genero").disabled=isblock;
-    selector("nacionalidad").disabled=isblock;
     selector("usuario").disabled=isblock;
     selector("rol").disabled=isblock;
   }
@@ -123,7 +124,6 @@ document.addEventListener("DOMContentLoaded",()=>{
     params.append("nombres", selector("nombres").value);
     params.append("genero", selector("genero").value);
     params.append("telefono", selector("telefono").value);
-    params.append("nacionalidad", selector("nacionalidad").value);
 
     const data = await fetch("http://localhost/CMMS/controllers/persona.controller.php",{
       method:'POST',
@@ -166,14 +166,14 @@ document.addEventListener("DOMContentLoaded",()=>{
   selector("form-update-user").addEventListener("submit",async(e)=>{
     e.preventDefault();
 
-    const isUserUnike = await searchUser(selector("usuario").value);
-    const isTelfUk = await searchTelf(selector("telefono").value);
+    //const isUserUnike = await searchUser(selector("usuario").value);
+    //const isTelfUk = await searchTelf(selector("telefono").value);
 
     const validaNumDoc = selector("numDoc").value.length>8&&selector("numDoc").value.length<20?false:true;
     const existNumDoc = await personByNumDoc();    
 
     const existND = (existNumDoc.length)<1;
-    if(isTelfUk.length===0 && isUserUnike.length===0 && existND && validaNumDoc){
+    if(validaNumDoc){
       if(confirm("¿Estas seguro de actualizar los datos del usuario?")){
         const iduser = localStorage.getItem('iduser');
         const params = new FormData();
@@ -200,9 +200,9 @@ document.addEventListener("DOMContentLoaded",()=>{
       if(!validaNumDoc){
         alert("Tu num. de documento debe tener 8 caracteres o 20");
       }
-      else if(!existND){
-        alert("El Num Doc, ya existe");
-      }
+      // else if(!existND){
+      //   alert("El Num Doc, ya existe");
+      // }
       
       
     }
@@ -220,7 +220,6 @@ document.addEventListener("DOMContentLoaded",()=>{
     selector("nombres").value="";
     selector("telefono").value="";
     selector("genero").value="";
-    selector("nacionalidad").value="";
     selector("usuario").value="";
     selector("rol").value="";
   }

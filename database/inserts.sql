@@ -10,7 +10,15 @@ INSERT INTO PERSONAS (idtipodoc, num_doc, apellidos, nombres, genero, telefono, 
 (2, 'EX123456', 'Martínez', 'Carlos', 'M', '987654323', 'Colombiano'),
 (1, '35255456','Ortiz Huaman', 'Pablo', 'M', '928483244', 'Peruana'),
 (1, '72754752', 'Avalos Romero', 'Royer Alexis', 'M', '936439633','Peruano'),
-(1, '72754751', 'Avalos Romero', 'Pedro Aldair', 'M', '995213305','Peruano');
+(1, '72754751', 'Avalos Romero', 'Pedro Aldair', 'M', '995213305','Peruano'),
+(1, '36436772', 'García', 'Juan', 'M', '555-1234', 'Colombiana'),
+(2, '87654321', 'Pérez', 'Ana', 'F', '555-5678', 'Mexicana'),
+(1, '23456789', 'López', 'Carlos', 'M', '555-9101', 'Argentina'),
+(2, '98765432', 'Martínez', 'Laura', 'F', '555-1122', 'Chilena'),
+(1, '34567890', 'Sánchez', 'Pedro', 'M', '555-1314', 'Peruana'),
+(2, '65432109', 'Ramírez', 'Marta', 'F', '555-1516', 'Ecuatoriana'),
+(1, '45678901', 'Torres', 'Jorge', 'M', '555-1718', 'Uruguaya'),
+(2, '54321098', 'Hernández', 'Lucía', 'F', '555-1920', 'Paraguaya');
 
 INSERT INTO ROLES (rol) VALUES 
 ('Administrador'),
@@ -22,7 +30,15 @@ INSERT INTO USUARIOS (idpersona, idrol, usuario, contrasena) VALUES
 (3, 2, 'c.martinez', '$2y$10$x45pTq2wG/jFtZkOPhvsMe9hReDbWqjo7sv5U37MTL2g10BglS4jG'),
 (4,2,'pablo35a', '$2y$10$0xJpbL03XkLI5Zz/lCfyVu6HTYSDKKUpEfLF6BywNTBDJofh9YNlO'),
 (4, 2, 'r.avalos', '$2y$10$VrxeMCQteaNdX6LwxoZEYevp8BCwKTpIKTVebChbXcxnNX7BTIFaW'),
-(5, 1, 'p.avalos', '$2y$10$j1KccY6Iex7h19WR0pfMpumhp.dsjJkBCcFUbtVwbPCHw7hECJNyW');
+(5, 1, 'p.avalos', '$2y$10$j1KccY6Iex7h19WR0pfMpumhp.dsjJkBCcFUbtVwbPCHw7hECJNyW'),
+(16, 1, 'garcia.juan', 'contrasena1'),
+(17, 2, 'perez.ana', 'contrasena2'),
+(18, 1, 'lopez.carlos', 'contrasena3'),
+(19, 2, 'martinez.laura', 'contrasena4'),
+(20, 1, 'sanchez.pedro', 'contrasena5'),
+(21, 2, 'ramirez.marta', 'contrasena6'),
+(22, 1, 'torres.jorge', 'contrasena7'),
+(23, 2, 'hernandez.lucia', 'contrasena8');
 
 -- UPDATE usuarios SET contrasena = '$2y$10$0xJpbL03XkLI5Zz/lCfyVu6HTYSDKKUpEfLF6BywNTBDJofh9YNlO' WHERE id_usuario=4;
 -- SELECT * FROM activos;
@@ -80,14 +96,23 @@ INSERT INTO estados(tipo_estado, nom_estado)
 		('orden', 'revision'),
         ('orden', 'finalizado');
 
-INSERT INTO activos(idsubcategoria, idmarca, modelo, cod_identificacion, fecha_adquisicion, descripcion, especificaciones, idestado)
+INSERT INTO activos(idsubcategoria, idmarca, modelo, cod_identificacion, fecha_adquisicion, descripcion, especificaciones)
 	VALUES
-	(2, 1, '14-EP', '123ABC', NOW(), 'Laptop 14-EP 16 RAM', '{"ram":"16GB", "disco":"solido"}',1),
-	(10, 1, 'Monitor 4K', 'MON123', NOW(), 'Monitor LG de 27 pulgadas', '{"resolucion":"3840x2160"}', 5),
-    (11, 2, 'Teclado Mecánico', 'TEC123', NOW(), 'Teclado mecánico HP', '{"tipo":"mecánico", "conectividad":"inalámbrico"}', 5),
-    (7, 4, 'Compresor Industrial', 'COMP123', NOW(), 'Compresor Caterpillar de 10HP', '{"potencia":"10HP"}', 2),
-    (6, 5, 'Camión de Carga Hyundai', 'CAM123', NOW(), 'Camión de carga pesada Hyundai', '{"capacidad":"10 toneladas"}', 2),
-	(9, 2, 'L3110', 'IMP123', NOW(), 'Impresora HP L3110', '{"capacidad":"200 kilogramos"}', 5);    
+	(2, 1, '14-EP', '123ABC', NOW(), 'Laptop 14-EP 16 RAM', '{"ram":"16GB", "disco":"solido"}'),
+	(10, 1, 'Monitor 4K', 'MON123', NOW(), 'Monitor LG de 27 pulgadas', '{"resolucion":"3840x2160"}'),
+    (11, 2, 'Teclado Mecánico', 'TEC123', NOW(), 'Teclado mecánico HP', '{"tipo":"mecánico", "conectividad":"inalámbrico"}'),
+    (7, 4, 'Compresor Industrial', 'COMP123', NOW(), 'Compresor Caterpillar de 10HP', '{"potencia":"10HP"}'),
+    (6, 5, 'Camión de Carga Hyundai', 'CAM123', NOW(), 'Camión de carga pesada Hyundai', '{"capacidad":"10 toneladas"}'),
+	(9, 2, 'L3110', 'IMP123', NOW(), 'Impresora HP L3110', '{"capacidad":"200 kilogramos"}'),
+    (1, 2, 'LG UltraGear', 'LG-001', '2023-01-15', 'Monitor para gaming', '{"resolucion": "2560x1440", "tasa_de_refresco": "144Hz"}'),
+	(2, 2, 'HP Pavilion', 'HP-002', '2023-02-20', 'Laptop para uso diario', '{"procesador": "Intel i5", "ram": "8GB"}'),
+	(3, 5, 'Caterpillar 320', 'CAT-003', '2023-03-10', 'Maquinaria pesada', '{"potencia": "150HP", "peso": "20ton"}'),
+	(4, 3, 'Nissan Frontier', 'NIS-004', '2023-04-05', 'Camioneta pickup', '{"motor": "2.5L", "traccion": "4x4"}'),
+	(5, 6, 'Hyundai Generator', 'HYD-005', '2023-05-12', 'Generador portátil', '{"potencia": "3000W", "tipo_combustible": "Gasolina"}'),
+	(6, 1, 'HP LaserJet', 'HP-006', '2023-06-18', 'Impresora láser', '{"tipo": "monocromo", "velocidad": "30ppm"}'),
+	(7, 1, 'LG Gram', 'LG-007', '2023-07-22', 'Laptop ultraligera', '{"peso": "999g", "pantalla": "14in"}'),
+	(8, 4, 'ABB Robot IRB', 'ABB-008', '2023-08-15', 'Robot industrial', '{"carga_util": "10kg", "alcance": "1.5m"}'),
+	(9, 7, 'FenWick Forklift', 'FW-009', '2023-09-10', 'Montacargas eléctrico', '{"capacidad_carga": "2000kg", "batería": "24V"}');
 -- select*from activos;
 INSERT INTO ubicaciones(ubicacion) 
 	VALUES
@@ -101,9 +126,19 @@ INSERT INTO solicitudes_activos(idusuario, idactivo, fecha_solicitud, motivo_sol
 	VALUES
 		(2,1,NOW(), 'Para el proyecto X', 1);
 
-INSERT INTO activos_responsables(idactivo, idusuario, fecha_designacion, condicion_equipo, imagenes, descripcion, autorizacion, solicitud) 
+INSERT INTO activos_responsables(idactivo, idusuario, condicion_equipo, imagenes, descripcion, autorizacion, solicitud) 
 	VALUES
-		(1,2,null, 'En perfectas condiciones', '{"imagen1":"http://nose/que/poner"}', 'equipo de trabajo',1,1);
+		-- (1,2,'En perfectas condiciones', '{"imagen1":"http://nose/que/poner"}', 'equipo de trabajo',1,1),
+        
+        -- (1, 8, 'Nuevo', '{"imagen1":"https://ejemplo.com/imagenes/lg_ultragear.jpg"}', 'Asignación a usuario', 6,1),
+		(2, 9, 'Este activo esta sin problemas', '{"imagen1":"https://ejemplo.com/imagenes/hp_pavilion.jpg"}', 'Uso diario', 'Autorizado', 1,1),
+		(3, 10, 'En buenas condiciones', '{"imagen1":"https://ejemplo.com/imagenes/caterpillar_320.jpg"}', 'Asignación a proyecto',8,1),
+		(4, 11, 'Tienes fallos en el motor', '{"imagen1":"https://ejemplo.com/imagenes/nissan_frontier.jpg"}', 'Camioneta de trabajo', 14, 1),
+		(5, 12, 'Nuevo', '{"imagen1":"https://ejemplo.com/imagenes/hyundai_generator.jpg"}', 'Generador de respaldo', 12, 1),
+		(6, 13, 'Nuevo', '{"imagen1":"https://ejemplo.com/imagenes/hp_laserjet.jpg"}', 'Impresión de documentos', 8, 1),
+		(7, 14, 'Usado', '{"imagen1":"https://ejemplo.com/imagenes/lg_gram.jpg"}', 'Laptop para administración', 10, 1),
+		(8, 15, 'Nuevo', '{"imagen1":"https://ejemplo.com/imagenes/abb_robot_irb.jpg"}', 'Robot para automatización', 14, 1),
+		(9, 8, 'Usado', '{"imagen1":"https://ejemplo.com/imagenes/fenwick_forklift.jpg"}', 'Montacargas para logística',14,1);
 
 
  -- SELECT*FROM activos_responsables;

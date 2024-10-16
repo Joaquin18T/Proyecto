@@ -94,9 +94,14 @@ document.addEventListener("DOMContentLoaded",()=>{
       selector("table-activos tbody").innerHTML+=`
       <tr >
         <td>${x.idactivo}</td>
+        <td>${x.subcategoria}</td>
         <td>${x.categoria}</td>
+        <td>${x.marca}</td>
         <td>${x.modelo}</td>
+        <td>${x.cod_identificacion}</td>
+        <td>${x.fecha_adquisicion}</td>
         <td>${x.descripcion}</td>
+        <td>${x.nom_estado}</td>
         <td><div class="field-espec ms-auto"></div></td>
         <td>
           ${x.nom_estado==="Fuera de Servicio"?'Sin Acciones':
@@ -112,8 +117,8 @@ document.addEventListener("DOMContentLoaded",()=>{
     if(!myTable){
       myTable = new DataTable("#table-activos",{
         searchable:false,
-        perPage:3,
-        perPageSelect:[3,7,10],
+        perPage:5,
+        perPageSelect:[5,10,15],
         labels:{
           perPage:"{select} Filas por pagina",
           noRows: "No econtrado",

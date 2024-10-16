@@ -13,12 +13,11 @@ CREATE PROCEDURE sp_register_person
     IN _apellidos VARCHAR(100),
     IN _nombres VARCHAR(100),
     IN _genero	CHAR(1),
-    IN _telefono CHAR(9),
-    IN _nacionalidad VARCHAR(50)
+    IN _telefono CHAR(9)
 )
 BEGIN
-	INSERT INTO PERSONAS (idtipodoc, num_doc, apellidos, nombres, genero, telefono, nacionalidad) VALUES 
-    (_idtipodoc, _num_doc, _apellidos, _nombres, _genero, _telefono, _nacionalidad);
+	INSERT INTO PERSONAS (idtipodoc, num_doc, apellidos, nombres, genero, telefono) VALUES 
+    (_idtipodoc, _num_doc, _apellidos, _nombres, _genero, _telefono);
     
     SELECT last_insert_id() as idpersona;
 END $$
@@ -38,7 +37,6 @@ BEGIN
         PER.nombres, 
         PER.telefono, 
         PER.genero, 
-        PER.nacionalidad,
         USU.idrol,
         USU.contrasena
     FROM usuarios USU
@@ -66,8 +64,7 @@ CREATE PROCEDURE sp_update_persona
     IN _apellidos VARCHAR(100),
     IN _nombres VARCHAR(100),
     IN _genero CHAR(1),
-    IN _telefono CHAR(9),
-    IN _nacionalidad VARCHAR(50)
+    IN _telefono CHAR(9)
 )
 BEGIN
 	UPDATE personas SET
@@ -76,8 +73,7 @@ BEGIN
     apellidos = _apellidos,
     nombres = _nombres,
     genero = _genero,
-    telefono = _telefono,
-    nacionalidad = _nacionalidad
+    telefono = _telefono
     WHERE id_persona = _idpersona;
 END $$
 

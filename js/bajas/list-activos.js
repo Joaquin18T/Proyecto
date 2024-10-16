@@ -89,8 +89,8 @@ document.addEventListener("DOMContentLoaded",()=>{
     if(!globals.myTable){
       globals.myTable = new DataTable("#table-activos",{
         searchable:false,
-        perPage:3,
-        perPageSelect:[3,7,10],
+        perPage:5,
+        perPageSelect:[5,10,15],
         labels:{
           perPage:"{select} Filas por pagina",
           noRows: "No econtrado",

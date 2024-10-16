@@ -62,7 +62,6 @@
                       <th>Nombres y Ap.</th>
                       <th>Telefono</th>
                       <th>Genero</th>
-                      <th>Nacionalidad</th>
                       <th>Acciones</th>
                     </tr>
                   </thead>
@@ -85,10 +84,10 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <h4>¿Estas seguro de actulizar?</h4>
+          <h4>¿Estas seguro de actualizar?</h4>
         </div>
         <div class="modal-footer">
-          <a class="btn btn-success aceppt-update">Save changes</a>
+          <button type="button" class="btn btn-success" id="aceppt-update">Actualizar</button>
         </div>
       </div>
     </div>

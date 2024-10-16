@@ -67,14 +67,24 @@
                     <col style="width:1%">
                     <col style="width:1%">
                     <col style="width:1%">
+                    <col style="width:1%">
+                    <col style="width:1%">
+                    <col style="width:1%">
+                    <col style="width:1%">
+                    <col style="width:1%">
                     <col style="width:2%">
                   </colgroup>
                   <thead class="text-center">
                     <tr>
                       <th>#</th>
                       <th>Categoria</th>
+                      <th>Subcategoria</th>
+                      <th>Marca</th>
                       <th>Modelo</th>
+                      <th>Cod. Identif.</th>
+                      <th>Fecha adq.</th>
                       <th>Descripcion</th>
+                      <th>Estado</th>
                       <th>Especificaciones</th>
                       <th>Acciones</th>
                     </tr>

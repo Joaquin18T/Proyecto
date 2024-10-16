@@ -27,8 +27,7 @@ if (isset($_POST['operation'])) {
         'apellidos' => $_POST['apellidos'],
         'nombres' => $_POST['nombres'],
         'genero' => $_POST['genero'],
-        'telefono' => $_POST['telefono'],
-        'nacionalidad' => $_POST['nacionalidad']
+        'telefono' => $_POST['telefono']==""?null:$_POST['telefono']
       ];
 
       $dato = $persona->add($enviarDatos);
@@ -49,8 +48,7 @@ if (isset($_POST['operation'])) {
         'apellidos' => $persona->limpiarCadena($_POST['apellidos']),
         'nombres' => $persona->limpiarCadena($_POST['nombres']),
         'genero' => $persona->limpiarCadena($_POST['genero']),
-        'telefono' => $persona->limpiarCadena($_POST['telefono']),
-        'nacionalidad' => $persona->limpiarCadena($_POST['nacionalidad'])
+        'telefono' => $_POST['telefono']==""?null:$_POST['telefono']
       ];
 
       $resp = $persona->updatePersona($datosEnviar);

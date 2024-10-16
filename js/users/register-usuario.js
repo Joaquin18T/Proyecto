@@ -73,7 +73,6 @@ document.addEventListener("DOMContentLoaded",async()=>{
     selector("telefono").value=data.telefono;
     selector("genero").value=data.genero;
     selector("password").value = data.contrasena;
-    selector("nacionalidad").value=data.nacionalidad;
     
 
     //si la persona tiene un usuario creado (crear un array)
@@ -96,7 +95,6 @@ document.addEventListener("DOMContentLoaded",async()=>{
     selector("nombres").disabled=isblock;
     selector("telefono").disabled=isblock;
     selector("genero").disabled=isblock;
-    selector("nacionalidad").disabled=isblock;
     selector("usuario").disabled=isblock;
     selector("password").disabled=isblock;
     selector("rol").disabled=isblock;
@@ -109,8 +107,6 @@ document.addEventListener("DOMContentLoaded",async()=>{
       selector("apellidos").value,
       selector("nombres").value,
       selector("genero").value,
-      selector("telefono").value,
-      selector("nacionalidad").value,
       selector("usuario").value,
       selector("password").value
     ];
@@ -124,17 +120,24 @@ document.addEventListener("DOMContentLoaded",async()=>{
   
   selector("form-person-user").addEventListener("submit",async (e)=>{
     e.preventDefault();
-
+    let telUk = [];
     const isValidate = validateData();
     const isUserUnike = await searchUser(selector("usuario").value);
-    const isTelfUk = await searchTelf(selector("telefono").value);
+
+    if(selector("telefono").value!==""){
+      telUk = await searchTelf(selector("telefono").value);
+    }
+    console.log(telUk);
+    
     const validaNumDoc = selector("numDoc").value.length===8||selector("numDoc").value.length===20?true:false;
 
     const existNumDoc = await personByNumDoc();
     const numDocExist = (existNumDoc.length<1);
-    console.log(existNumDoc);
+    const validatePass = validarClave(selector("password").value);
+    const numDocTipoDoc = validateTipoDocNumDoc();
     
-    if(isValidate && isUserUnike.length===0 && isTelfUk.length===0 && numDocExist && validaNumDoc){
+
+    if(isValidate && isUserUnike.length===0 && telUk.length===0 && numDocExist && validaNumDoc && validatePass && numDocTipoDoc){
       //console.log(selector("password").value);
       
       if(confirm("¿Estas seguro de guardar?")){
@@ -146,7 +149,6 @@ document.addEventListener("DOMContentLoaded",async()=>{
         params.append("nombres", selector("nombres").value);
         params.append("genero", selector("genero").value);
         params.append("telefono", selector("telefono").value);
-        params.append("nacionalidad", selector("nacionalidad").value);
 
         const options = {
           method:"POST",
@@ -164,12 +166,18 @@ document.addEventListener("DOMContentLoaded",async()=>{
     }else{
       if(isUserUnike.length>0){
         alert("El nombre de usuario ya existe, por favor escriba otro");
-      }else if(isTelfUk.length>0){
+      }else if(telUk.length>0){
         alert("El numero de telefono ya existe, por favor escriba otro");
       }else if(!numDocExist){
         alert("El num. de doc. ya existe");
       }else if(!validaNumDoc){
-        alert("Tu num. de documento debe tener 8 caracteres o 20");
+        alert("Tu num. de documento debe tener 8 o 20 caracteres");
+      }else if(!validatePass){
+        alert("Tu clave debe ser mayor a 8 caracteres");
+      }else if(!numDocTipoDoc){
+        alert("El tipo de documento debe ser de acuerdo a la cantidad de caracteres");
+      }else{
+        alert("Hubo un error al registrar la persona");
       }
     }
 
@@ -192,6 +200,17 @@ document.addEventListener("DOMContentLoaded",async()=>{
     params.append("telefono", telf);
     const data = await fetch(`http://localhost/CMMS/controllers/persona.controller.php?${params}`);
     return data.json();
+  }
+
+  function validateTipoDocNumDoc(){
+    let isvalidate = false;
+    if(parseInt(selector("numDoc").value.length) ===8 && parseInt(selector("tipodoc").value)===1){
+      isvalidate=true;
+    }
+    if(parseInt(selector("numDoc").value.length) ===20 && parseInt(selector("tipodoc").value)===2){
+      isvalidate=true;
+    }
+    return isvalidate;
   }
 
   /*
@@ -255,6 +274,14 @@ document.addEventListener("DOMContentLoaded",async()=>{
     })
   }
 
+  function validarClave(clave){
+    if(clave.length>=8){
+      return true;
+    }else{
+      return false;
+    }
+  }
+
   function resetUI(){
     
     selector("tipodoc").value="";
@@ -262,7 +289,6 @@ document.addEventListener("DOMContentLoaded",async()=>{
     selector("nombres").value="";
     selector("telefono").value="";
     selector("genero").value="";
-    selector("nacionalidad").value="";
     selector("usuario").value="";
     selector("password").value="";
     selector("rol").value="";

@@ -19,7 +19,7 @@ class Persona extends ExecQuery
   {
     try {
 
-      $cmd = parent::execQ("CALL sp_register_person(?,?,?,?,?,?,?)");
+      $cmd = parent::execQ("CALL sp_register_person(?,?,?,?,?,?)");
       $cmd->execute(
         array(
           $params['idtipodoc'],
@@ -28,7 +28,6 @@ class Persona extends ExecQuery
           $params['nombres'],
           $params['genero'],
           $params['telefono'],
-          $params['nacionalidad']
         )
       );
       return $cmd->fetchAll(PDO::FETCH_ASSOC);
@@ -68,7 +67,7 @@ class Persona extends ExecQuery
   {
     try {
       $status = false;
-      $cmd = parent::execQ("CALL sp_update_persona(?,?,?,?,?,?,?,?)");
+      $cmd = parent::execQ("CALL sp_update_persona(?,?,?,?,?,?,?)");
       $status = $cmd->execute(
         array(
           $params['idpersona'],
@@ -77,8 +76,7 @@ class Persona extends ExecQuery
           $params['apellidos'],
           $params['nombres'],
           $params['genero'],
-          $params['telefono'],
-          $params['nacionalidad']
+          $params['telefono']
         )
       );
       return $status;

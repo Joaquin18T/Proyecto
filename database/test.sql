@@ -9,7 +9,7 @@ select *from activos_responsables;
 select*from historial_activos;
 select*from notificaciones;
 select*from activos;
-select*from usuarios;
+select*from usuarios where idrol=1;
 select*from personas;
 select*from estados;
 select*from bajas_activo;

@@ -153,6 +153,7 @@ BEGIN
         ACT.cod_identificacion,
         ACT.fecha_adquisicion,
         ACT.descripcion,
+        EST.nom_estado,
         ACT.especificaciones
 	FROM activos ACT
     INNER JOIN subcategorias SUB ON ACT.idsubcategoria = SUB.idsubcategoria

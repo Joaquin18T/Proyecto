@@ -59,7 +59,7 @@
                   pattern="[0-9]+"
                   maxlength="9"
                   minlength="9"
-                  required>
+                  >
                 <label for="telefono" class="form-label">Telefono</label>
               </div>
             </div>
@@ -71,12 +71,6 @@
                   <option value="F">Femenino</option>
                 </select>
                 <label for="genero" class="form-label">Genero</label>
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="form-floating">
-                <input type="text" class="form-control" id="nacionalidad" autocomplete="off" required>
-                <label for="nacionalidad" class="form-label">Nacionalidad</label>
               </div>
             </div>
           </div>
