@@ -1,4 +1,4 @@
-use sigemapre;
+use gamp;
 
 DROP PROCEDURE IF EXISTS `actualizarBorradorOdt`
 DELIMITER //

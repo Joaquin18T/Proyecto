@@ -1,4 +1,4 @@
-USE sigemapre;
+USE gamp;
 
 DROP PROCEDURE IF EXISTS `eliminarOdt`
 DELIMITER $$
