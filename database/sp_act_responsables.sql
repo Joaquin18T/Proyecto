@@ -198,6 +198,8 @@ BEGIN
     ORDER BY RES.fecha_asignacion DESC;
 END $$
 
+call sp_search_activo_responsable(null, null, null)
+
 DROP PROCEDURE IF EXISTS sp_list_resp_activo;
 DELIMITER $$
 CREATE PROCEDURE sp_list_resp_activo

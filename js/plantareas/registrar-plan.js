@@ -235,6 +235,22 @@ $(document).ready(async () => {
         })
     })
 
+    async function obtenerTareas() {
+        const paramsTareasSearch = new URLSearchParams()
+        paramsTareasSearch.append("operation", "obtenerTareasPorPlanTarea")
+        paramsTareasSearch.append("idplantarea", idplantarea_generado)
+        const tareasRegistradasObtenidas = await getDatos(`${host}tarea.controller.php`,paramsTareasSearch)
+        return tareasRegistradasObtenidas
+    }
+
+    async function obtenerActivosVinculados(){
+        const paramsObtenerAVT = new URLSearchParams()
+        paramsObtenerAVT.append("operation", "listarActivosPorTareaYPlan")
+        paramsObtenerAVT.append("idplantarea", idplantarea_generado)
+        const avtData = await getDatos(`${host}activosvinculados.controller.php`, paramsObtenerAVT)
+        return avtData
+    }
+
     /* ********************** EVENTOS *************************************************** */
     //AGREGAR NUEVA TAREA, FORMATEAR EL FORMULARIO TAREA, HABILITAR CAMPOS ACTIVOS Y RENDERIZAR LA TAREA AGREGADA AL SELECT
     $q("#form-tarea").addEventListener("submit", async (e) => {
@@ -278,7 +294,7 @@ $(document).ready(async () => {
             await renderSubCategorias()
             await renderUbicacion()
             registrarTareasOk = true
-            habilitarBtnTerminar()
+        
             //confirmarEliminacionTarea()
 
             const btnsEliminarTarea = $all(".btn-eliminar-tarea")
@@ -290,15 +306,33 @@ $(document).ready(async () => {
                     console.log("ID tarea CLICKEADO: ", idTarea)
                     const li = btn.closest("li");
                     li.remove();
+
+                    const activosVinculados = document.querySelectorAll(`li[data-idtarea="${idTarea}"]`);
+                    activosVinculados.forEach(activo => activo.remove());
+
+                    //ELIMINAMOS LA TAREA
                     const formEliminacionTarea = new FormData();
                     formEliminacionTarea.append("operation", "eliminarTarea")
                     const eliminado = await fetch(`${host}tarea.controller.php/${idTarea}`, {method: 'POST', body:formEliminacionTarea } )
                     const elim = await eliminado.json()
                     console.log("eliminado?: ", elim)
+                    
+                    //CONSULTAMOS LAS TAREAS REGISTRADAS HASTA EL MOMENTO
+                    const tareasRegistradasObtenidas = await obtenerTareas()
+                    const avtObtenidas = await obtenerActivosVinculados()
+                    console.log("tareasRegistradasObtenidas: ", await tareasRegistradasObtenidas) // me quede aca
+                    console.log("avt data hasta el momento: ", avtObtenidas)
+
+                    if(elim){
+                        if(tareasRegistradasObtenidas.length == 0 || avtObtenidas.length == 0){
+                            console.log("ya no hay tareas");
+                            btnTerminarPlanHabilitado = false;
+                            btnTerminarPlan.disabled = true;
+                        }
+                    }            
                 })
             })
         }
-
     })
 
     //AGREGA EL PLAN DE TAREA
@@ -384,7 +418,7 @@ $(document).ready(async () => {
 
             activoVinculadoTareaObtenido.forEach((avt) => {
                 listaActivosAsignados.innerHTML += `
-                    <li class="list-group-item d-flex justify-content-between align-items-center mb-3">
+                    <li class="list-group-item d-flex justify-content-between align-items-center mb-3" data-idtarea="${avt.idtarea}">
                         ${avt.descripcion}
                         <span class="badge bg-primary rounded-pill btn-eliminar" data-idactivovinculado="${avt.idactivo_vinculado}">
                             <i class="fa-solid fa-trash"></i>
@@ -393,22 +427,7 @@ $(document).ready(async () => {
                 `
             });
 
-            const btnsEliminar = document.querySelectorAll(".btn-eliminar");
-            btnsEliminar.forEach(btn => {
-                btn.addEventListener("click", async () => {
-                    const idActivoResp = parseInt(btn.getAttribute("data-idactivovinculado"));
-                    console.log("ID ACTIVO RESP CLICKEADO: ", idActivoResp)
-                    const li = btn.closest("li");
-                    li.remove();
-                    const formEliminacionAVT = new FormData();
-                    formEliminacionAVT.append("operation", "eliminarActivosVinculadosTarea")
-                    const eliminado = await fetch(`${host}activosvinculados.controller.php/${idActivoResp}`, {method: 'POST', body:formEliminacionAVT } )
-                    const elim = await eliminado.json()
-                    console.log("eliminado?: ", elim)
-                    /* activosElegidosPrevia = activosElegidosPrevia.filter(activo => activo.idact_resp !== idActivoResp);
-                    console.log("Lista de activos actualizada: ", activosElegidosPrevia); */
-                });
-            });
+            
         }
 
         registrarActivosOk = true
@@ -421,7 +440,47 @@ $(document).ready(async () => {
         checkboxes.forEach(chk => {
             chk.checked = false;  // Deselecciona el checkbox
         });
-        habilitarBtnTerminar()
+    
+    })
+
+    listaActivosAsignados.addEventListener("click", async (event)=>{
+        if (event.target.closest(".btn-eliminar")) {            
+            const btn = event.target.closest(".btn-eliminar");
+            const idActivoResp = parseInt(btn.getAttribute("data-idactivovinculado"));
+            console.log("ID ACTIVO RESP CLICKEADO: ", idActivoResp);
+    
+            const li = btn.closest("li");
+            li.remove();
+    
+            const formEliminacionAVT = new FormData();
+            formEliminacionAVT.append("operation", "eliminarActivosVinculadosTarea");
+    
+            const eliminado = await fetch(`${host}activosvinculados.controller.php/${idActivoResp}`, {
+                method: 'POST',
+                body: formEliminacionAVT
+            });
+    
+            // PRIMERO ELIMINAMOS EL ACTIVO VINCULADO
+            const elim = await eliminado.json();
+            console.log("eliminado?: ", elim);
+
+            // LUEGO CONSULTAMOS CUANTOS ACTIVOS VINCULADOS ESTAN REGISTRADOS AL MOMENTO
+            const paramsAVTsearch = new URLSearchParams()
+            paramsAVTsearch.append("operation", "listarActivosPorTareaYPlan")
+            paramsAVTsearch.append("idplantarea", idplantarea_generado)
+            const avtdata = await getDatos(`${host}activosvinculados.controller.php`,paramsAVTsearch)
+            console.log("avtdata: ", avtdata)
+    
+            if (elim) {
+                console.log("AVDATA ANTES DE VERIFICAR: ", avtdata);
+                console.log("avtdata.length antes de verificar: ", avtdata.length);
+                if (avtdata.length === 0) {
+                    console.log("ya no hay activos vinculados");
+                    btnTerminarPlanHabilitado = false;
+                    btnTerminarPlan.disabled = true;
+                }
+            }
+        }
     })
 
     //ESTE EVENTO SERVIRA SI SE CAMBIA A ULTIMA MINUTO LA TAREA SELECCIONADA con Activos YA SELECCIONADOS
@@ -438,28 +497,12 @@ $(document).ready(async () => {
 
     })
 
-    function habilitarBtnTerminar(){
-        console.log("registrarActivosOk: ",registrarActivosOk)
-        console.log("registrarTareasOk: ", registrarTareasOk)
-        if(registrarTareasOk && registrarActivosOk){
-            console.log("habilitando el btn terminar ...")
-            btnTerminarPlanHabilitado = true
-            btnTerminarPlan.disabled = false
-            return true            
-        }
-        
-    }
-
     btnTerminarPlan.addEventListener("click", ()=>{
-        console.log("estando cuando de click al btn terminar plan")
-        if(habilitarBtnTerminar() == true){
-            console.log("pasando por el btn terminar plan")
-            if(!btnTerminarPlanHabilitado){
-                alert("completa los registros primero")
-                return
-            }         
-            window.location.href = `http://localhost/CMMS/views/plantareas`               
-        }
+        console.log("estando cuando de click al btn terminar plan")        
+        console.log("pasando por el btn terminar plan")
+        alert("completa los registros primero")            
+        window.location.href = `http://localhost/CMMS/views/plantareas`               
+        
         
     })
 
