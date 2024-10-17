@@ -22,6 +22,7 @@ $(document).ready(async () => {
     const activosList = $q("#activosBodyTable");
     //UL
     const listaActivosAsignados = $q(".listaActivosAsignados")
+    const ulTareasAgregadas = $q(".listaTareasAgregadas");
     // LISTAS
     let activosElegidos = []
     //let activosElegidosPrevia = []
@@ -32,6 +33,10 @@ $(document).ready(async () => {
     //BOTONES
     const btnAgregarActivos = $q("#btnAgregarActivos")
     const btnTerminarPlan = $q("#btnTerminarPlan")
+    //const btnActualizarTarea = $q("#btnActualizarTarea")
+    //const btnCancelarTarea = $q("#btnCancelarTarea")
+    const btnGuardarTarea = $q("#btnGuardarTarea")
+    const btnsTareaAcciones = $q("#btnsTareaAcciones") // esto en realidad es un div pero guardara botones
     //ESTADOS
     let habilitarBeforeUnload = true
     //let registrarTareasOk = false
@@ -76,14 +81,14 @@ $(document).ready(async () => {
         selectElegirTareaParaActivo.innerHTML =
             "<option value='-1'>Seleccione una tarea</option>"; // Opción predeterminada
 
-        for (let i = 0; i < data.length; i++) {    
+        for (let i = 0; i < data.length; i++) {
             selectElegirTareaParaActivo.innerHTML += `
                 <option value="${data[i].idtarea}">${data[i].descripcion}</option>
             `;
         }
     }
 
-    function renderTablaActivos(){
+    function renderTablaActivos() {
         if (tbActivos) {
             tbActivos.clear().rows.add($(activosList).find('tr')).draw();
         } else {
@@ -118,7 +123,7 @@ $(document).ready(async () => {
     }
 
     async function renderSubCategorias() {
-        const data = await getDatos(`${host}subcategoria.controller.php`, `operation=getSubCategoria`) 
+        const data = await getDatos(`${host}subcategoria.controller.php`, `operation=getSubCategoria`)
 
         selectSubCategoria.innerHTML = `<option selected value="-1">Sub Categoria</option>`
         for (let i = 0; i < data.length; i++) {
@@ -147,6 +152,7 @@ $(document).ready(async () => {
         const fechaInicioTarea = $q("#fecha-inicio");
         const fechaVencimiento = $q("#fecha-vencimiento");
 
+
         let formTarea = new FormData();
         formTarea.append("operation", "add")
         formTarea.append("idplantarea", idplantarea_generado);
@@ -169,7 +175,7 @@ $(document).ready(async () => {
         params.append("idubicacion", (selectUbicacion.value.trim() === "" || selectUbicacion.value == -1) ? null : selectUbicacion.value) //
         params.append("cod_identificacion", "")
 
-        const data = await getDatos(`${host}activo.controller.php`, params)        
+        const data = await getDatos(`${host}activo.controller.php`, params)
         activosList.innerHTML = "";
         //        activosList.innerHTML = ""
         console.log("activos fitlrados", data);
@@ -184,7 +190,7 @@ $(document).ready(async () => {
                 <td>${data[i].modelo}</td>
             </tr>
             `;
-        }        
+        }
 
         renderTablaActivos()
 
@@ -235,16 +241,24 @@ $(document).ready(async () => {
         const paramsTareasSearch = new URLSearchParams()
         paramsTareasSearch.append("operation", "obtenerTareasPorPlanTarea")
         paramsTareasSearch.append("idplantarea", idplantarea_generado)
-        const tareasRegistradasObtenidas = await getDatos(`${host}tarea.controller.php`,paramsTareasSearch)
+        const tareasRegistradasObtenidas = await getDatos(`${host}tarea.controller.php`, paramsTareasSearch)
         return tareasRegistradasObtenidas
     }
 
-    async function obtenerActivosVinculados(){
+    async function obtenerActivosVinculados() {
         const paramsObtenerAVT = new URLSearchParams()
         paramsObtenerAVT.append("operation", "listarActivosPorTareaYPlan")
         paramsObtenerAVT.append("idplantarea", idplantarea_generado)
         const avtData = await getDatos(`${host}activosvinculados.controller.php`, paramsObtenerAVT)
         return avtData
+    }
+
+    async function obtenerTareaPorId(idtarea_generado) {
+        const params = new URLSearchParams()
+        params.append("operation", "obtenerTareaPorId")
+        params.append("idtarea", idtarea_generado)
+        const ultimaTareaAgregada = await getDatos(`${host}tarea.controller.php`, params)
+        return ultimaTareaAgregada
     }
 
     async function eliminarPlanTarea(idplantarea) {
@@ -259,10 +273,10 @@ $(document).ready(async () => {
 
     //AGREGAR NUEVA TAREA, FORMATEAR EL FORMULARIO TAREA, HABILITAR CAMPOS ACTIVOS Y RENDERIZAR LA TAREA AGREGADA AL SELECT
     $q("#form-tarea").addEventListener("submit", async (e) => {
-        e.preventDefault()        
+        e.preventDefault()
         let permitir = true
+        let sintareas = false;
         const formtarea = $q("#form-tarea");
-        const ulTareasAgregadas = $q(".listaTareasAgregadas");
         const tareasExistentes = await getDatos(`${host}tarea.controller.php`, `operation=obtenerTareas`)
         console.log("tareasExistentes: ", tareasExistentes)
         for (let i = 0; i < tareasExistentes.length; i++) {
@@ -278,10 +292,7 @@ $(document).ready(async () => {
             console.log("id obtenido: ", dataId.id)
             idtarea_generado = dataId.id;
 
-            const params = new URLSearchParams()
-            params.append("operation", "obtenerTareaPorId")
-            params.append("idtarea", idtarea_generado)
-            const ultimaTareaAgregada = await getDatos(`${host}tarea.controller.php`, params)
+            const ultimaTareaAgregada = await obtenerTareaPorId(idtarea_generado)
             console.log("la ultima tarea agregada: ", ultimaTareaAgregada);
             //AGREGA LAS TAREAS AGREGADAS A LA INTERFAZ DE LA LISTA
             ulTareasAgregadas.innerHTML += `
@@ -299,12 +310,12 @@ $(document).ready(async () => {
             await renderSubCategorias()
             await renderUbicacion()
             //registrarTareasOk = true
-        
-            //confirmarEliminacionTarea()
 
+            //confirmarEliminacionTarea()
+            const liTareaAgregada = $all(".tarea-agregada")
             const btnsEliminarTarea = $all(".btn-eliminar-tarea")
             btnsEliminarTarea.forEach(btn => {
-                btn.addEventListener("click", async ()=>{
+                btn.addEventListener("click", async () => {
                     console.log("eliminado")
                     console.log("data-tarea-id: ", btn.getAttribute("data-tarea-id"))
                     const idTarea = parseInt(btn.getAttribute("data-tarea-id"));
@@ -318,28 +329,103 @@ $(document).ready(async () => {
                     //ELIMINAMOS LA TAREA
                     const formEliminacionTarea = new FormData();
                     formEliminacionTarea.append("operation", "eliminarTarea")
-                    const eliminado = await fetch(`${host}tarea.controller.php/${idTarea}`, {method: 'POST', body:formEliminacionTarea } )
+                    const eliminado = await fetch(`${host}tarea.controller.php/${idTarea}`, { method: 'POST', body: formEliminacionTarea })
                     const elim = await eliminado.json()
                     console.log("eliminado?: ", elim.eliminado)
-                    
+
                     //CONSULTAMOS LAS TAREAS REGISTRADAS HASTA EL MOMENTO
                     const tareasRegistradasObtenidas = await obtenerTareas()
                     const avtObtenidas = await obtenerActivosVinculados()
                     console.log("tareasRegistradasObtenidas: ", await tareasRegistradasObtenidas) // me quede aca
                     console.log("avt data hasta el momento: ", avtObtenidas)
+                    //ELIMINAR CONTENIDO DE LAS CAJAS DE TEXTO
+                    formtarea.reset()
 
-                    if(elim.eliminado){
-                        if(tareasRegistradasObtenidas.length == 0 || avtObtenidas.length == 0){
+                    if (elim.eliminado) {
+                        if (tareasRegistradasObtenidas.length == 0 || avtObtenidas.length == 0) {
                             console.log("ya no hay tareas");
                             btnTerminarPlanHabilitado = false;
-                            btnTerminarPlan.disabled = true;  
-                            habilitarCamposActivo(true)                           
+                            btnTerminarPlan.disabled = true;
+                            habilitarCamposActivo(true)
                         }
-                    }   
-                    await renderTareasSelect()       
-                     
+                    }
+                    await renderTareasSelect()
+                    sintareas = true
+                    return
                 })
             })
+            console.log("sintareas? :", sintareas)
+            if (!sintareas) {
+                liTareaAgregada.forEach(litarea => {
+                    litarea.addEventListener("click", async () => {
+                        const idtarea = litarea.getAttribute("data-tarea-id")
+                        console.log("click a : ", idtarea)
+                        const tareaObtenida = await obtenerTareaPorId(idtarea)
+                        //RENDERIZAR INFO EN LOS INPUTS Y SELECT de acuerdo a la tarea obtenida
+                        $q("#txtDescripcionTarea").value = tareaObtenida[0].descripcion
+                        $q("#fecha-inicio").value = tareaObtenida[0].fecha_inicio
+                        $q("#fecha-vencimiento").value = tareaObtenida[0].fecha_vencimiento
+                        $q("#txtIntervaloTarea").value = tareaObtenida[0].cant_intervalo
+                        $q("#txtFrecuenciaTarea").value = tareaObtenida[0].frecuencia
+                        $q("#tipoPrioridadTarea").value = tareaObtenida[0].idtipo_prioridad
+                        //console.log("fecha: ", $q("#fecha-inicio").value)
+                        btnGuardarTarea.style.display = 'none'
+
+                        btnsTareaAcciones.innerHTML = `
+                            <div class="col-md-4">
+                                <button type="button" id="btnActualizarTarea" class="btn btn-success">Actualizar</button>
+                            </div>
+                            <div class="col-md-4">
+                                <button type="button" id="btnCancelarTarea" class="btn btn-danger">Cancelar</button>
+                            </div>                            
+                        `
+
+                        $q("#btnCancelarTarea").addEventListener("click", () => {
+                            formtarea.reset()
+                            btnGuardarTarea.style.display = 'block'
+                            btnsTareaAcciones.innerHTML = ""
+                        })
+
+                        $q("#btnActualizarTarea").addEventListener("click", async () => {
+                            // Aquí llamas tu función para actualizar la tarea
+                            const formActualizarTarea = new FormData()
+                            formActualizarTarea.append("operation", "actualizarTarea")
+                            formActualizarTarea.append("idtarea", idtarea)
+                            formActualizarTarea.append("idtipo_prioridad", $q("#tipoPrioridadTarea").value)
+                            formActualizarTarea.append("descripcion", $q("#txtDescripcionTarea").value)
+                            formActualizarTarea.append("fecha_inicio", $q("#fecha-inicio").value)
+                            formActualizarTarea.append("fecha_vencimiento", $q("#fecha-vencimiento").value)
+                            formActualizarTarea.append("cant_intervalo", $q("#txtIntervaloTarea").value)
+                            formActualizarTarea.append("frecuencia", $q("#txtFrecuenciaTarea").value)
+                            formActualizarTarea.append("idestado", 8)
+
+                            const response = await fetch(`${host}tarea.controller.php`, {
+                                method: "POST",
+                                body: formActualizarTarea
+                            })
+
+                            const result = await response.json()
+                            console.log("Tarea actualizada: ", result)
+
+                            const liTareaActual = document.querySelector(`li[data-tarea-id="${idtarea}"]`);
+                            liTareaActual.innerHTML = `
+                                ${$q("#txtDescripcionTarea").value} - Tarea: ${idtarea}
+                                <span class="badge bg-primary rounded-pill btn-eliminar-tarea" data-tarea-id="${idtarea}">
+                                    <i class="fa-solid fa-trash"></i>
+                                </span>
+                            `;
+
+                            // Aquí puedes refrescar la lista de tareas si es necesario o cualquier acción adicional
+
+                            // Limpiar los campos del formulario y volver al estado inicial
+                            formtarea.reset()
+                            btnGuardarTarea.style.display = 'block'
+                            btnsTareaAcciones.innerHTML = ""
+                        })
+                    })
+                })
+            }
+
         }
     })
 
@@ -354,7 +440,7 @@ $(document).ready(async () => {
             alert("Solo se permite letras y espacios");
             return;
         }
-    
+
         //PRIMER PASO: VERIFICAR SI EL PLAN A REGISTRAR YA EXISTE
         const obtenerPlanDeTareas = await getDatos(`${host}plandetarea.controller.php`, `operation=getPlanesDeTareas`)
         for (let i = 0; i < obtenerPlanDeTareas.length; i++) {
@@ -379,7 +465,7 @@ $(document).ready(async () => {
             window.localStorage.clear();
             window.localStorage.setItem("idplantarea", idplantarea_generado);
             await loadFunctions();
-            habilitarCamposTarea(false);            
+            habilitarCamposTarea(false);
         }
     });
 
@@ -389,7 +475,7 @@ $(document).ready(async () => {
         const paramsAVTsearch = new URLSearchParams()
         paramsAVTsearch.append("operation", "listarActivosPorTareaYPlan")
         paramsAVTsearch.append("idplantarea", idplantarea_generado)
-        const avtdata = await getDatos(`${host}activosvinculados.controller.php`,paramsAVTsearch)
+        const avtdata = await getDatos(`${host}activosvinculados.controller.php`, paramsAVTsearch)
         console.log("avtdata: ", avtdata)
 
         if (parseInt(selectElegirTareaParaActivo.value) === -1) { // si es que manipulan el console de google
@@ -397,14 +483,14 @@ $(document).ready(async () => {
             return
         }
         for (let e = 0; e < activosElegidos.length; e++) {
-            for (let f = 0; f < avtdata.length; f++) {                
-                if(avtdata[f].idactivo == activosElegidos[e].idactivo && avtdata[f].idtarea == activosElegidos[e].idtarea){
+            for (let f = 0; f < avtdata.length; f++) {
+                if (avtdata[f].idactivo == activosElegidos[e].idactivo && avtdata[f].idtarea == activosElegidos[e].idtarea) {
                     alert("este activo ya esta registrado a esa tarea .....")
                     estado = true;
                     break;
                 }
             }
-            if(estado){
+            if (estado) {
                 return
             }
 
@@ -419,7 +505,7 @@ $(document).ready(async () => {
             const params = new URLSearchParams()
             params.append("operation", "obtenerUnActivoVinculadoAtarea")
             params.append("idactivovinculado", id.id)
-            const activoVinculadoTareaObtenido = await getDatos(`${host}activosvinculados.controller.php`,params)
+            const activoVinculadoTareaObtenido = await getDatos(`${host}activosvinculados.controller.php`, params)
             console.log("activoVinculadoTareaObtenido: ", await activoVinculadoTareaObtenido) // me quede aca
 
             //RENDERIZAR ACTIVOS VINCULADOS AGREGADOS AL INTERFAZ
@@ -435,7 +521,7 @@ $(document).ready(async () => {
                 `
             });
 
-            
+
         }
 
         //registrarActivosOk = true
@@ -450,34 +536,34 @@ $(document).ready(async () => {
         });
 
         const avtObtenidos = await obtenerActivosVinculados()
-        if(avtObtenidos.length == 0){
+        if (avtObtenidos.length == 0) {
             console.log("ya no hay tareas");
             btnTerminarPlanHabilitado = false;
             btnTerminarPlan.disabled = true;
-        }else{
+        } else {
             btnTerminarPlanHabilitado = true;
             btnTerminarPlan.disabled = false
         }
-    
+
     })
 
-    listaActivosAsignados.addEventListener("click", async (event)=>{
-        if (event.target.closest(".btn-eliminar")) {            
+    listaActivosAsignados.addEventListener("click", async (event) => {
+        if (event.target.closest(".btn-eliminar")) {
             const btn = event.target.closest(".btn-eliminar");
             const idActivoResp = parseInt(btn.getAttribute("data-idactivovinculado"));
             console.log("ID ACTIVO RESP CLICKEADO: ", idActivoResp);
-    
+
             const li = btn.closest("li");
             li.remove();
-    
+
             const formEliminacionAVT = new FormData();
             formEliminacionAVT.append("operation", "eliminarActivosVinculadosTarea");
-    
+
             const eliminado = await fetch(`${host}activosvinculados.controller.php/${idActivoResp}`, {
                 method: 'POST',
                 body: formEliminacionAVT
             });
-    
+
             // PRIMERO ELIMINAMOS EL ACTIVO VINCULADO
             const elim = await eliminado.json();
             console.log("eliminado?: ", elim.eliminado);
@@ -486,9 +572,9 @@ $(document).ready(async () => {
             const paramsAVTsearch = new URLSearchParams()
             paramsAVTsearch.append("operation", "listarActivosPorTareaYPlan")
             paramsAVTsearch.append("idplantarea", idplantarea_generado)
-            const avtdata = await getDatos(`${host}activosvinculados.controller.php`,paramsAVTsearch)
+            const avtdata = await getDatos(`${host}activosvinculados.controller.php`, paramsAVTsearch)
             console.log("avtdata: ", avtdata)
-    
+
             if (elim.eliminado) {
                 console.log("AVDATA ANTES DE VERIFICAR: ", avtdata);
                 console.log("avtdata.length antes de verificar: ", avtdata.length);
@@ -515,13 +601,13 @@ $(document).ready(async () => {
 
     })
 
-    btnTerminarPlan.addEventListener("click", ()=>{
-        console.log("estando cuando de click al btn terminar plan")        
+    btnTerminarPlan.addEventListener("click", () => {
+        console.log("estando cuando de click al btn terminar plan")
         console.log("pasando por el btn terminar plan")
         habilitarBeforeUnload = false
-        window.location.href = `http://localhost/CMMS/views/plantareas`               
-        
-        
+        window.location.href = `http://localhost/CMMS/views/plantareas`
+
+
     })
 
     window.addEventListener("beforeunload", (event) => {

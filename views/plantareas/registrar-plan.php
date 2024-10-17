@@ -68,7 +68,14 @@
 
                     </div>
                     <div class="card-footer">
-                        <button type="submit" id="btnGuardarTarea" class="btn btn-primary" disabled>Guardar</button>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <button type="submit" id="btnGuardarTarea" class="btn btn-primary" disabled>Guardar</button>
+                            </div>
+                            <div id="btnsTareaAcciones">
+                                
+                            </div>
+                        </div>
                     </div>
                 </div>
             </form>
