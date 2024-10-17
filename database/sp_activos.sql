@@ -139,6 +139,7 @@ CREATE PROCEDURE sp_list_activos
 	IN _idsubcategoria INT,
     IN _cod_identificacion CHAR(40),
     IN _fecha_adquisicion DATE,
+    IN _fecha_adquisicion_fin DATE,
     IN _idestado INT,
     IN _idmarca INT
 )
@@ -162,11 +163,11 @@ BEGIN
     INNER JOIN estados EST ON ACT.idestado = EST.idestado
     WHERE (SUB.idsubcategoria = _idsubcategoria OR _idsubcategoria IS NULL)
     AND (ACT.cod_identificacion LIKE CONCAT('%', _cod_identificacion, '%') OR _cod_identificacion IS NULL)
-    AND (ACT.fecha_adquisicion = _fecha_adquisicion OR _fecha_adquisicion IS NULL)
+    AND (ACT.fecha_adquisicion>=_fecha_adquisicion AND ACT.fecha_adquisicion<=_fecha_adquisicion_fin OR _fecha_adquisicion IS NULL OR _fecha_adquisicion_fin IS NULL)
     AND (EST.idestado = _idestado OR _idestado IS NULL)
     AND (MAR.idmarca = _idmarca OR _idmarca IS NULL);
 END $$
-
+-- CALL sp_list_activos(NULL, NULL, '2023-01-13','2023-04-01',NULL, NULL);
 DROP PROCEDURE IF EXISTS sp_update_estado_activo;
 DELIMITER $$
 CREATE PROCEDURE sp_update_estado_activo

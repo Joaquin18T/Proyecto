@@ -23,6 +23,7 @@ if (isset($_GET['operation'])) {
         'idsubcategoria' => $_GET['idsubcategoria']==""?null:$_GET['idsubcategoria'],
         'cod_identificacion' => $_GET['cod_identificacion']==""?null:$_GET['cod_identificacion'],
         'fecha_adquisicion' => $_GET['fecha_adquisicion']==""?null:$_GET['fecha_adquisicion'],
+        'fecha_adquisicion_fin' => $_GET['fecha_adquisicion_fin']==""?null:$_GET['fecha_adquisicion_fin'],
         'idestado' => $_GET['idestado']==""?null:$_GET['idestado'],
         'idmarca' => $_GET['idmarca']==""?null:$_GET['idmarca']
       ];

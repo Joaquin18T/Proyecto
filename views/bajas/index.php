@@ -43,6 +43,7 @@
                     <col style="width:1%">
                     <col style="width:1%">
                     <col style="width:1%">
+                    <col style="width:1%">
                     <col style="width:2%">
                   </colgroup>
                   <thead class="text-center">
@@ -53,6 +54,7 @@
                       <th>Fecha Adqui.</th>
                       <th>Resp. Princ.</th>
                       <th>Ult. Ubicacion</th>
+                      <th>Estado</th>
                       <th>Acciones</th>
                     </tr>
                   </thead>

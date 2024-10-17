@@ -33,6 +33,7 @@ BEGIN
         R.rol,
         U.estado,
         CONCAT(P.apellidos,' ',P.nombres) as nombres,
+        TD.tipodoc,
         P.num_doc,
         P.telefono,
         P.genero

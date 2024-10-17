@@ -31,14 +31,14 @@ INSERT INTO USUARIOS (idpersona, idrol, usuario, contrasena) VALUES
 (4,2,'pablo35a', '$2y$10$0xJpbL03XkLI5Zz/lCfyVu6HTYSDKKUpEfLF6BywNTBDJofh9YNlO'),
 (4, 2, 'r.avalos', '$2y$10$VrxeMCQteaNdX6LwxoZEYevp8BCwKTpIKTVebChbXcxnNX7BTIFaW'),
 (5, 1, 'p.avalos', '$2y$10$j1KccY6Iex7h19WR0pfMpumhp.dsjJkBCcFUbtVwbPCHw7hECJNyW'),
-(16, 1, 'garcia.juan', 'contrasena1'),
-(17, 2, 'perez.ana', 'contrasena2'),
-(18, 1, 'lopez.carlos', 'contrasena3'),
-(19, 2, 'martinez.laura', 'contrasena4'),
-(20, 1, 'sanchez.pedro', 'contrasena5'),
-(21, 2, 'ramirez.marta', 'contrasena6'),
-(22, 1, 'torres.jorge', 'contrasena7'),
-(23, 2, 'hernandez.lucia', 'contrasena8');
+(6, 1, 'garcia.juan', 'contrasena1'),
+(7, 2, 'perez.ana', 'contrasena2'),
+(8, 1, 'lopez.carlos', 'contrasena3'),
+(9, 2, 'martinez.laura', 'contrasena4'),
+(10, 1, 'sanchez.pedro', 'contrasena5'),
+(11, 2, 'ramirez.marta', 'contrasena6'),
+(12, 1, 'torres.jorge', 'contrasena7'),
+(13, 2, 'hernandez.lucia', 'contrasena8');
 
 -- UPDATE usuarios SET contrasena = '$2y$10$0xJpbL03XkLI5Zz/lCfyVu6HTYSDKKUpEfLF6BywNTBDJofh9YNlO' WHERE id_usuario=4;
 -- SELECT * FROM activos;

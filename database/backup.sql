@@ -1059,6 +1059,7 @@ BEGIN
 		ACT.idactivo,
         ACT.fecha_adquisicion,
         ACT.cod_identificacion,
+        EST.nom_estado,
         ACT.descripcion,
         (SELECT CONCAT(U.usuario,'|', P.apellidos, ' ', P.nombres) FROM usuarios U
         INNER JOIN personas P ON u.idpersona = P.id_persona WHERE
@@ -1342,6 +1343,7 @@ DELIMITER $$
 	IN _idsubcategoria INT,
     IN _cod_identificacion CHAR(40),
     IN _fecha_adquisicion DATE,
+    IN _fecha_adquisicion_fin DATE,
     IN _idestado INT,
     IN _idmarca INT
 )
@@ -1365,7 +1367,7 @@ BEGIN
     INNER JOIN estados EST ON ACT.idestado = EST.idestado
     WHERE (SUB.idsubcategoria = _idsubcategoria OR _idsubcategoria IS NULL)
     AND (ACT.cod_identificacion LIKE CONCAT('%', _cod_identificacion, '%') OR _cod_identificacion IS NULL)
-    AND (ACT.fecha_adquisicion = _fecha_adquisicion OR _fecha_adquisicion IS NULL)
+    AND (ACT.fecha_adquisicion>=_fecha_adquisicion AND ACT.fecha_adquisicion<=_fecha_adquisicion_fin OR _fecha_adquisicion IS NULL OR _fecha_adquisicion_fin IS NULL)
     AND (EST.idestado = _idestado OR _idestado IS NULL)
     AND (MAR.idmarca = _idmarca OR _idmarca IS NULL);
 END */$$
@@ -1416,6 +1418,7 @@ BEGIN
         R.rol,
         U.estado,
         CONCAT(P.apellidos,' ',P.nombres) as nombres,
+        TD.tipodoc,
         P.num_doc,
         P.telefono,
         P.genero

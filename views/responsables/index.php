@@ -49,6 +49,7 @@ require_once '../header.php';
                   <colgroup>
                     <col style="width: 0.5%;">
                     <col style="width: 2%;">
+                    <col style="width: 2%;">
                     <col style="width: 5%;">
                     <col style="width: 3%;">
                     <col style="width: 3%;">
@@ -58,6 +59,7 @@ require_once '../header.php';
                     <tr class="text-center">
                       <th>ID</th>
                       <th>Cod. Identificación</th>
+                      <th>Subcategoria</th>
                       <th>Descripción</th>
                       <th>Ubicacion</th>
                       <th>Responsable</th>
@@ -140,11 +142,10 @@ require_once '../header.php';
       </select>
       <label for="sb-ubicacion" class="form-label">Ubicacion</label>
     </div>
-    <div class="form-floating mt-2">
+    <div class="form-floating mt-3">
       <select name="sb-responsable" id="sb-responsable" class="form-control w-75">
-        <option value="">Selecciona</option>
       </select>
-      <label for="sb-responsable" class="form-label">Activo y responsable</label>
+      <label for="sb-responsable" class="form-label">Activo</label>
     </div>
 
   </div>
