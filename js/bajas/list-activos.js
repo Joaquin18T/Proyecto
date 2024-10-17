@@ -77,9 +77,10 @@ document.addEventListener("DOMContentLoaded",()=>{
         <td>${x.descripcion}</td>
         <td>${x.fecha_adquisicion}</td>
         <td>
-          ${x.dato==null?"Sin usuario asignado":x.dato}
+        ${x.dato==null?"Sin usuario asignado":x.dato}
         </td>
         <td>${x.ubicacion==null?"Sin Ubicacion":x.ubicacion}</td>
+        <td>${x.nom_estado}</td>
         <td>
           <button type="button" class="btn btn-sm btn-primary sb-registrar" data-id=${x.idactivo} data-user=${x.dato==null?"":x.dato}>Dar Baja</button>
         </td>

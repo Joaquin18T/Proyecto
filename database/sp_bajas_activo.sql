@@ -57,6 +57,7 @@ BEGIN
 		ACT.idactivo,
         ACT.fecha_adquisicion,
         ACT.cod_identificacion,
+        EST.nom_estado,
         ACT.descripcion,
         (SELECT CONCAT(U.usuario,'|', P.apellidos, ' ', P.nombres) FROM usuarios U
         INNER JOIN personas P ON u.idpersona = P.id_persona WHERE

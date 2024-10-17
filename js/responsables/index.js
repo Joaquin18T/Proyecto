@@ -59,6 +59,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       <tr>
         <td>${i+1}</td>
         <td>${element.cod_identificacion}</td>
+        <td>${element.subcategoria}</td>
         <td>${element.descripcion}</td>
         <td>${element.ubicacion}</td>
         <td><button type="button" data-idactivo=${element.idactivo} class="btn btn-sm btn-primary btn-colab">Ver colab</button></td>

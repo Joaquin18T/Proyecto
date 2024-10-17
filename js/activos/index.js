@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded",()=>{
   const host = "http://localhost/CMMS/controllers/";
   let myTable = null;
-
+  let rows = 5;
   function selector(value) {
     return document.querySelector(`#${value}`);
   }
@@ -70,18 +70,26 @@ document.addEventListener("DOMContentLoaded",()=>{
   })();
 
   async function showData(){
+    let data = [];
+    selector("table-activos tbody").innerHTML="";
     const params = new URLSearchParams();
     params.append("operation","getAllFilters");
     params.append("idsubcategoria",selector("subcategoria").value);
     params.append("cod_identificacion",selector("cod_identificacion").value);
     params.append("fecha_adquisicion",selector("fecha_adquisicion").value);
+    params.append("fecha_adquisicion_fin",selector("fecha_adquisicion_fin").value);
     params.append("idestado",selector("estado").value);
     params.append("idmarca",selector("marca").value);
 
-    const data = await getDatos(`${host}activo.controller.php`, params);
+    data = await getDatos(`${host}activo.controller.php`, params);
+
+    if(myTable){
+      myTable.pages=data;
+      myTable.options.perPage = data.length;
+    }
     console.log(data);
     
-    selector("table-activos tbody").innerHTML="";
+    
     if(data.length===0){
       selector("table-activos tbody").innerHTML=`
       <tr>
@@ -114,25 +122,30 @@ document.addEventListener("DOMContentLoaded",()=>{
       showEspecificaciones(especificaciones);
       especificaciones="";
     });
-    if(!myTable){
-      myTable = new DataTable("#table-activos",{
-        searchable:false,
-        perPage:5,
-        perPageSelect:[5,10,15],
-        labels:{
-          perPage:"{select} Filas por pagina",
-          noRows: "No econtrado",
-          info:"Mostrando {start} a {end} de {rows} filas"
-        }
-      });
-    }
+    createTable();
+    console.log(myTable);
+    
     buttonsUpdate();
     showDetalleBaja();
+  }
+
+  function createTable(){
+    myTable = new DataTable("#table-activos",{
+      searchable:false,
+      perPage:5,
+      perPageSelect:[5,10,15],
+      labels:{
+        perPage:"{select} Filas por pagina",
+        noRows: "No econtrado",
+        info:"Mostrando {start} a {end} de {rows} filas"
+      }
+    });
   }
   
   changeByFilters();
   function changeByFilters(){
     const filters = document.querySelectorAll(".filter");
+    selector("table-activos tbody").innerHTML="";
     filters.forEach(x=>{
       x.addEventListener("change",async()=>{
         await showData();

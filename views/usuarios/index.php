@@ -60,8 +60,9 @@
                       <th>Nom. Usuario</th>
                       <th>Rol</th>
                       <th>Nombres y Ap.</th>
-                      <th>Telefono</th>
+                      <th>Tipo doc.</th>
                       <th>Genero</th>
+                      <th>Estado</th>
                       <th>Acciones</th>
                     </tr>
                   </thead>

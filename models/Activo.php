@@ -95,17 +95,19 @@ class Activo extends ExecQuery{
         'idsubcategoria'=>null,
         'cod_identificacion'=>null,
         'fecha_adquisicion'=>null,
+        'fecha_adquisicion_fin'=>null,
         'idestado'=>null,
         'idmarca'=>null
       ];
 
       $realParams = array_merge($defaultParams, $params);
-      $cmd = parent::execQ("CALL sp_list_activos(?,?,?,?,?)");
+      $cmd = parent::execQ("CALL sp_list_activos(?,?,?,?,?,?)");
       $cmd->execute(
         array(
           $realParams['idsubcategoria'],
           $realParams['cod_identificacion'],
           $realParams['fecha_adquisicion'],
+          $realParams['fecha_adquisicion_fin'],
           $realParams['idestado'],
           $realParams['idmarca']
         )
@@ -243,7 +245,7 @@ class Activo extends ExecQuery{
 //   'idestado'=>4
 // ]));
 
-// echo json_encode($asc->listOfFilters(['fecha_adquisicion'=>'2024-10-12']));
+//echo json_encode($asc->listOfFilters(['fecha_adquisicion'=>'2023-01-13', 'fecha_adquisicion_fin'=>'2023-04-01']));
 
 // echo json_encode($asc->filterBySubcategoria(['idsubcategoria'=>7]));
 

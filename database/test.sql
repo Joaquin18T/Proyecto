@@ -11,10 +11,13 @@ select*from notificaciones;
 select*from activos;
 select*from usuarios where idrol=1;
 select*from personas;
+select*from USUARIOs;
 select*from estados;
 select*from bajas_activo;
 
 DELETE FROM bajas_activo where idbaja_activo>=1;
 UPDATE activos SET idestado = 3 WHERE idactivo = 1;    
 ALTER TABLE bajas_activo AUTO_INCREMENT = 1;
+
+select * from activos WHERE fecha_adquisicion>='2023-01-13' AND fecha_adquisicion <='2023-04-01'
 
