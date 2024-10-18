@@ -16,18 +16,32 @@ BEGIN
     GROUP BY pt.idplantarea, pt.descripcion;
 END $$
 
+DROP PROCEDURE IF EXISTS `obtenerPlanTareaPorId`
+DELIMITER $$
+CREATE PROCEDURE `obtenerPlanTareaPorId` (IN _idplantarea INT)
+BEGIN 
+	SELECT 
+        idplantarea, 
+        descripcion,
+        incompleto
+    FROM plandetareas
+    WHERE idplantarea = _idplantarea;
+END $$
+
 -- PROCEDIMIENTOS ALMACENADOS PLAN DE TAREA Y TAREAS
 DROP PROCEDURE IF EXISTS `obtenerPlantareasDetalles`
 DELIMITER $$
-CREATE PROCEDURE obtenerPlantareasDetalles()
+CREATE PROCEDURE obtenerPlantareasDetalles(IN _eliminado INT)
 BEGIN 
 SELECT PT.idplantarea, 
        PT.descripcion, 
        COUNT(DISTINCT TAR.idtarea) AS tareas_totales, 
-       COUNT(DISTINCT AV.idactivo_vinculado) AS activos_vinculados
+       COUNT(DISTINCT AV.idactivo_vinculado) AS activos_vinculados,
+       PT.incompleto
        FROM plandetareas PT
 LEFT JOIN tareas TAR ON TAR.idplantarea = PT.idplantarea
 LEFT JOIN activos_vinculados_tarea AV ON AV.idtarea = TAR.idtarea
+WHERE PT.eliminado = _eliminado
 GROUP BY PT.idplantarea, PT.descripcion
 ORDER BY PT.idplantarea DESC;
 END $$

@@ -115,7 +115,7 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <table id="tablaActivos" class="stripe row-border order-column nowrap" style="width:100%">
+                    <table id="tablaActivos" class="stripe row-border order-column nowrap table-hover" style="width:100%">
                         <thead>
                             <tr>
                                 <th></th>

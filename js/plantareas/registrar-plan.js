@@ -25,7 +25,6 @@ $(document).ready(async () => {
     const ulTareasAgregadas = $q(".listaTareasAgregadas");
     // LISTAS
     let activosElegidos = []
-    //let activosElegidosPrevia = []
     //SELECTS
     const selectElegirTareaParaActivo = $q("#elegirTareaParaActivo");
     const selectSubCategoria = $q("#elegirSubCategoria")
@@ -33,15 +32,9 @@ $(document).ready(async () => {
     //BOTONES
     const btnAgregarActivos = $q("#btnAgregarActivos")
     const btnTerminarPlan = $q("#btnTerminarPlan")
-    //const btnActualizarTarea = $q("#btnActualizarTarea")
-    //const btnCancelarTarea = $q("#btnCancelarTarea")
     const btnGuardarTarea = $q("#btnGuardarTarea")
     const btnsTareaAcciones = $q("#btnsTareaAcciones") // esto en realidad es un div pero guardara botones
-    //ESTADOS
-    let habilitarBeforeUnload = true
-    //let registrarTareasOk = false
-    //let registrarActivosOk = false
-    let btnTerminarPlanHabilitado = false
+
 
     renderTablaActivos()
 
@@ -66,7 +59,6 @@ $(document).ready(async () => {
 
     async function loadFunctions() {
         await renderPrioridades()
-        //await renderActivosList()           
     }
 
 
@@ -177,7 +169,6 @@ $(document).ready(async () => {
 
         const data = await getDatos(`${host}activo.controller.php`, params)
         activosList.innerHTML = "";
-        //        activosList.innerHTML = ""
         console.log("activos fitlrados", data);
         for (let i = 0; i < data.length; i++) {
             activosList.innerHTML += `
@@ -261,14 +252,6 @@ $(document).ready(async () => {
         return ultimaTareaAgregada
     }
 
-    async function eliminarPlanTarea(idplantarea) {
-        const paramsEliminacion = new FormData()
-        paramsEliminacion.append("operation", "eliminarPlanDeTarea")
-        const Fborrado = await fetch(`${host}plandetarea.controller.php/${idplantarea}`, { method: 'POST', body: paramsEliminacion })
-        const borrado = Fborrado.json()
-        return borrado
-    }
-
     /* ********************************************* EVENTOS *************************************************** */
 
     //AGREGAR NUEVA TAREA, FORMATEAR EL FORMULARIO TAREA, HABILITAR CAMPOS ACTIVOS Y RENDERIZAR LA TAREA AGREGADA AL SELECT
@@ -296,8 +279,8 @@ $(document).ready(async () => {
             console.log("la ultima tarea agregada: ", ultimaTareaAgregada);
             //AGREGA LAS TAREAS AGREGADAS A LA INTERFAZ DE LA LISTA
             ulTareasAgregadas.innerHTML += `
-                    <li class="list-group-item d-flex justify-content-between align-items-center tarea-agregada mb-3" data-tarea-id="${ultimaTareaAgregada[0]?.idtarea}">
-                        ${ultimaTareaAgregada[0]?.descripcion} - Tarea: ${ultimaTareaAgregada[0]?.idtarea}
+                    <li class="list-group-item d-flex justify-content-between align-items-center mb-3">
+                        <p class="tarea-agregada" data-tarea-id="${ultimaTareaAgregada[0]?.idtarea}">${ultimaTareaAgregada[0]?.descripcion} - Tarea: ${ultimaTareaAgregada[0]?.idtarea}</p>
                         <span class="badge bg-primary rounded-pill btn-eliminar-tarea" data-tarea-id="${ultimaTareaAgregada[0]?.idtarea}">
                             <i class="fa-solid fa-trash"></i>
                         </span>
@@ -344,8 +327,6 @@ $(document).ready(async () => {
                     if (elim.eliminado) {
                         if (tareasRegistradasObtenidas.length == 0 || avtObtenidas.length == 0) {
                             console.log("ya no hay tareas");
-                            btnTerminarPlanHabilitado = false;
-                            btnTerminarPlan.disabled = true;
                             habilitarCamposActivo(true)
                         }
                     }
@@ -407,12 +388,10 @@ $(document).ready(async () => {
                             const result = await response.json()
                             console.log("Tarea actualizada: ", result)
 
-                            const liTareaActual = document.querySelector(`li[data-tarea-id="${idtarea}"]`);
-                            liTareaActual.innerHTML = `
+                            const pTareaActual = document.querySelector(`p[data-tarea-id="${idtarea}"]`);
+                            pTareaActual.innerHTML = `
                                 ${$q("#txtDescripcionTarea").value} - Tarea: ${idtarea}
-                                <span class="badge bg-primary rounded-pill btn-eliminar-tarea" data-tarea-id="${idtarea}">
-                                    <i class="fa-solid fa-trash"></i>
-                                </span>
+                                
                             `;
 
                             // Aquí puedes refrescar la lista de tareas si es necesario o cualquier acción adicional
@@ -441,16 +420,38 @@ $(document).ready(async () => {
             return;
         }
 
-        //PRIMER PASO: VERIFICAR SI EL PLAN A REGISTRAR YA EXISTE
-        const obtenerPlanDeTareas = await getDatos(`${host}plandetarea.controller.php`, `operation=getPlanesDeTareas`)
-        for (let i = 0; i < obtenerPlanDeTareas.length; i++) {
-            if (descripcionPlanTarea.value == obtenerPlanDeTareas[i].descripcion) {
-                alert("ESTE PLAN YA EXISTE, CREA OTRO")
-                permitir = false
+        const paramsBuscarVigentes = new URLSearchParams()
+        paramsBuscarVigentes.append("operation", "getPlanesDeTareas")
+        paramsBuscarVigentes.append("eliminado", 0)
+
+        const paramsBuscarEliminados = new URLSearchParams()
+        paramsBuscarEliminados.append("operation", "getPlanesDeTareas")
+        paramsBuscarEliminados.append("eliminado", 1)
+
+        // PRIMER PASO: VERIFICAR SI EL PLAN A REGISTRAR YA EXISTE
+        const obtenerPlanDeTareasVigentes = await getDatos(`${host}plandetarea.controller.php`, paramsBuscarVigentes);
+        const obtenerPlanDeTareasEliminados = await getDatos(`${host}plandetarea.controller.php`, paramsBuscarEliminados);
+
+        // Comprobar en los planes vigentes
+        for (let i = 0; i < obtenerPlanDeTareasVigentes.length; i++) {
+            if (descripcionPlanTarea.value === obtenerPlanDeTareasVigentes[i].descripcion) {
+                alert("ESTE PLAN YA EXISTE EN VIGENTES, CREA OTRO");
+                permitir = false;
                 break;
             }
-
         }
+
+        // Comprobar en los planes eliminados
+        if (permitir) {
+            for (let i = 0; i < obtenerPlanDeTareasEliminados.length; i++) {
+                if (descripcionPlanTarea.value === obtenerPlanDeTareasEliminados[i].descripcion) {
+                    alert("ESTE PLAN YA EXISTE EN ELIMINADOS, CREA OTRO");
+                    permitir = false;
+                    break;
+                }
+            }
+        }
+
         if (permitir) {
             //SEGUNDO PASO: REGISTRAR PLAN DE TAREA
             const formPlan = new FormData()
@@ -461,11 +462,9 @@ $(document).ready(async () => {
             console.log("registro: ", registro)
             idplantarea_generado = registro.id ? registro.id : -1; //EL IDPLANTAREA GENERADO DESPUES DE CREAR EL PLAN SE ASIGNARA A ESA VARIABLE PARA PDOER VINCULAR LAS NEUVAS TAREAS AGREGADAS A ESE PLAN, SI NO ESTA CREADA ENTONCES TOMARA -1 EL CUAL SI INTENTAMOS AGREGAR UNA TAREA PUES NO SE PODRA CON -1
             console.log("idplantarea_generado: ", idplantarea_generado);
-            //GUARDAR EL ID DEL PLAN TAREA SERVIRA PARA VERIFICAR CUANDO SE VA SIN HABER TERMINADO DE COMPLETAR TODO "BORRADOR".
-            window.localStorage.clear();
-            window.localStorage.setItem("idplantarea", idplantarea_generado);
             await loadFunctions();
             habilitarCamposTarea(false);
+            btnTerminarPlan.disabled = false
         }
     });
 
@@ -535,16 +534,6 @@ $(document).ready(async () => {
             chk.checked = false;  // Deselecciona el checkbox
         });
 
-        const avtObtenidos = await obtenerActivosVinculados()
-        if (avtObtenidos.length == 0) {
-            console.log("ya no hay tareas");
-            btnTerminarPlanHabilitado = false;
-            btnTerminarPlan.disabled = true;
-        } else {
-            btnTerminarPlanHabilitado = true;
-            btnTerminarPlan.disabled = false
-        }
-
     })
 
     listaActivosAsignados.addEventListener("click", async (event) => {
@@ -575,15 +564,7 @@ $(document).ready(async () => {
             const avtdata = await getDatos(`${host}activosvinculados.controller.php`, paramsAVTsearch)
             console.log("avtdata: ", avtdata)
 
-            if (elim.eliminado) {
-                console.log("AVDATA ANTES DE VERIFICAR: ", avtdata);
-                console.log("avtdata.length antes de verificar: ", avtdata.length);
-                if (avtdata.length === 0) {
-                    console.log("ya no hay activos vinculados");
-                    btnTerminarPlanHabilitado = false;
-                    btnTerminarPlan.disabled = true;
-                }
-            }
+
         }
     })
 
@@ -601,26 +582,36 @@ $(document).ready(async () => {
 
     })
 
-    btnTerminarPlan.addEventListener("click", () => {
+    btnTerminarPlan.addEventListener("click", async () => {
         console.log("estando cuando de click al btn terminar plan")
         console.log("pasando por el btn terminar plan")
         habilitarBeforeUnload = false
-        window.location.href = `http://localhost/CMMS/views/plantareas`
+        // verificar
+        const tareas = await obtenerTareas()
+        const avt = await obtenerActivosVinculados()
+        if (tareas.length == 0 || avt.length == 0) {
+            alert("EL PLAN SE MANTIENE INCOMPLETO")
+            window.location.href = `http://localhost/CMMS/views/plantareas`
+        }
+        else {
+            const formActualizarPlan = new FormData()
+            formActualizarPlan.append("operation", "actualizarPlanDeTareas")
+            formActualizarPlan.append("idplantarea", idplantarea_generado)
+            formActualizarPlan.append("descripcion", $q("#txtDescripcionPlanTarea").value)
+            formActualizarPlan.append("incompleto", 0)
 
+            const response = await fetch(`${host}plandetarea.controller.php`, {
+                method: "POST",
+                body: formActualizarPlan
+            })
+
+            const estado = await response.json()
+            console.log("Plan actualizado: ", estado)
+            if (estado.actualizado) {
+                window.location.href = `http://localhost/CMMS/views/plantareas`
+            }
+        }
 
     })
-
-    window.addEventListener("beforeunload", (event) => {
-        if (habilitarBeforeUnload) {
-            (async () => {
-                const borrado = await eliminarPlanTarea(window.localStorage.getItem("idplantarea"));
-                console.log("borrado?: ", borrado)
-                return
-            })();
-            window.localStorage.removeItem("idplantarea");
-            event.preventDefault(); // Ya no es necesario en la mayoría de los navegadores, pero se deja por compatibilidad
-            event.returnValue = ''; // Requerido para mostrar el diálogo de confirmación de salida
-        }
-    });
 
 })

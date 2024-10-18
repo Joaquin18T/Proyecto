@@ -10,11 +10,15 @@ $plandetarea = new PlanDeTarea();
 if (isset($_GET['operation'])) {
     switch ($_GET['operation']) {
         case 'getPlanesDeTareas':
-            echo json_encode($plandetarea->getPlanesDeTareas());
+            echo json_encode($plandetarea->getPlanesDeTareas(['eliminado' => $_GET['eliminado']]));
             break;
 
         case 'verificarPlanInconcluso':
             echo json_encode($plandetarea->verificarPlanInconcluso(['idplantarea' => $_GET['idplantarea']]));
+            break;
+        
+        case 'obtenerPlanTareaPorId':
+            echo json_encode($plandetarea->obtenerPlanTareaPorId(['idplantarea' => $_GET['idplantarea']]));
             break;
     }
 }
@@ -35,7 +39,7 @@ if (isset($_POST['operation'])) {
 
             $idEliminar = explode("/", $path);
             $idplantarea = ($path != '/') ? end($idEliminar) : null;
-            $estado = $plandetarea->eliminarPlanDeTarea(["idplantarea" => $idplantarea]);
+            $estado = $plandetarea->eliminarPlanDeTarea(["idplantarea" => $idplantarea, "eliminado" => $_POST['eliminado']]);
             echo json_encode(["eliminado" => $estado]);
             break;
 
@@ -43,7 +47,7 @@ if (isset($_POST['operation'])) {
             $datosEnviar = [
                 "idplantarea"           => $_POST["idplantarea"],
                 "descripcion"           => $_POST["descripcion"],
-                "borrador"              => $_POST["borrador"]
+                "incompleto"              => $_POST["incompleto"]
             ];
             $actualizado = $plandetarea->actualizarPlanDeTareas($datosEnviar);
             echo json_encode(["actualizado" => $actualizado]); // array , accedemos a posicion 0 por que ahi se encuentra

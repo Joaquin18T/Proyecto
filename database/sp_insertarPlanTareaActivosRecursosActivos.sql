@@ -17,8 +17,8 @@ BEGIN
         SET existe_error = 1;
 	END;
     
-    INSERT INTO plandetareas (descripcion)
-    VALUES (_descripcion);
+    INSERT INTO plandetareas (descripcion, incompleto)
+    VALUES (_descripcion, true);
     
     IF existe_error = 1 THEN
 		SET _idplantarea = -1;
@@ -39,8 +39,8 @@ CREATE PROCEDURE `insertarTarea`(
     IN _idplantarea INT,
     IN _idtipo_prioridad INT,
     IN _descripcion VARCHAR(200),
-    IN _fecha_inicio DATETIME,
-    IN _fecha_vencimiento DATETIME,
+    IN _fecha_inicio DATE,
+    IN _fecha_vencimiento DATE,
     IN _cant_intervalo INT,
     IN _frecuencia VARCHAR(10),
     IN _idestado INT
