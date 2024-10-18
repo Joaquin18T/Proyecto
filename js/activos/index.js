@@ -1,9 +1,8 @@
-document.addEventListener("DOMContentLoaded",()=>{
+document.addEventListener("DOMContentLoaded", () => {
   const host = "http://localhost/CMMS/controllers/";
   let myTable = null;
-  let rows = 5;
-  function selector(value) {
-    return document.querySelector(`#${value}`);
+  function $selector(value) {
+    return document.querySelector(`${value}`);
   }
 
   async function getDatos(link, params) {
@@ -19,87 +18,92 @@ document.addEventListener("DOMContentLoaded",()=>{
   }
 
   (async () => {
-    const data = await getDatos(`${host}subcategoria.controller.php`, "operation=getSubCategoria");
+    const data = await getDatos(
+      `${host}subcategoria.controller.php`,
+      "operation=getSubCategoria"
+    );
     //console.log(data);
-    data.forEach(x => {
+    data.forEach((x) => {
       const element = createOption(x.idsubcategoria, x.subcategoria);
-      selector("subcategoria").appendChild(element);
-    })
-  })();
-
-  (async()=>{
-    const params = new URLSearchParams();
-    params.append("operation", "getAll");
-    //params.append("idsubcategoria", id);
-    const data = await getDatos(`${host}marca.controller.php`, "operation=getAll");
-
-    //console.log(data);
-    
-    data.forEach(x => {
-      const element = createOption(x.idmarca, x.marca);
-      selector("marca").appendChild(element);
-    })
-  })();
-
-  (async()=>{
-    const data = await getDatos(`${host}estado.controller.php`, "operation=getAllByActivo");
-    //console.log(data);
-    data.forEach(x=>{
-      const element = createOption(x.idestado, x.nom_estado);
-      selector("estado").appendChild(element);
+      $selector("#subcategoria").appendChild(element);
     });
   })();
 
-  function getDate(){
+  (async () => {
+    const params = new URLSearchParams();
+    params.append("operation", "getAll");
+    //params.append("idsubcategoria", id);
+    const data = await getDatos(
+      `${host}marca.controller.php`,
+      "operation=getAll"
+    );
+
+    //console.log(data);
+
+    data.forEach((x) => {
+      const element = createOption(x.idmarca, x.marca);
+      $selector("#marca").appendChild(element);
+    });
+  })();
+
+  (async () => {
+    const data = await getDatos(
+      `${host}estado.controller.php`,
+      "operation=getAllByActivo"
+    );
+    //console.log(data);
+    data.forEach((x) => {
+      const element = createOption(x.idestado, x.nom_estado);
+      $selector("#estado").appendChild(element);
+    });
+  })();
+
+  function getDate() {
     const today = new Date();
     const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
     const formattedDate = `${year}-${month}-${day}`;
-    //selector("fecha").value = formattedDate;
+    //$("fecha").value = formattedDate;
     return formattedDate;
   }
 
-  selector("fecha_adquisicion").addEventListener("change",()=>{
-    const valor = selector("fecha_adquisicion").value;
+  $selector("#fecha_adquisicion").addEventListener("change", () => {
+    const valor = $selector("#fecha_adquisicion").value;
     console.log(valor);
   });
 
-  (async()=>{
+  (async () => {
     await showData();
   })();
 
-  async function showData(){
+  async function showData() {
     let data = [];
-    selector("table-activos tbody").innerHTML="";
+    $selector("#table-activos tbody").innerHTML = "";
     const params = new URLSearchParams();
-    params.append("operation","getAllFilters");
-    params.append("idsubcategoria",selector("subcategoria").value);
-    params.append("cod_identificacion",selector("cod_identificacion").value);
-    params.append("fecha_adquisicion",selector("fecha_adquisicion").value);
-    params.append("fecha_adquisicion_fin",selector("fecha_adquisicion_fin").value);
-    params.append("idestado",selector("estado").value);
-    params.append("idmarca",selector("marca").value);
+    params.append("operation", "getAllFilters");
+    params.append("idsubcategoria", $selector("#subcategoria").value);
+    params.append("cod_identificacion", $selector("#cod_identificacion").value);
+    params.append("fecha_adquisicion", $selector("#fecha_adquisicion").value);
+    params.append(
+      "fecha_adquisicion_fin",
+      $selector("#fecha_adquisicion_fin").value
+    );
+    params.append("idestado", $selector("#estado").value);
+    params.append("idmarca", $selector("#marca").value);
 
     data = await getDatos(`${host}activo.controller.php`, params);
 
-    if(myTable){
-      myTable.pages=data;
-      myTable.options.perPage = data.length;
-    }
-    console.log(data);
-    
-    
-    if(data.length===0){
-      selector("table-activos tbody").innerHTML=`
+    if (data.length === 0) {
+      $selector("#table-activos tbody").innerHTML = `
       <tr>
         <td colspan="6">No encontrado</td>
       </tr>
       `;
     }
-    data.forEach(x=>{
+    data.forEach((x) => {
       let especificaciones = JSON.parse(x.especificaciones);
-      selector("table-activos tbody").innerHTML+=`
+      $selector("#table-activos tbody").innerHTML += `
       <tr >
         <td>${x.idactivo}</td>
         <td>${x.subcategoria}</td>
@@ -112,95 +116,107 @@ document.addEventListener("DOMContentLoaded",()=>{
         <td>${x.nom_estado}</td>
         <td><div class="field-espec ms-auto"></div></td>
         <td>
-          ${x.nom_estado==="Fuera de Servicio"?'Sin Acciones':
-            x.nom_estado==="Baja"?`<button type="button" class="btn btn-sm btn-primary btn-baja" data-id=${x.idactivo}>Detalles</button>`:
-            `<button type="button" class="btn btn-sm btn-primary modal-update" data-id=${x.idactivo}>update</button>
-          `}
+          ${
+            x.nom_estado === "Fuera de Servicio"
+              ? "Sin Acciones"
+              : x.nom_estado === "Baja"
+              ? `<button type="button" class="btn btn-sm btn-primary btn-baja" data-id=${x.idactivo}>Detalles</button>`
+              : `<button type="button" class="btn btn-sm btn-primary modal-update" data-id=${x.idactivo}>update</button>
+          `
+          }
         </td>
       </tr>
       `;
       showEspecificaciones(especificaciones);
-      especificaciones="";
+      especificaciones = "";
     });
-    createTable();
-    console.log(myTable);
-    
     buttonsUpdate();
     showDetalleBaja();
   }
+  createTable();
 
-  function createTable(){
-    myTable = new DataTable("#table-activos",{
-      searchable:false,
-      perPage:5,
-      perPageSelect:[5,10,15],
-      labels:{
-        perPage:"{select} Filas por pagina",
-        noRows: "No econtrado",
-        info:"Mostrando {start} a {end} de {rows} filas"
-      }
-    });
+  function createTable() {
+    if (myTable) {
+      myTable.clear().rows.add($("#tb-body-activo").find("tr")).draw();
+    } else {
+      // Inicializa DataTable si no ha sido inicializado antes
+      myTable = $("#table-activos").DataTable({
+        paging: true,
+        searching: false,
+        lengthMenu: [5, 10, 15, 20],
+        pageLength: 5,
+        language: {
+          lengthMenu: "Mostrar _MENU_ filas por página",
+          paginate: {
+            previous: "Anterior",
+            next: "Siguiente",
+          },
+          emptyTable: "No hay datos disponibles",
+          search: "Buscar:",
+          info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+        },
+      });
+    }
   }
-  
+
   changeByFilters();
-  function changeByFilters(){
+  function changeByFilters() {
     const filters = document.querySelectorAll(".filter");
-    selector("table-activos tbody").innerHTML="";
-    filters.forEach(x=>{
-      x.addEventListener("change",async()=>{
+    $selector("#table-activos tbody").innerHTML = "";
+    filters.forEach((x) => {
+      x.addEventListener("change", async () => {
         await showData();
       });
-      if(x.id==="cod_identificacion"){
-        x.addEventListener("keyup",async()=>{
+      if (x.id === "cod_identificacion") {
+        x.addEventListener("keyup", async () => {
           await showData();
         });
       }
-      
     });
   }
 
-  function showEspecificaciones(data={}){
+  function showEspecificaciones(data = {}) {
     let contain = document.createElement("ul");
 
-    Object.entries(data).forEach(([key, value])=>{
+    Object.entries(data).forEach(([key, value]) => {
       const element = document.createElement("li");
       element.innerHTML = `<strong>${key}</strong>: ${value}`;
-      contain.appendChild(element);      
+      contain.appendChild(element);
     });
 
     const fields = document.querySelectorAll(".field-espec");
-    fields.forEach(x=>{
+    fields.forEach((x) => {
       x.appendChild(contain);
     });
   }
 
-  function buttonsUpdate(){
+  function buttonsUpdate() {
     const buttons = document.querySelectorAll(".modal-update");
-    buttons.forEach(x=>{
-      x.addEventListener("click",(e)=>{
-        const id= e.target.dataset.id;
-        localStorage.setItem('id', id);
-        
-        const modalImg = new bootstrap.Modal(selector("modal-update"));
+    buttons.forEach((x) => {
+      x.addEventListener("click", (e) => {
+        const id = e.target.dataset.id;
+        localStorage.setItem("id", id);
+
+        const modalImg = new bootstrap.Modal($selector("#modal-update"));
         modalImg.show();
-      })
+      });
     });
   }
 
-  function showDetalleBaja(){
+  function showDetalleBaja() {
     const btnBajas = document.querySelectorAll(".btn-baja");
 
-    btnBajas.forEach(x=>{
-      x.addEventListener("click",async()=>{
+    btnBajas.forEach((x) => {
+      x.addEventListener("click", async () => {
         const id = parseInt(x.getAttribute("data-id"));
         const desc = await getDescripcion(id);
-        selector("desc").textContent=desc;
+        $selector("#desc").textContent = desc;
 
         const dataBaja = await dataActivoBaja(id);
         await showDataBajaActivo(dataBaja);
         showPDF(dataBaja.ruta_doc);
 
-        const sidebar = selector("activo-baja-detalle");
+        const sidebar = $selector("#activo-baja-detalle");
         const offCanvas = new bootstrap.Offcanvas(sidebar);
 
         offCanvas.show();
@@ -208,62 +224,67 @@ document.addEventListener("DOMContentLoaded",()=>{
     });
   }
 
-  async function dataActivoBaja(idactivo){
+  async function dataActivoBaja(idactivo) {
     const params = new URLSearchParams();
     params.append("operation", "dataBajaActivo");
     params.append("idactivo", idactivo);
 
     const data = await getDatos(`${host}bajaActivo.controller.php`, params);
     return data[0];
-    
   }
 
-  async function showDataBajaActivo(data){
+  async function showDataBajaActivo(data) {
     const aprobacion = await getUser(data.aprobacion);
 
-    selector("fecha-baja").innerHTML =`<strong>Fecha de Baja: </strong>${data.fecha_baja}`;
-    selector("aprobacion").innerHTML = `<strong>Aprobado por: </strong>${aprobacion.dato} (${aprobacion.usuario})`;
-    selector("motivo").textContent = data.motivo;
-    selector("comentario").textContent = data.coment_adicionales==null?"Sin ningun comentario":data.coment_adicionales;
+    $selector(
+      "#fecha-baja"
+    ).innerHTML = `<strong>Fecha de Baja: </strong>${data.fecha_baja}`;
+    $selector(
+      "#aprobacion"
+    ).innerHTML = `<strong>Aprobado por: </strong>${aprobacion.dato} (${aprobacion.usuario})`;
+    $selector("#motivo").textContent = data.motivo;
+    $selector("#comentario").textContent =
+      data.coment_adicionales == null
+        ? "Sin ningun comentario"
+        : data.coment_adicionales;
   }
 
-  function showPDF(route){
-    let cont=0;
-    let index=0;
-    for(let i=0; i<route.length; i++){
-      if(route[i]==="/"){
+  function showPDF(route) {
+    let cont = 0;
+    let index = 0;
+    for (let i = 0; i < route.length; i++) {
+      if (route[i] === "/") {
         cont++;
       }
-      if(cont===3){
+      if (cont === 3) {
         index = i;
         break;
       }
     }
-    const newRoute =`http://localhost${route.slice(index, route.length)}`;
+    const newRoute = `http://localhost${route.slice(index, route.length)}`;
     console.log(newRoute);
-    
-    selector("view-pdf-baja").href = newRoute;
-    cont=0;
-    index=0;
+
+    $selector("#view-pdf-baja").href = newRoute;
+    cont = 0;
+    index = 0;
   }
 
-  async function getUser(iduser){
+  async function getUser(iduser) {
     const params = new URLSearchParams();
     params.append("operation", "getUserById");
     params.append("idusuario", iduser);
 
     const data = await getDatos(`${host}usuarios.controller.php`, params);
-    
+
     return data[0];
   }
 
-  async function getDescripcion(idactivo){
+  async function getDescripcion(idactivo) {
     const params = new URLSearchParams();
     params.append("operation", "getById");
     params.append("idactivo", idactivo);
-    const data = await getDatos(`${host}activo.controller.php`,params);
-  
-    return data[0].descripcion
-  }
+    const data = await getDatos(`${host}activo.controller.php`, params);
 
+    return data[0].descripcion;
+  }
 });

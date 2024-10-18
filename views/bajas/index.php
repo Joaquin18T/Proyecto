@@ -15,7 +15,7 @@
               <div class="row g-3 mb-3">
                 <div class="col-md-2">
                   <div class="form-floating">
-                    <input type="date" class="form-control filter" id="fecha_adquisicion">
+                    <input type="date" id="fecha_adquisicion" class="form-control filter" >
                     <label for="fecha_adquisicion">Fecha</label>
                   </div>
                 </div>
@@ -58,7 +58,7 @@
                       <th>Acciones</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody id="table-activos-tbody">
                   </tbody>
                 </table>
 
@@ -103,5 +103,11 @@
   </div>
 </div>
 <?php require_once '../footer.php' ?>
+<!-- JQUERY -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
 <script src="<?= $host ?>js/bajas/list-activos.js"></script>
-<script src="https://unpkg.com/vanilla-datatables@latest/dist/vanilla-dataTables.min.js" type="text/javascript"></script>
+</body>
+</html>
+

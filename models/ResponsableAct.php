@@ -157,9 +157,25 @@ class ResponsableAct extends ExecQuery{
   public function listResp_activo(){
     return parent::getData("sp_list_resp_activo");
   }
+
+  public function getResponsablePrin($params=[]):array{
+    try{
+      $cmd = parent::execQ("CALL sp_getresp_principal(?)");
+      $cmd->execute(
+        array(
+          $params['idactivo_resp']
+        )
+      );
+      return $cmd->fetchAll(PDO::FETCH_ASSOC);
+    }catch(Exception $e){
+      error_log("Error: ".$e->getMessage());
+    }
+  }
 }
 
 // $resp = new ResponsableAct();
+
+// echo json_encode($resp->getResponsablePrin(['idactivo_resp'=>3]));
 
 // echo json_encode($resp->listResp_activo());
 

@@ -8,7 +8,8 @@ document.addEventListener("DOMContentLoaded",()=>{
     myTable:null,
     no_responsable:false
   };
-
+  console.log(selector("estado"));
+  
   function selector(value) {
     return document.querySelector(`#${value}`);
   }
@@ -42,10 +43,6 @@ document.addEventListener("DOMContentLoaded",()=>{
     });
   })();
 
-  selector("fecha_adquisicion").addEventListener("change",()=>{
-    const valor = selector("fecha_adquisicion").value;
-    console.log(valor);
-  });
 
   (async()=>{
     await showData();
@@ -56,7 +53,6 @@ document.addEventListener("DOMContentLoaded",()=>{
     params.append("operation","sinServicio");
     params.append("fecha_adquisicion",selector("fecha_adquisicion").value);
     params.append("idestado",selector("estado").value);
-
     const data = await getDatos(`${host}bajaActivo.controller.php`, params);
     console.log(data);
     
@@ -87,19 +83,31 @@ document.addEventListener("DOMContentLoaded",()=>{
       </tr>
       `;
     });
-    if(!globals.myTable){
-      globals.myTable = new DataTable("#table-activos",{
-        searchable:false,
-        perPage:5,
-        perPageSelect:[5,10,15],
-        labels:{
-          perPage:"{select} Filas por pagina",
-          noRows: "No econtrado",
-          info:"Mostrando {start} a {end} de {rows} filas"
-        }
+    btnRegistrar();
+  }
+  createTable();
+  function createTable(){
+    if (globals.myTable) {
+      globals.myTable.clear().rows.add($("#table-activos-tbody").find("tr")).draw();
+    } else {
+      // Inicializa DataTable si no ha sido inicializado antes
+      globals.myTable = $("#table-activos").DataTable({
+        paging: true,
+        searching: false,
+        lengthMenu: [5, 10, 15, 20],
+        pageLength: 5,
+        language: {
+          lengthMenu: "Mostrar _MENU_ filas por página",
+          paginate: {
+            previous: "Anterior",
+            next: "Siguiente",
+          },
+          emptyTable: "No hay datos disponibles",
+          search: "Buscar:",
+          info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+        },
       });
     }
-    btnRegistrar();
   }
 
   function btnRegistrar(){
@@ -146,7 +154,16 @@ document.addEventListener("DOMContentLoaded",()=>{
     const respuesta = await data.json();
     return respuesta;
   }
-
+  filtersData();
+  function filtersData(){
+    const filters = document.querySelectorAll(".filter");
+    filters.forEach(x=>{
+      x.addEventListener("change",async()=>{
+        await showData();
+      });
+    });
+  }
+  
   selector("register-baja").addEventListener("submit",async(e)=>{
     e.preventDefault();
 
@@ -289,8 +306,8 @@ document.addEventListener("DOMContentLoaded",()=>{
       responsable:0,
       user_responsable:"",
       cod_identificacion:"",
-      myTable:null,
-      no_responsable:false
+      no_responsable:false,
+      myTable:null
     };
   }
 });

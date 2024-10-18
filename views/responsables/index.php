@@ -66,7 +66,7 @@ require_once '../header.php';
                       <th>Acciones</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody id="tbody-tb-activo-resp">
         
                   </tbody>
                 </table>
@@ -136,24 +136,29 @@ require_once '../header.php';
     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
   <div class="offcanvas-body">
-    <div class="form-floating">
-      <select name="sb-ubicacion" id="sb-ubicacion" class="form-control w-75">
-        <option value="">Selecciona</option>
-      </select>
-      <label for="sb-ubicacion" class="form-label">Ubicacion</label>
-    </div>
-    <div class="form-floating mt-3">
-      <select name="sb-responsable" id="sb-responsable" class="form-control w-75">
-      </select>
-      <label for="sb-responsable" class="form-label">Activo</label>
-    </div>
+    <form class="form mt-4" id="form-update-ubicacion">
+      <div class="form-floating">
+        <select name="sb-ubicacion" id="sb-ubicacion" class="form-control w-75">
+          <option value="">Selecciona</option>
+        </select>
+        <label for="sb-ubicacion" class="form-label">Ubicacion</label>
+      </div>
+      <div class="form-floating mt-3">
+        <input type="text" id="sb-responsable" class="form-control w-75" readonly>
+        <label for="sb-responsable" class="form-label">Responsable P.</label>
+      </div>
+      <button type="submit" class="btn btn-sm btn-success mt-3">Actualizar</button>
+    </form>
 
   </div>
 </div>
 <!-- ./SIDEBAR DE ACTUALIZAR LA UBICACION -->
 
 <?php require_once '../footer.php' ?>
-<script src="https://unpkg.com/vanilla-datatables@latest/dist/vanilla-dataTables.min.js" type="text/javascript"></script>
+<!-- JQUERY -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- LIBRERIA -->
+<script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
 <script src="../../js/responsables/index.js"></script>
 </body>
 
