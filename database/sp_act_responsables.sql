@@ -30,14 +30,14 @@ CREATE VIEW v_activo_resp AS
       SUB.subcategoria,
       ACT.modelo,
       MAR.marca,
-	  MAX(UBI.ubicacion) ubicacion,
+	  UBI.ubicacion,
 	  ACT.fecha_adquisicion,
-	  MAX(RES.condicion_equipo) condicion_equipo,
+	  RES.condicion_equipo,
 	  EST.nom_estado,
       RES.autorizacion,
       RES.descripcion despresp,
       ACT.especificaciones,
-	  MAX(RES.imagenes) imagenes
+	  RES.imagenes
 	FROM activos_responsables RES
 	INNER JOIN activos ACT ON RES.idactivo = ACT.idactivo
     INNER JOIN marcas MAR ON ACT.idmarca = MAR.idmarca
@@ -45,11 +45,15 @@ CREATE VIEW v_activo_resp AS
     INNER JOIN subcategorias SUB ON ACT.idsubcategoria = SUB.idsubcategoria
 	INNER JOIN estados EST ON ACT.idestado = EST.idestado
 	INNER JOIN (
-		SELECT H.idactivo_resp, MAX(H.idubicacion) AS idubicacion
-		FROM historial_activos H
-		GROUP BY H.idactivo_resp
-    )HIS ON HIS.idactivo_resp = RES.idactivo_resp
-	INNER JOIN ubicaciones UBI ON HIS.idubicacion = UBI.idubicacion
+		SELECT H1.idactivo_resp, UBI1.ubicacion
+		FROM historial_activos H1
+        INNER JOIN ubicaciones UBI1 ON H1.idubicacion = UBI1.idubicacion
+        WHERE H1.fecha_movimiento = (
+			SELECT MAX(H2.fecha_movimiento)
+            FROM historial_activos H2
+            WHERE H2.idactivo_resp = H1.idactivo_resp
+        )
+    )AS UBI ON UBI.idactivo_resp = RES.idactivo_resp
     WHERE ACT.idestado=1
     GROUP BY ACT.idactivo
     ORDER BY RES.fecha_asignacion DESC;
@@ -176,7 +180,7 @@ BEGIN
       SUB.subcategoria,
       ACT.modelo,
       MAR.marca,
-	  MAX(UBI.ubicacion) ubicacion,
+	  UBI.ubicacion,
 	  EST.nom_estado,
       RES.autorizacion
 	FROM activos_responsables RES
@@ -186,19 +190,22 @@ BEGIN
     INNER JOIN subcategorias SUB ON ACT.idsubcategoria = SUB.idsubcategoria
 	INNER JOIN estados EST ON ACT.idestado = EST.idestado
 	INNER JOIN (
-		SELECT H.idactivo_resp, MAX(H.idubicacion) AS idubicacion
-		FROM historial_activos H
-		GROUP BY H.idactivo_resp
-    )HIS ON HIS.idactivo_resp = RES.idactivo_resp
-	INNER JOIN ubicaciones UBI ON HIS.idubicacion = UBI.idubicacion
-    WHERE (SUB.idsubcategoria = _idsubcategoria OR _idsubcategoria IS NULL) AND
-    (UBI.idubicacion = _idubicacion OR _idubicacion IS NULL) AND
-    (ACT.cod_identificacion LIKE CONCAT('%', _cod_identificacion, '%') OR _cod_identificacion IS NULL) AND ACT.idestado=1
+		SELECT H1.idactivo_resp, UBI1.ubicacion, UBI1.idubicacion
+		FROM historial_activos H1
+        INNER JOIN ubicaciones UBI1 ON H1.idubicacion = UBI1.idubicacion
+        WHERE H1.fecha_movimiento = (
+			SELECT MAX(H2.fecha_movimiento)
+            FROM historial_activos H2
+            WHERE H2.idactivo_resp = H1.idactivo_resp
+        )
+    )UBI ON UBI.idactivo_resp = RES.idactivo_resp
+    WHERE 	(SUB.idsubcategoria = _idsubcategoria OR _idsubcategoria IS NULL) AND
+			(UBI.idubicacion = _idubicacion OR _idubicacion IS NULL) AND
+			(ACT.cod_identificacion LIKE CONCAT('%', _cod_identificacion, '%') OR _cod_identificacion IS NULL) AND ACT.idestado=1
     GROUP BY ACT.idactivo
     ORDER BY RES.fecha_asignacion DESC;
 END $$
-
-call sp_search_activo_responsable(null, null, null)
+CALL sp_search_activo_responsable(null, null, null);
 
 DROP PROCEDURE IF EXISTS sp_list_resp_activo;
 DELIMITER $$
@@ -212,3 +219,25 @@ BEGIN
     INNER JOIN activos A ON R.idactivo = A.idactivo
     WHERE A.idestado >=3 AND A.idestado<=4;
 END $$
+
+DROP PROCEDURE IF EXISTS sp_getresp_principal;
+DELIMITER $$
+CREATE PROCEDURE sp_getresp_principal
+(
+	IN _idactivo_resp INT
+)
+BEGIN
+	SELECT 
+		RES.idactivo_resp,
+		P.apellidos, P.nombres,
+        U.usuario
+	FROM activos_responsables RES
+    INNER JOIN usuarios U ON RES.idusuario = U.id_usuario
+    INNER JOIN personas P ON U.idpersona = P.id_persona
+    WHERE RES.idactivo_resp = _idactivo_resp;
+END $$
+
+
+
+
+

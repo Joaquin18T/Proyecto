@@ -1,5 +1,5 @@
 /*
-SQLyog Ultimate v12.5.1 (64 bit)
+SQLyog Professional v12.5.1 (64 bit)
 MySQL - 10.4.32-MariaDB : Database - gamp
 *********************************************************************
 */
@@ -258,7 +258,7 @@ CREATE TABLE `historial_activos` (
   KEY `fk_idubicacion` (`idubicacion`),
   CONSTRAINT `fk_idactivo_resp` FOREIGN KEY (`idactivo_resp`) REFERENCES `activos_responsables` (`idactivo_resp`),
   CONSTRAINT `fk_idubicacion` FOREIGN KEY (`idubicacion`) REFERENCES `ubicaciones` (`idubicacion`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `historial_activos` */
 
@@ -272,7 +272,12 @@ insert  into `historial_activos`(`idhistorial_activo`,`idactivo_resp`,`idubicaci
 (7,7,3,'2024-10-16 18:07:39'),
 (8,8,4,'2024-10-16 18:07:39'),
 (9,9,5,'2024-10-16 18:07:39'),
-(10,10,2,'2024-10-16 18:07:39');
+(10,10,2,'2024-10-16 18:07:39'),
+(12,9,3,'2024-10-17 20:00:35'),
+(13,8,1,'2024-10-17 21:25:18'),
+(14,9,5,'2024-10-17 21:26:17'),
+(15,8,3,'2024-10-17 21:27:47'),
+(16,10,4,'2024-10-17 21:28:09');
 
 /*Table structure for table `historial_estado_odt` */
 
@@ -391,8 +396,8 @@ CREATE TABLE `personas` (
   `genero` char(1) NOT NULL,
   `telefono` char(9) DEFAULT NULL,
   PRIMARY KEY (`id_persona`),
-  UNIQUE KEY `uk_telefono` (`telefono`),
   UNIQUE KEY `uk_num_doc` (`num_doc`),
+  UNIQUE KEY `uk_telefono` (`telefono`),
   KEY `fk_idtipodoc` (`idtipodoc`),
   CONSTRAINT `fk_idtipodoc` FOREIGN KEY (`idtipodoc`) REFERENCES `tipo_doc` (`idtipodoc`),
   CONSTRAINT `chk_genero` CHECK (`genero` in ('M','F'))
@@ -880,7 +885,6 @@ DELIMITER $$
     IN _idestado INT
 )
 BEGIN
--- Declaracion de variables
 	DECLARE existe_error INT DEFAULT 0;
     
     -- Manejador de excepciones
@@ -1138,10 +1142,8 @@ BEGIN
 	BEGIN
 		SET existe_error = 1;
 	END;
-
      INSERT INTO bajas_activo(idactivo, motivo, coment_adicionales, ruta_doc, aprobacion) VALUES
      (_idactivo, _motivo, NULLIF(_coment_adicionales,''), _ruta_doc, _aprobacion);
-
      IF existe_error = 1 THEN
 		SET _idbaja_activo = -1;
      ELSE
@@ -1270,6 +1272,27 @@ BEGIN
 	FROM marcas MAR
 	INNER JOIN activos ACT ON MAR.idmarca = ACT.idmarca
 	WHERE ACT.idsubcategoria = _idsubcategoria;
+END */$$
+DELIMITER ;
+
+/* Procedure structure for procedure `sp_getresp_principal` */
+
+/*!50003 DROP PROCEDURE IF EXISTS  `sp_getresp_principal` */;
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_getresp_principal`(
+	IN _idactivo_resp INT
+)
+BEGIN
+	SELECT 
+		RES.idactivo_resp,
+		P.apellidos, P.nombres,
+        U.usuario
+	FROM activos_responsables RES
+    INNER JOIN usuarios U ON RES.idusuario = U.id_usuario
+    INNER JOIN personas P ON U.idpersona = P.id_persona
+    WHERE RES.idactivo_resp = _idactivo_resp;
 END */$$
 DELIMITER ;
 
@@ -1440,7 +1463,6 @@ DELIMITER ;
 DELIMITER $$
 
 /*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_list_resp_activo`(
-
 )
 BEGIN
 	SELECT R.idactivo_resp, A.descripcion
@@ -1485,7 +1507,6 @@ BEGIN
 	SELECT COUNT(idusuario) INTO es_resp 
 	FROM activos_responsables 
 	WHERE es_responsable = 1 AND idactivo = _idactivo;
-
     IF es_resp >=1 THEN
 		SET _cantidad = -1;
 	ELSE
@@ -1663,7 +1684,7 @@ BEGIN
       SUB.subcategoria,
       ACT.modelo,
       MAR.marca,
-	  MAX(UBI.ubicacion) ubicacion,
+	  UBI.ubicacion,
 	  EST.nom_estado,
       RES.autorizacion
 	FROM activos_responsables RES
@@ -1673,14 +1694,18 @@ BEGIN
     INNER JOIN subcategorias SUB ON ACT.idsubcategoria = SUB.idsubcategoria
 	INNER JOIN estados EST ON ACT.idestado = EST.idestado
 	INNER JOIN (
-		SELECT H.idactivo_resp, MAX(H.idubicacion) AS idubicacion
-		FROM historial_activos H
-		GROUP BY H.idactivo_resp
-    )HIS ON HIS.idactivo_resp = RES.idactivo_resp
-	INNER JOIN ubicaciones UBI ON HIS.idubicacion = UBI.idubicacion
-    WHERE (SUB.idsubcategoria = _idsubcategoria OR _idsubcategoria IS NULL) AND
-    (UBI.idubicacion = _idubicacion OR _idubicacion IS NULL) AND
-    (ACT.cod_identificacion LIKE CONCAT('%', _cod_identificacion, '%') OR _cod_identificacion IS NULL) AND ACT.idestado=1
+		SELECT H1.idactivo_resp, UBI1.ubicacion, UBI1.idubicacion
+		FROM historial_activos H1
+        INNER JOIN ubicaciones UBI1 ON H1.idubicacion = UBI1.idubicacion
+        WHERE H1.fecha_movimiento = (
+			SELECT MAX(H2.fecha_movimiento)
+            FROM historial_activos H2
+            WHERE H2.idactivo_resp = H1.idactivo_resp
+        )
+    )UBI ON UBI.idactivo_resp = RES.idactivo_resp
+    WHERE 	(SUB.idsubcategoria = _idsubcategoria OR _idsubcategoria IS NULL) AND
+			(UBI.idubicacion = _idubicacion OR _idubicacion IS NULL) AND
+			(ACT.cod_identificacion LIKE CONCAT('%', _cod_identificacion, '%') OR _cod_identificacion IS NULL) AND ACT.idestado=1
     GROUP BY ACT.idactivo
     ORDER BY RES.fecha_asignacion DESC;
 END */$$

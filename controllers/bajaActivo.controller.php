@@ -7,8 +7,8 @@ if (isset($_GET['operation'])) {
   switch ($_GET['operation']) {
     case 'sinServicio':
       $params = [
-        'idestado' => $_GET['idestado'] == "" ? null : $_GET['idestado'],
-        'fecha_adquisicion' => $_GET['fecha_adquisicion'] == "" ? null : $_GET['fecha_adquisicion']
+        'fecha_adquisicion' => $_GET['fecha_adquisicion'] == "" ? null : $_GET['fecha_adquisicion'],
+        'idestado' => $_GET['idestado'] == "" ? null : $_GET['idestado']
       ];
       echo json_encode($baja->activosBaja($params));
       break;

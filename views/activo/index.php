@@ -107,7 +107,7 @@
                       <th>Acciones</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody id="tb-body-activo">
                   </tbody>
                 </table>
 
@@ -180,8 +180,11 @@
 <!-- ./SIDEBAR DE DETALLES DE LA BAJA DE UN ACTIVO-->
 
 <?php require_once '../footer.php' ?>
-<script src="../../js/activos/index.js"></script>
-<script src="https://unpkg.com/vanilla-datatables@latest/dist/vanilla-dataTables.min.js" type="text/javascript"></script>
+<!-- JQUERY -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- LIBRERIA -->
+<script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+<script src="<?=$host?>js/activos/index.js"></script>
 </body>
 
 </html>

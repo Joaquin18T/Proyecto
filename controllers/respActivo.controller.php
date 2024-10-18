@@ -48,6 +48,10 @@ if(isset($_GET['operation'])){
     case 'listRespActivo':
       echo json_encode($respAct->listResp_activo());
       break;
+    case 'getResponasblePrin':
+      $cleanData = $respAct->limpiarCadena($_GET['idactivo_resp']);
+      echo json_encode($respAct->getResponsablePrin(['idactivo_resp'=>$cleanData]));
+      break;
   }
 }
 

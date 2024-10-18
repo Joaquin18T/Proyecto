@@ -72,7 +72,7 @@ BEGIN
     AND (EST.idestado = _idestado OR _idestado IS NULL)
     WHERE EST.idestado >1 AND EST.idestado<5 AND EST.idestado !=4;
 END $$
-
+CALL sp_activos_sin_servicio('2024-10-16', null);
 DROP PROCEDURE IF EXISTS sp_data_baja_activo;
 DELIMITER $$
 CREATE PROCEDURE sp_data_baja_activo

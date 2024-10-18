@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded",()=>{
   const host = "http://localhost/CMMS/controllers/";
-  let dataTable = null;
+  let myTable = null;
+  let idactivo_resp = 0;
   function selector(value) {
     return document.querySelector(`#${value}`);
   }
@@ -34,10 +35,11 @@ document.addEventListener("DOMContentLoaded",()=>{
 
   (async()=>{
     await showData();
-    await usersByActivo();
+    
   })();
   
   async function showData(){
+    selector("tb-activo-resp tbody").innerHTML="";
     const params = new URLSearchParams();
     params.append("operation", "searchActivoResp");
     params.append("idsubcategoria", selector("subcategoria").value);
@@ -45,8 +47,8 @@ document.addEventListener("DOMContentLoaded",()=>{
     params.append("cod_identificacion", selector("cod_identificacion").value);
     const data = await getDatos(`http://localhost/CMMS/controllers/respActivo.controller.php`,params);
     //selector("imgTest").src=Object.values(JSON.parse(data[1].imagenes))[0].url;
-    console.log(data);
-    selector("tb-activo-resp tbody").innerHTML="";
+
+    
     if(data.length===0){
       selector("tb-activo-resp tbody").innerHTML=`
       <tr>
@@ -65,26 +67,13 @@ document.addEventListener("DOMContentLoaded",()=>{
         <td><button type="button" data-idactivo=${element.idactivo} class="btn btn-sm btn-primary btn-colab">Ver colab</button></td>
         <td>
           <button type="button" data-idresp=${element.idactivo_resp} class="btn btn-sm btn-primary btn-det" data-bs-toggle="modal" 
-          data-bs-target="#modal-activo-resp">Click me</button>
+          data-bs-target="#modal-activo-resp">Detalles</button>
 
           <button type="button" data-idresp=${element.idactivo_resp} class="btn btn-sm btn-primary btn-update-ubicacion">Edt. Ub.</button>
         </td>
       </tr>
       `;
     });
-
-    if(!dataTable){
-      dataTable =new DataTable("#tb-activo-resp", {
-        searchable:false,
-        perPage: 5,
-        perPageSelect: [5, 10, 15],
-        labels:{
-          perPage:"{select} Filas por pagina",
-          noRows: "No econtrado",
-          info:"Mostrando {start} a {end} de {rows} filas"
-        }
-      });
-    }
 
     data.forEach(x => {
       const option = document.createElement("option");
@@ -95,12 +84,40 @@ document.addEventListener("DOMContentLoaded",()=>{
 
     buttonDetail();
     btnUpdateUbicacion();
+    await usersByActivo();
+    
   }
+  //createTable();
+
   searchActivoResponsable();
+  function createTable(){
+    if (myTable) {
+      myTable.clear().rows.add($("#tbody-tb-activo-resp").find("tr")).draw();
+    } else {
+      // Inicializa DataTable si no ha sido inicializado antes
+      myTable = $("#tb-activo-resp").DataTable({
+        paging: true,
+        searching: false,
+        lengthMenu: [5, 10, 15, 20],
+        pageLength: 5,
+        language: {
+          lengthMenu: "Mostrar _MENU_ filas por página",
+          paginate: {
+            previous: "Anterior",
+            next: "Siguiente",
+          },
+          emptyTable: "No hay datos disponibles",
+          search: "Buscar:",
+          info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+        },
+      });
+    }
+  }
 
   function searchActivoResponsable(){
     const filters = document.querySelectorAll(".filter");
-
+    selector("tb-activo-resp tbody").innerHTML="";
+    createTable();
     filters.forEach(x=>{
       x.addEventListener("change",async()=>{
         await showData();
@@ -172,7 +189,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   }
 
   async function usersByActivo(){
-    const dataButtons = listOfButtons("btn-colab");
+    const dataButtons = document.querySelectorAll(".btn-colab");
     dataButtons.forEach(x=>{
       x.addEventListener("click",async(e)=>{
         const value = e.target.dataset.idactivo;
@@ -199,14 +216,6 @@ document.addEventListener("DOMContentLoaded",()=>{
 
   function listOfButtons(classButton){
     const data = document.querySelectorAll(`.${classButton}`);
-    // let valor = "";
-    // data.forEach(x=>{
-    //   x.addEventListener("click",(e)=>{
-    //     valor=e.target.dataset
-        
-    //   });
-    // });
-    // console.log(valor);
     return data;
   }
 
@@ -262,11 +271,55 @@ document.addEventListener("DOMContentLoaded",()=>{
   function btnUpdateUbicacion() {
     const buttons = document.querySelectorAll(".btn-update-ubicacion");
     buttons.forEach(x=>{
-      x.addEventListener("click",()=>{
+      x.addEventListener("click",async()=>{
+        idactivo_resp = x.getAttribute("data-idresp");
+        const dataResp = await getResPrincipal(idactivo_resp);
+        selector("sb-responsable").value =`${dataResp.apellidos} ${dataResp.nombres} - ${dataResp.usuario}`;
         const sidebar = selector("sb-ubicacion-update");
         const offCanvas = new bootstrap.Offcanvas(sidebar);
-        offCanvas.show();//me quede aki
+        offCanvas.show();
       });
     });
+  }
+
+  async function getResPrincipal(id){
+    const params = new URLSearchParams();
+    params.append("operation", "getResponasblePrin");
+    params.append("idactivo_resp", parseInt(id));
+
+    const data = await getDatos(`${host}respActivo.controller.php`,params);
+    return data[0];
+  }
+
+  selector("form-update-ubicacion").addEventListener("submit",async(e)=>{
+    e.preventDefault();
+    
+    if(confirm("¿Deseas actualizarlo?")){
+      const resp = await updateUbicacion();
+      if(resp.mensaje==="Historial guardado"){
+        alert("Se ha actualizado la ubicacion");
+        const sidebar = bootstrap.Offcanvas.getOrCreateInstance(selector("sb-ubicacion-update"));
+        sidebar.hide();
+        await showData();
+      }else{
+        alert("Hubo un error al actualizar");
+      }
+    }
+    
+  });
+
+  async function updateUbicacion(){
+    const params = new FormData();
+    params.append("operation", "add");
+    params.append("idactivo_resp", parseInt(idactivo_resp));
+    params.append("idubicacion", parseInt(selector("sb-ubicacion").value));
+
+    const data = await fetch(`${host}historialactivo.controller.php`, {
+      method:'POST',
+      body:params
+    });
+    const addNewUbicacion = await data.json();
+
+    return addNewUbicacion;
   }
 });

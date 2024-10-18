@@ -29,15 +29,15 @@ class BajaActivo extends ExecQuery{
   public function activosBaja($params=[]):array{
     try{
       $defaultParams = [
-        'idestado'=>null,
-        'fecha_adquisicion'=>null
+        'fecha_adquisicion'=>null,
+        'idestado'=>null
       ];
       $realParams = array_merge($defaultParams, $params);
       $cmd=parent::execQ("CALL sp_activos_sin_servicio(?,?)");
       $cmd->execute(
         array(
-          $realParams['idestado'],
-          $realParams['fecha_adquisicion']
+          $realParams['fecha_adquisicion'],
+          $realParams['idestado']
         )
       );
       return $cmd->fetchAll(PDO::FETCH_ASSOC);
@@ -61,11 +61,11 @@ class BajaActivo extends ExecQuery{
   }
 }
 
-// $baja = new BajaActivo();
+//$baja = new BajaActivo();
 
 // echo json_encode($baja->dataBajaActivo(['idactivo'=>1]));
 
-// echo json_encode($baja->activosBaja(['idestado'=>null]));
+//echo json_encode($baja->activosBaja(['fecha_adquisicion'=>'2024-10-16']));
 
 // $id = $baja->add([
 //   'idactivo'=> 2,
