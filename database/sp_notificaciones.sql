@@ -54,7 +54,7 @@ BEGIN
     ORDER BY fecha_asignacion DESC;
 END $$
 
-
+CALL sp_responsable_notificacion(12);
 
 DROP PROCEDURE IF EXISTS sp_detalle_notificacion_resp;
 DELIMITER $$
@@ -77,9 +77,11 @@ BEGIN
     INNER JOIN marcas MAR ON ACT.idmarca = MAR.idmarca
     INNER JOIN historial_activos HIS ON RES.idactivo_resp = HIS.idactivo_resp
     INNER JOIN ubicaciones UBI ON HIS.idubicacion = UBI.idubicacion
-    WHERE RES.idusuario = _idusuario AND RES.idactivo_resp = _idactivo_resp;
+    WHERE RES.idusuario = _idusuario AND RES.idactivo_resp = _idactivo_resp
+    ORDER BY HIS.fecha_movimiento DESC;
+ -- LIMIT 1 -- acabar esto
 END $$
-
+CALL sp_detalle_notificacion_resp(12, 6);
 
 
 DROP PROCEDURE IF EXISTS sp_detalle_sol_estado

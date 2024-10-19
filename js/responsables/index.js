@@ -170,12 +170,19 @@ document.addEventListener("DOMContentLoaded",()=>{
   }
 
   selector("list-sidebar-activos").addEventListener("change",async()=>{
-    const params = new URLSearchParams();
-    params.append("operation", "usersByActivo");
-    params.append("idactivo", selector("list-sidebar-activos").value);
-    const data = await getDataUsuarios(params);
+    const data = await usersActivo(selector("list-sidebar-activos").value);
+    console.log("sb activos", data);
+    
     renderListUsers(data);
   });
+
+  async function usersActivo(valor){
+    const params = new URLSearchParams();
+    params.append("operation", "usersByActivo");
+    params.append("idactivo", parseInt(valor));
+    const data = await getDataUsuarios(params);
+    return data;
+  }
 
   function renderListUsers(data){
     const list = selector("list-users");
@@ -303,6 +310,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     if(confirm("¿Deseas actualizarlo?")){
       const resp = await updateUbicacion();
       if(resp.mensaje==="Historial guardado"){
+
         alert("Se ha actualizado la ubicacion");
         const sidebar = bootstrap.Offcanvas.getOrCreateInstance(selector("sb-ubicacion-update"));
         sidebar.hide();
@@ -327,5 +335,20 @@ document.addEventListener("DOMContentLoaded",()=>{
     const addNewUbicacion = await data.json();
 
     return addNewUbicacion;
+  }
+
+  async function createNotificacion(iduser){
+    const params = new URLSearchParams();
+    params.append("operation", "add");
+    params.append("idusuario", parseInt(iduser));
+    params.append("tipo","Nueva Ubicacion");
+    params.append("mensaje","Se ha actualizado una ubicacion de un activo asignado");
+
+    const data = await fetch(`${host}notificacion.controller.php`,{
+      method:'POST',
+      body:params
+    });
+    const resp = await data.json();
+    return resp.respuesta;
   }
 });

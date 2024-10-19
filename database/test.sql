@@ -18,9 +18,9 @@ DELETE FROM bajas_activo where idbaja_activo>=2;
 UPDATE activos SET idestado = 3 WHERE idactivo = 2;    
 ALTER TABLE bajas_activo AUTO_INCREMENT = 1;
 
-UPDATE usuarios SET contrasena = '$2y$10$Q1zxS16fPXZNYyKkTMqLE.xgeBijyEm88.49s1DRJSTZnwUj5dOne' WHERE id_usuario = 12;
+UPDATE usuarios SET contrasena = '$2y$10$/w29oS1sTWIU7fJphQkoIeox2MbOlR8YLEOOG199o0Am5HZ9wADfa' WHERE id_usuario = 14;
 
-
+UPDATE activos_responsables SET es_responsable = '1' WHERE idactivo_resp = 12;
 
 
 

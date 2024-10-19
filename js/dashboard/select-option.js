@@ -52,24 +52,25 @@ document.addEventListener("DOMContentLoaded", () => {
     params.append("idusuario", id);
     params.append("idnotificacion", "");
 
-
     const data = await getDatos(`${host}notificacion.controller.php`, params);
-    //console.log("notify",data);
-    const dataResp = await dataRespNof(data[0].idusuario);
-    idusuario = await getIdUser();
-    
-    const dataCombined = matchList(data, dataResp);
-    //console.log(dataCombined);
-    
-    dataCombined.forEach((x) => {
-      createNotificacion(
-        x.idactivo_resp,
-        x.mensaje,
-        x.descripcion,
-        x.fecha_creacion,
-        x.desresp
-      );
-    });
+    console.log("notify",data);
+    if(data.length>0){
+      const dataResp = await dataRespNof(data[0].idusuario);
+      idusuario = await getIdUser();
+      
+      const dataCombined = matchList(data, dataResp);
+      //console.log(dataCombined);
+      
+      dataCombined.forEach((x) => {
+        createNotificacion(
+          x.idactivo_resp,
+          x.mensaje,
+          x.descripcion,
+          x.fecha_creacion,
+          x.desresp
+        );
+      });
+    }
     showPreviewDetailt();
   })();
 

@@ -201,7 +201,8 @@ BEGIN
     )UBI ON UBI.idactivo_resp = RES.idactivo_resp
     WHERE 	(SUB.idsubcategoria = _idsubcategoria OR _idsubcategoria IS NULL) AND
 			(UBI.idubicacion = _idubicacion OR _idubicacion IS NULL) AND
-			(ACT.cod_identificacion LIKE CONCAT('%', _cod_identificacion, '%') OR _cod_identificacion IS NULL) AND ACT.idestado=1
+			(ACT.cod_identificacion LIKE CONCAT('%', _cod_identificacion, '%') OR _cod_identificacion IS NULL) AND 
+            ACT.idestado BETWEEN 1 AND 2
     GROUP BY ACT.idactivo
     ORDER BY RES.fecha_asignacion DESC;
 END $$
@@ -227,17 +228,36 @@ CREATE PROCEDURE sp_getresp_principal
 	IN _idactivo_resp INT
 )
 BEGIN
-	SELECT 
-		RES.idactivo_resp,
-		P.apellidos, P.nombres,
-        U.usuario
-	FROM activos_responsables RES
-    INNER JOIN usuarios U ON RES.idusuario = U.id_usuario
-    INNER JOIN personas P ON U.idpersona = P.id_persona
-    WHERE RES.idactivo_resp = _idactivo_resp;
+	DECLARE isResP INT DEFAULT 0;
+    
+    SELECT COUNT(*) INTO isResP
+    FROM activos_responsables WHERE es_responsable='1'
+    AND idactivo_resp = _idactivo_resp;
+    
+    IF isResP>0 THEN
+		SELECT 
+			RES.idactivo_resp,
+			P.apellidos, P.nombres,
+			U.usuario
+		FROM activos_responsables RES
+		INNER JOIN usuarios U ON RES.idusuario = U.id_usuario
+		INNER JOIN personas P ON U.idpersona = P.id_persona
+		WHERE RES.idactivo_resp = _idactivo_resp AND RES.es_responsable = '1';
+	ELSE
+		SELECT 
+			RES.idactivo_resp,
+			P.apellidos, P.nombres,
+			U.usuario
+		FROM activos_responsables RES
+		INNER JOIN usuarios U ON RES.idusuario = U.id_usuario
+		INNER JOIN personas P ON U.idpersona = P.id_persona
+		WHERE RES.idactivo_resp = _idactivo_resp
+        ORDER BY RES.fecha_asignacion ASC
+        LIMIT 1;
+	END IF;
 END $$
 
-
+CALL sp_getresp_principal(12);
 
 
 

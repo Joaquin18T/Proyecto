@@ -175,7 +175,7 @@ class ResponsableAct extends ExecQuery{
 
 // $resp = new ResponsableAct();
 
-// echo json_encode($resp->getResponsablePrin(['idactivo_resp'=>3]));
+// echo json_encode($resp->getResponsablePrin(['idactivo_resp'=>6]));
 
 // echo json_encode($resp->listResp_activo());
 
