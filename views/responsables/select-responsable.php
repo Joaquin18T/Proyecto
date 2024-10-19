@@ -28,7 +28,7 @@
     <div class="col-md-12">
       <div class="card">
         <div class="card-header">Asignar Responsable</div>
-        <div class="card-body">
+        <div class="card-body" style="height: 75vh;">
           <div class="row g-3 mb-3">
             <div class="col-md-3">
               <div class="form-floating mt-3">
@@ -59,7 +59,7 @@
                     <th class="text-center">Acciones</th>
                   </tr>
                 </thead>
-                <tbody></tbody>
+                <tbody id="tbody-colaboradores"></tbody>
               </table>
             </div>
           </div>
@@ -69,7 +69,10 @@
   </div>
 </div>
 <?php require_once '../footer.php' ?>
+<!-- JQUERY -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- LIBRERIA -->
+<script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
 <script src="../../js/responsables/select-responsable.js"></script>
-<script src="https://unpkg.com/vanilla-datatables@latest/dist/vanilla-dataTables.min.js" type="text/javascript"></script>
 </body>
 </html>

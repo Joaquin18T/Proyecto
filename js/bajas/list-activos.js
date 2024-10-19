@@ -84,11 +84,19 @@ document.addEventListener("DOMContentLoaded",()=>{
       `;
     });
     btnRegistrar();
+    createTable();
   }
-  createTable();
+  
   function createTable(){
+    let rows = $("#table-activos-tbody").find("tr");
+    //console.log(rows.length);
+    
     if (globals.myTable) {
-      globals.myTable.clear().rows.add($("#table-activos-tbody").find("tr")).draw();
+      if (rows.length > 1) {
+        globals.myTable.clear().rows.add(rows).draw();
+      } else if(rows.length===1){
+        globals.myTable.clear().draw(); // Limpia la tabla si no hay filas.
+      }
     } else {
       // Inicializa DataTable si no ha sido inicializado antes
       globals.myTable = $("#table-activos").DataTable({
@@ -102,11 +110,14 @@ document.addEventListener("DOMContentLoaded",()=>{
             previous: "Anterior",
             next: "Siguiente",
           },
-          emptyTable: "No hay datos disponibles",
           search: "Buscar:",
           info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+          emptyTable: "No se encontraron registros"
         },
       });
+      // if (rows.length > 0) {
+      //   myTable.rows.add(rows).draw(); // Si hay filas, agrégalas.
+      // }
     }
   }
 

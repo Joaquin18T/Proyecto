@@ -66,7 +66,7 @@
                       <th>Acciones</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody id="tbody-usuarios">
 
                   </tbody>
                 </table>
@@ -96,8 +96,10 @@
 </div>
 
 <?php require_once '../footer.php' ?>
-
+<!-- JQUERY -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- LIBRERIA -->
+<script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
 <script src="http://localhost/CMMS/js/users/index.js"></script>
-<script src="https://unpkg.com/vanilla-datatables@latest/dist/vanilla-dataTables.min.js" type="text/javascript"></script>
 </body>
 </html>

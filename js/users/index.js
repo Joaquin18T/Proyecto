@@ -1,7 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
-  let dataTable = null;
-  let cont = 0;
-  let isEmpty = false;
+  let myTable = null;
+
   const host = "http://localhost/CMMS/controllers/";
 
   function selector(value) {
@@ -44,41 +43,6 @@ document.addEventListener("DOMContentLoaded", () => {
     await showUsuarios();
   })();
 
-  function resetTable() {
-    const table = selector("tb-usuarios");
-
-    table.innerHTML = "";
-    const colgroup = document.createElement("colgroup");
-    const thead = document.createElement("thead");
-    const tbody = document.createElement("tbody");
-
-    colgroup.innerHTML = `
-                        <col style="width: 0.5%;">
-                        <col style="width: 1%;">
-                        <col style="width: 1%;">
-                        <col style="width: 2%;">
-                        <col style="width: 1%;">
-                        <col style="width: 1%;">
-                        <col style="width: 1%;">
-                        <col style="width: 0.5%;">
-          `;
-    table.appendChild(colgroup);
-
-    thead.innerHTML = `
-                        <tr>
-                          <th>ID</th>
-                          <th>Nom. Usuario</th>
-                          <th>Rol</th>
-                          <th>Nombres y Ap.</th>
-                          <th>Telefono</th>
-                          <th>Genero</th>
-                          <th>Nacionalidad</th>
-                          <th>Acciones</th>
-                        </tr>
-          `;
-    table.appendChild(thead);
-    table.appendChild(tbody);
-  }
 
   async function showUsuarios() {
     const params = new URLSearchParams();
@@ -89,8 +53,15 @@ document.addEventListener("DOMContentLoaded", () => {
     params.append("idtipodoc", selector("tipodoc").value);
 
     const data = await getDatos(`${host}usuarios.controller.php`, params);
-    //resetTable();
     selector("tb-usuarios tbody").innerHTML = "";
+    if(data.length===0){
+      selector("tbody-usuarios").innerHTML = `
+      <tr>
+        <td colspan="8">No encontrado</td>
+      </tr>
+      `;
+    }
+    
     data.forEach((x) => {
       selector("tb-usuarios tbody").innerHTML += `
         <tr>
@@ -109,22 +80,41 @@ document.addEventListener("DOMContentLoaded", () => {
         </tr>
       `;
     });
-    
-    if(!dataTable){
-      dataTable =new DataTable("#tb-usuarios", {
-        searchable:false,
-        perPage: 5, 
-        perPageSelect: [5, 10, 15], 
-        labels:{
-          perPage: "{select} Filas por pagina",
-          noRows: "Registros no encontrados",
-          info: "Mostrando {start} a {end} de {rows} filas"
-        }
-      });
-    }
+
     loadUpdate();
+    createTable();
   }
 
+  function createTable(){
+    let rows = $("#tbody-usuarios").find("tr");
+    //console.log(rows.length);
+    
+    if (myTable) {
+      if (rows.length > 1) {
+        myTable.clear().rows.add(rows).draw();
+      } else if(rows.length===1){
+        myTable.clear().draw(); // Limpia la tabla si no hay filas.
+      }
+    } else {
+      // Inicializa DataTable si no ha sido inicializado antes
+      myTable = $("#tb-usuarios").DataTable({
+        paging: true,
+        searching: false,
+        lengthMenu: [5, 10, 15, 20],
+        pageLength: 5,
+        language: {
+          lengthMenu: "Mostrar _MENU_ filas por página",
+          paginate: {
+            previous: "Anterior",
+            next: "Siguiente",
+          },
+          search: "Buscar:",
+          info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+          emptyTable: "No se encontraron registros"
+        },
+      });
+    }
+  }
   
   function filtersData() {
     const filters = document.querySelectorAll(".filters");

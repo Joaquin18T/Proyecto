@@ -85,14 +85,21 @@ document.addEventListener("DOMContentLoaded",()=>{
     buttonDetail();
     btnUpdateUbicacion();
     await usersByActivo();
+    createTable();
     
   }
-  //createTable();
 
-  searchActivoResponsable();
+  
   function createTable(){
+    let rows = $("#tbody-tb-activo-resp").find("tr");
+    //console.log(rows.length);
+    
     if (myTable) {
-      myTable.clear().rows.add($("#tbody-tb-activo-resp").find("tr")).draw();
+      if (rows.length > 1) {
+        myTable.clear().rows.add(rows).draw();
+      } else if(rows.length===1){
+        myTable.clear().draw(); // Limpia la tabla si no hay filas.
+      }
     } else {
       // Inicializa DataTable si no ha sido inicializado antes
       myTable = $("#tb-activo-resp").DataTable({
@@ -106,18 +113,17 @@ document.addEventListener("DOMContentLoaded",()=>{
             previous: "Anterior",
             next: "Siguiente",
           },
-          emptyTable: "No hay datos disponibles",
           search: "Buscar:",
           info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+          emptyTable: "No se encontraron registros"
         },
       });
     }
   }
-
+  searchActivoResponsable();
   function searchActivoResponsable(){
     const filters = document.querySelectorAll(".filter");
     selector("tb-activo-resp tbody").innerHTML="";
-    createTable();
     filters.forEach(x=>{
       x.addEventListener("change",async()=>{
         await showData();
