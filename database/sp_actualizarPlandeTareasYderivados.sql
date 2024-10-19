@@ -5,11 +5,11 @@ DELIMITER $$
 CREATE PROCEDURE actualizarPlanDeTareas(
     IN _idplantarea INT, 
     IN _descripcion VARCHAR(80),
-    IN _borrador BOOLEAN)
+    IN _incompleto BOOLEAN)
 BEGIN
     UPDATE plandetareas 
     SET descripcion = _descripcion,
-		borrador = _borrador, 
+		incompleto = _incompleto, 
         update_at = NOW()
     WHERE idplantarea = _idplantarea;
 END $$
@@ -114,3 +114,5 @@ BEGIN
         update_at = NOW()
     WHERE idtarea = _idtarea;
 END //
+
+-- *********************************************************************

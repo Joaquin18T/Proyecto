@@ -195,6 +195,8 @@ CREATE TABLE `plandetareas`
 (
 	idplantarea		int			auto_increment primary key,
     descripcion		varchar(80)	not null,
+	incompleto 		boolean		null default true,
+    eliminado		boolean		null default false,
     create_at		datetime	not null default now(),
     update_at		datetime	null,
     CONSTRAINT uk_descripcion_plan UNIQUE(descripcion)

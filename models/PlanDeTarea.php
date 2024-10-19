@@ -5,11 +5,13 @@ require_once 'ExecQuery.php';
 class PlanDeTarea extends ExecQuery
 {
 
-    public function getPlanesDeTareas()
+    public function getPlanesDeTareas($params = []):array
     {
         try {
-            $sp = parent::execQ("CALL obtenerPlantareasDetalles");
-            $sp->execute();
+            $sp = parent::execQ("CALL obtenerPlantareasDetalles(?)");
+            $sp->execute(array(
+                $params['eliminado']
+            ));
             return $sp->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
             die($e->getMessage());
@@ -43,13 +45,25 @@ class PlanDeTarea extends ExecQuery
         }
     } // INTEGRADO ✔
 
+    public function obtenerPlanTareaPorId($params = [])
+    {
+        try {
+            $sp = parent::execQ("CALL obtenerPlanTareaPorId(?)");
+            $sp->execute(array($params['idplantarea']));
+            return $sp->fetchAll(PDO::FETCH_ASSOC); // ME DEVOLVERA EL ULTIMO ID GENERADO
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+    } // INTEGRADO 
+
     public function eliminarPlanDeTarea($params = []): bool //ESTO SERA ELIMINACION LOGICA
     {
         try {
             $status = false;
-            $sp = parent::execQ("CALL eliminarPlanDeTarea(?)");
+            $sp = parent::execQ("CALL eliminarPlanDeTarea(?,?)");
             $status = $sp->execute(array(
-                $params['idplantarea']
+                $params['idplantarea'],
+                $params['eliminado']
             ));
             return $status;
         } catch (Exception $e) {
@@ -65,7 +79,7 @@ class PlanDeTarea extends ExecQuery
             $status = $sp->execute(array(
                 $params['idplantarea'],
                 $params['descripcion'],
-                $params['borrador']
+                $params['incompleto']
             ));
             return $status;
         } catch (Exception $e) {

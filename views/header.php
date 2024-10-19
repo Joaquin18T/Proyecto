@@ -28,6 +28,10 @@ $host = "http://localhost/CMMS/";
   <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <!-- Usuarios -->
+   
+  <!-- jKanban CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jkanban@1.2.0/dist/jkanban.min.css">
+
 
 </head>
 
@@ -217,6 +221,15 @@ $host = "http://localhost/CMMS/";
                 </a>
               </li>
             </ul>
+            <ul class="flex-column nav">
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  href="<?= $host ?>views/odt">
+                  <span class="sidebar-text">Ordenes de Trabajo</span>
+                </a>
+              </li>
+            </ul>
           </div>
         </li>
         <li class="nav-item">
@@ -392,7 +405,7 @@ $host = "http://localhost/CMMS/";
                 </li>
                 <!-- Opción de logout -->
                 <li>
-                  <a class="dropdown-item d-flex align-items-center" href="#">
+                  <a class="dropdown-item d-flex align-items-center" href="<?=$host?>/controllers/usuarios.controller.php?operation=destroy">
                     <svg
                       class="dropdown-icon text-danger me-2"
                       fill="none"

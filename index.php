@@ -46,7 +46,7 @@
           if(!acceso.permitido){
             alert(acceso.status);
           }else{
-            window.location.href='./views/';
+            window.location.href='./views/odt';
           }
         })
         
