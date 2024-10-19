@@ -13,15 +13,19 @@ BEGIN
         TAR.fecha_vencimiento,
         ACT.descripcion as activo,
         TP.tipo_prioridad as prioridad,
-        EST.nom_estado
+        EST.nom_estado,
+        PT.eliminado,
+        PT.incompleto
         FROM tareas TAR
         LEFT JOIN plandetareas PT ON PT.idplantarea = TAR.idplantarea
         LEFT JOIN activos_vinculados_tarea AVT ON AVT.idtarea = TAR.idtarea
         LEFT JOIN activos ACT ON ACT.idactivo = AVT.idactivo
         LEFT JOIN tipo_prioridades TP ON TP.idtipo_prioridad = TAR.idtipo_prioridad
-        LEFT JOIN estados EST ON EST.idestado = TAR.idestado;
+        LEFT JOIN estados EST ON EST.idestado = TAR.idestado
+        WHERE PT.eliminado = 0 AND PT.incompleto = 0;
 END //
 
+call obtenerTareas()
 
 DROP PROCEDURE IF EXISTS `obtenerTareasPorEstado`
 DELIMITER //
@@ -45,6 +49,8 @@ BEGIN
         LEFT JOIN estados EST ON EST.idestado = TAR.idestado
         WHERE EST.idestado = _idestado;
 END //
+
+call obtenerTareasPorEstado(9)
 
 DROP PROCEDURE IF EXISTS `obtenerTareasOdt`
 DELIMITER //

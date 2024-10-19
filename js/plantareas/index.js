@@ -8,7 +8,6 @@ $(document).ready(async () => {
         return document.querySelectorAll(object);
     }
 
-
     const tbodyPlanTareas = $q("#tb-plantareas tbody")
     const tbodyPlanTareasEliminadas = $q("#tb-plantareas-eliminadas tbody");
 
