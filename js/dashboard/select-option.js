@@ -1,28 +1,29 @@
 document.addEventListener("DOMContentLoaded", () => {
-  if (document.getElementById("options-sidebar")) {
-    const sidebarList = document.getElementById("options-sidebar");
+  // if (document.getElementById("options-sidebar")) {
+  //   const sidebarList = document.getElementById("options-sidebar");
 
-    sidebarList.addEventListener("click", (e) => {
-      if (e.target && e.target.matches("a.nav-link")) {
-        const aElement = document.querySelectorAll(".nav-link");
-        aElement.forEach((x) => {
-          x.addEventListener("click", (e) => {
-            e.preventDefault();
-            const hrefValue = enlace.href;
-            window.location.href = hrefValue;
-          });
-        });
+  //   sidebarList.addEventListener("click", (e) => {
+  //     if (e.target && e.target.matches("a.nav-link")) {
+  //       const aElement = document.querySelectorAll(".nav-link");
+  //       aElement.forEach((x) => {
+  //         x.addEventListener("click", (e) => {
+  //           e.preventDefault();
+  //           const hrefValue = enlace.href;
+  //           window.location.href = hrefValue;
+  //         });
+  //       });
 
-        let items = sidebarList.querySelectorAll("li");
-        items.forEach((item) => item.classList.remove("active"));
+  //       let items = sidebarList.querySelectorAll("li");
+  //       items.forEach((item) => item.classList.remove("active"));
 
-        // Añadir la clase active al li seleccionado
-        e.target.parentElement.classList.add("active");
-      }
-    });
-  }
+  //       // Añadir la clase active al li seleccionado
+  //       e.target.parentElement.classList.add("active");
+  //     }
+  //   });
+  // }
 
   //CONSTANTES
+  
   const host = "http://localhost/CMMS/controllers/";
   let idusuario=0;
 
@@ -57,11 +58,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if(data.length>0){
       const dataResp = await dataRespNof(data[0].idusuario);
       idusuario = await getIdUser();
+      //console.log("resp", dataResp);
+      const newArray = avoidRepeats(data);
+      //const dataCombined = matchList(data, dataResp);
+      //console.log("combined", dataCombined);
       
-      const dataCombined = matchList(data, dataResp);
-      //console.log(dataCombined);
-      
-      dataCombined.forEach((x) => {
+      newArray.forEach((x) => {
         createNotificacion(
           x.idactivo_resp,
           x.mensaje,
@@ -74,11 +76,31 @@ document.addEventListener("DOMContentLoaded", () => {
     showPreviewDetailt();
   })();
 
+  /**
+   * Combina dos arrays de objetos segun su posicion
+   * @param {*} arr1 Primer array a combinar
+   * @param {*} arr2 Segundo array a combinar
+   * @returns Retorna la combinacion de los dos array de objetos
+   */
   function matchList(arr1=[], arr2=[]){
     const combinar = arr1.map((x, i)=>{
       return {...x, ...arr2[i]}
     });
     return combinar
+  }
+
+  function avoidRepeats(list=[]){
+    const idDuplicates = new Set();
+    const newArray=[];
+    list.forEach(x=>{
+      if(!idDuplicates.has(x.idnotificacion)){
+        newArray.push(x);
+        idDuplicates.add(x.idnotificacion);
+      }
+    });
+    console.log(newArray);
+    return newArray;
+    
   }
 
   /*

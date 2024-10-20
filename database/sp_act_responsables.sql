@@ -152,6 +152,7 @@ CREATE PROCEDURE sp_users_by_activo
 )
 BEGIN
 	SELECT
+    USU.id_usuario,
 	USU.usuario,
     PER.apellidos,
     RES.fecha_asignacion,

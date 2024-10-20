@@ -233,7 +233,6 @@ BEGIN
 END $$
 
 
--- 12-10
 DROP PROCEDURE IF EXISTS sp_get_activoById;
 DELIMITER $$
 CREATE PROCEDURE sp_get_activoById

@@ -21,20 +21,36 @@ CREATE PROCEDURE sp_list_notificacion
     IN _idnotificacion INT
 )
 BEGIN
-	SELECT
-		NOF.idusuario,
-		NOF.idnotificacion,
-		NOF.tipo,
-		NOF.estado,
-		NOF.mensaje,
-		NOF.fecha_creacion
-    FROM notificaciones NOF
-	WHERE 
-		(NOF.idusuario = _idusuario OR _idusuario IS NULL) AND
-        (NOF.idnotificacion = _idnotificacion OR _idnotificacion IS NULL)
-    ORDER BY NOF.fecha_creacion DESC;
+SELECT
+    NOF.idusuario,
+    NOF.idnotificacion,
+    NOF.tipo,
+    NOF.estado,
+    NOF.mensaje,
+    MAX(NOF.fecha_creacion) AS fecha_creacion, -- Usamos MAX o alguna función agregada
+    RES.idusuario,
+    ACT.descripcion,
+    RES.descripcion AS desresp,
+    RES.idactivo_resp
+FROM notificaciones NOF
+RIGHT JOIN activos_responsables RES ON NOF.idusuario = RES.idusuario
+LEFT JOIN activos ACT ON RES.idactivo = ACT.idactivo
+	where 
+		(NOF.idusuario = _idusuario OR _idusuario IS NULL) 
+        AND (NOF.idnotificacion = _idnotificacion OR _idnotificacion IS NULL)
+GROUP BY 
+    NOF.idusuario,
+    NOF.idnotificacion,
+    NOF.tipo,
+    NOF.estado,
+    NOF.mensaje,
+    RES.idusuario,
+    ACT.descripcion,
+    RES.descripcion,
+    RES.idactivo_resp
+ORDER BY MAX(NOF.fecha_creacion) DESC;
 END $$
--- CALL sp_list_notificacion(null, 3);
+-- CALL sp_list_notificacion(2,null);
 
 DROP PROCEDURE IF EXISTS sp_responsable_notificacion;
 DELIMITER $$
@@ -51,10 +67,10 @@ BEGIN
 	FROM activos_responsables RES
     INNER JOIN activos ACT ON RES.idactivo = ACT.idactivo
     WHERE RES.idusuario = _idusuario
-    ORDER BY fecha_asignacion DESC;
+    ORDER BY RES.fecha_asignacion DESC;
 END $$
 
-CALL sp_responsable_notificacion(12);
+CALL sp_responsable_notificacion(2);
 
 DROP PROCEDURE IF EXISTS sp_detalle_notificacion_resp;
 DELIMITER $$
@@ -78,12 +94,12 @@ BEGIN
     INNER JOIN historial_activos HIS ON RES.idactivo_resp = HIS.idactivo_resp
     INNER JOIN ubicaciones UBI ON HIS.idubicacion = UBI.idubicacion
     WHERE RES.idusuario = _idusuario AND RES.idactivo_resp = _idactivo_resp
-    ORDER BY HIS.fecha_movimiento DESC;
- -- LIMIT 1 -- acabar esto
+    ORDER BY HIS.fecha_movimiento DESC
+    LIMIT 1; -- acabar esto
 END $$
-CALL sp_detalle_notificacion_resp(12, 6);
+CALL sp_detalle_notificacion_resp(2, 1);
 
-
+-- no se usa
 DROP PROCEDURE IF EXISTS sp_detalle_sol_estado
 DELIMITER $$
 CREATE PROCEDURE sp_detalle_sol_estado

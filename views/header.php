@@ -324,7 +324,7 @@ $host = "http://localhost/CMMS/";
   <main class="content">
     <!-- NAVBAR-HEADER -->
     <nav
-      class="navbar navbar-top navbar-expand navbar-dashboard navbar-dark ps-0 pe-2 pb-0">
+      class="navbar navbar-top navbar-expand navbar-dashboard navbar-dark ps-0 pb-0">
       <div class="container-fluid px-0">
         <div
           class="d-flex justify-content-between w-100"
@@ -333,7 +333,7 @@ $host = "http://localhost/CMMS/";
           <!-- Navbar links (PERFIL USUARIO) -->
           <ul class="navbar-nav align-items-center">
             <!-- LOGO NOTIFICACION -->
-            <li class="nav-item dropdown">
+            <li class="nav-item dropdown me-4">
               <a
                 class="nav-link text-dark notification-bell unread dropdown-toggle"
                 href="#"
@@ -377,7 +377,7 @@ $host = "http://localhost/CMMS/";
             <!-- FIN LOGO NOTIFICACION -->
 
             <!-- USER - LOGOUT -->
-            <li class="nav-item dropdown ms-lg-3">
+            <li class="nav-item dropdown ms-lg-3 me-2">
               <a
                 class="nav-link dropdown-toggle pt-1 px-0"
                 href="#"

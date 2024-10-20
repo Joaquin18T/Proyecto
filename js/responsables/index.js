@@ -2,6 +2,8 @@ document.addEventListener("DOMContentLoaded",()=>{
   const host = "http://localhost/CMMS/controllers/";
   let myTable = null;
   let idactivo_resp = 0;
+  let users=[];
+  let contNof = 0;
   function selector(value) {
     return document.querySelector(`#${value}`);
   }
@@ -69,7 +71,7 @@ document.addEventListener("DOMContentLoaded",()=>{
           <button type="button" data-idresp=${element.idactivo_resp} class="btn btn-sm btn-primary btn-det" data-bs-toggle="modal" 
           data-bs-target="#modal-activo-resp">Detalles</button>
 
-          <button type="button" data-idresp=${element.idactivo_resp} class="btn btn-sm btn-primary btn-update-ubicacion">Edt. Ub.</button>
+          <button type="button" data-idresp=${element.idactivo_resp} data-idact=${element.idactivo} class="btn btn-sm btn-primary btn-update-ubicacion">Edt. Ub.</button>
         </td>
       </tr>
       `;
@@ -286,6 +288,10 @@ document.addEventListener("DOMContentLoaded",()=>{
     buttons.forEach(x=>{
       x.addEventListener("click",async()=>{
         idactivo_resp = x.getAttribute("data-idresp");
+
+        users = await usersActivo(parseInt(x.getAttribute("data-idact")));
+        console.log("idactivo",x.getAttribute("data-idact"));
+
         const dataResp = await getResPrincipal(idactivo_resp);
         selector("sb-responsable").value =`${dataResp.apellidos} ${dataResp.nombres} - ${dataResp.usuario}`;
         const sidebar = selector("sb-ubicacion-update");
@@ -310,11 +316,17 @@ document.addEventListener("DOMContentLoaded",()=>{
     if(confirm("¿Deseas actualizarlo?")){
       const resp = await updateUbicacion();
       if(resp.mensaje==="Historial guardado"){
-
-        alert("Se ha actualizado la ubicacion");
-        const sidebar = bootstrap.Offcanvas.getOrCreateInstance(selector("sb-ubicacion-update"));
-        sidebar.hide();
-        await showData();
+        console.log("users asignados", users);
+        
+        const isCorrect = await createNotificacion(users);
+        if(isCorrect){
+          alert("Se ha actualizado la ubicacion");
+          users=[];
+          selector("sb-ubicacion").value="";
+          const sidebar = bootstrap.Offcanvas.getOrCreateInstance(selector("sb-ubicacion-update"));
+          sidebar.hide();
+          await showData();
+        }
       }else{
         alert("Hubo un error al actualizar");
       }
@@ -337,7 +349,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     return addNewUbicacion;
   }
 
-  async function createNotificacion(iduser){
+  async function addNotificacion(iduser){
     const params = new URLSearchParams();
     params.append("operation", "add");
     params.append("idusuario", parseInt(iduser));
@@ -350,5 +362,17 @@ document.addEventListener("DOMContentLoaded",()=>{
     });
     const resp = await data.json();
     return resp.respuesta;
+  }
+
+  async function createNotificacion(data=[]){
+    for (let i = 0; i < data.length; i++) {
+      let isAdd = await addNotificacion(data[i].id_usuario);
+      if(isAdd>0){
+        contNof++;
+      }
+    }
+    const isValidate = contNof===data.length?true:false;
+    contNof=0;
+    return isValidate;
   }
 });
