@@ -1852,7 +1852,31 @@ DELIMITER $$
 	IN _idactivo_resp INT
 )
 BEGIN
-	SELECT * FROM v_activo_resp WHERE idactivo_resp=_idactivo_resp;
+	 SELECT 
+	  RES.idactivo_resp, RES.condicion_equipo, RES.autorizacion, RES.descripcion despresp, RES.imagenes,
+	  ACT.idactivo, ACT.cod_identificacion, ACT.descripcion, ACT.fecha_adquisicion, ACT.modelo, ACT.especificaciones,
+      SUB.subcategoria,
+      MAR.marca,
+	  UBI.ubicacion,
+	  EST.nom_estado
+	FROM activos_responsables RES
+	INNER JOIN activos ACT ON RES.idactivo = ACT.idactivo
+    INNER JOIN marcas MAR ON ACT.idmarca = MAR.idmarca
+	INNER JOIN usuarios USU ON RES.idusuario = USU.id_usuario
+    INNER JOIN subcategorias SUB ON ACT.idsubcategoria = SUB.idsubcategoria
+	INNER JOIN estados EST ON ACT.idestado = EST.idestado
+	INNER JOIN (
+		SELECT H1.idactivo_resp, UBI1.ubicacion, UBI1.idubicacion
+		FROM historial_activos H1
+        INNER JOIN ubicaciones UBI1 ON H1.idubicacion = UBI1.idubicacion
+        WHERE H1.fecha_movimiento = (
+			SELECT MAX(H2.fecha_movimiento)
+            FROM historial_activos H2
+            WHERE H2.idactivo_resp = H1.idactivo_resp
+        )
+    )UBI ON UBI.idactivo_resp = RES.idactivo_resp
+    WHERE RES.idactivo_resp = _idactivo_resp
+    GROUP BY ACT.idactivo;
 END */$$
 DELIMITER ;
 
@@ -2146,31 +2170,6 @@ BEGIN
 END */$$
 DELIMITER ;
 
-/*Table structure for table `v_activo_resp` */
-
-DROP TABLE IF EXISTS `v_activo_resp`;
-
-/*!50001 DROP VIEW IF EXISTS `v_activo_resp` */;
-/*!50001 DROP TABLE IF EXISTS `v_activo_resp` */;
-
-/*!50001 CREATE TABLE  `v_activo_resp`(
- `idactivo_resp` int(11) ,
- `idactivo` int(11) ,
- `cod_identificacion` char(40) ,
- `descripcion` varchar(200) ,
- `subcategoria` varchar(60) ,
- `modelo` varchar(60) ,
- `marca` varchar(80) ,
- `ubicacion` varchar(60) ,
- `fecha_adquisicion` date ,
- `condicion_equipo` varchar(500) ,
- `nom_estado` varchar(50) ,
- `autorizacion` int(11) ,
- `despresp` varchar(500) ,
- `especificaciones` longtext ,
- `imagenes` longtext 
-)*/;
-
 /*Table structure for table `v_personas` */
 
 DROP TABLE IF EXISTS `v_personas`;
@@ -2200,13 +2199,6 @@ DROP TABLE IF EXISTS `v_subcategoria`;
  `categoria` varchar(60) ,
  `subcategoria` varchar(60) 
 )*/;
-
-/*View structure for view v_activo_resp */
-
-/*!50001 DROP TABLE IF EXISTS `v_activo_resp` */;
-/*!50001 DROP VIEW IF EXISTS `v_activo_resp` */;
-
-/*!50001 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_activo_resp` AS select `res`.`idactivo_resp` AS `idactivo_resp`,`act`.`idactivo` AS `idactivo`,`act`.`cod_identificacion` AS `cod_identificacion`,`act`.`descripcion` AS `descripcion`,`sub`.`subcategoria` AS `subcategoria`,`act`.`modelo` AS `modelo`,`mar`.`marca` AS `marca`,max(`ubi`.`ubicacion`) AS `ubicacion`,`act`.`fecha_adquisicion` AS `fecha_adquisicion`,max(`res`.`condicion_equipo`) AS `condicion_equipo`,`est`.`nom_estado` AS `nom_estado`,`res`.`autorizacion` AS `autorizacion`,`res`.`descripcion` AS `despresp`,`act`.`especificaciones` AS `especificaciones`,max(`res`.`imagenes`) AS `imagenes` from (((((((`activos_responsables` `res` join `activos` `act` on(`res`.`idactivo` = `act`.`idactivo`)) join `marcas` `mar` on(`act`.`idmarca` = `mar`.`idmarca`)) join `usuarios` `usu` on(`res`.`idusuario` = `usu`.`id_usuario`)) join `subcategorias` `sub` on(`act`.`idsubcategoria` = `sub`.`idsubcategoria`)) join `estados` `est` on(`act`.`idestado` = `est`.`idestado`)) join (select `h`.`idactivo_resp` AS `idactivo_resp`,max(`h`.`idubicacion`) AS `idubicacion` from `historial_activos` `h` group by `h`.`idactivo_resp`) `his` on(`his`.`idactivo_resp` = `res`.`idactivo_resp`)) join `ubicaciones` `ubi` on(`his`.`idubicacion` = `ubi`.`idubicacion`)) where `act`.`idestado` = 1 group by `act`.`idactivo` order by `res`.`fecha_asignacion` desc */;
 
 /*View structure for view v_personas */
 
