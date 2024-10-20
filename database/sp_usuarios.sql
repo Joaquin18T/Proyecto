@@ -17,6 +17,8 @@ BEGIN
     WHERE US.estado=1;
 END $$
 
+call sp_list_users
+
 DROP PROCEDURE IF EXISTS sp_list_persona_users;
 DELIMITER $$
 CREATE PROCEDURE sp_list_persona_users
@@ -36,7 +38,8 @@ BEGIN
         TD.tipodoc,
         P.num_doc,
         P.telefono,
-        P.genero
+        P.genero,
+        U.asignacion
 	FROM usuarios U
     INNER JOIN roles R ON U.idrol = R.idrol
     INNER JOIN personas P ON U.idpersona = P.id_persona
@@ -48,7 +51,32 @@ BEGIN
 END $$
 -- CALL sp_list_persona_users(null,1,null,null);
         
+DROP PROCEDURE IF EXISTS sp_filtrar_usuarios;
+DELIMITER $$
+CREATE PROCEDURE sp_filtrar_usuarios
+(
+    IN _numdoc VARCHAR(50),
+    IN _dato VARCHAR(80)
+)
+BEGIN
+	SELECT
+		U.id_usuario,
+		U.usuario,
+        R.rol,
+        CONCAT(P.apellidos,' ',P.nombres) as nombres,
+        TD.tipodoc,
+        P.num_doc,
+		U.estado
+	FROM usuarios U
+    INNER JOIN roles R ON U.idrol = R.idrol
+    INNER JOIN personas P ON U.idpersona = P.id_persona
+    INNER JOIN tipo_doc TD ON P.idtipodoc = TD.idtipodoc
+    AND (P.num_doc=_numdoc OR _numdoc IS NULL)
+    AND (P.apellidos LIKE CONCAT('%', _dato ,'%') OR P.nombres LIKE CONCAT('%', _dato ,'%') OR _dato IS NULL);
+END $$
 
+-- select * from personas;
+-- CALL sp_filtrar_usuarios(72754753,null);
 
 DROP PROCEDURE IF EXISTS sp_user_login;
 DELIMITER $$
@@ -70,6 +98,7 @@ BEGIN
     WHERE usuario=_usuario AND US.estado=1;
 END $$
 
+select * from odt;
 DROP PROCEDURE IF EXISTS sp_register_user;
 DELIMITER $$
 CREATE PROCEDURE sp_register_user

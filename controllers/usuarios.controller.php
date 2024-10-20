@@ -10,6 +10,7 @@ if (isset($_GET['operation'])) {
     case 'login':
       $login = [
         'permitido' => false,
+        'idusuario' => -1,
         'usuario' => '',
         'rol' => '',
         'status' => ''
@@ -26,6 +27,7 @@ if (isset($_GET['operation'])) {
           $login['permitido'] = true;
           $login['usuario'] = $row[0]['usuario'];
           $login['rol'] = $row[0]['rol'];
+          $login['idusuario'] = $row[0]['id_usuario'];
         } else {
           $login["status"] = "Contrasenia incorrecta";
         }
@@ -51,14 +53,20 @@ if (isset($_GET['operation'])) {
       break;
     case 'listOfFilters':
       echo json_encode($user->listFilters([
-        'idrol'=>$_GET['idrol']==""?null:$user->limpiarCadena($_GET['idrol']),
-        'idtipodoc'=>$_GET['idtipodoc']==""?null:$user->limpiarCadena($_GET['idtipodoc']),
-        'estado'=>$_GET['estado']==""?null:$user->limpiarCadena($_GET['estado']),
-        'dato'=>$_GET['dato']==""?null:$user->limpiarCadena($_GET['dato'])
+        'idrol' => $_GET['idrol'] == "" ? null : $user->limpiarCadena($_GET['idrol']),
+        'idtipodoc' => $_GET['idtipodoc'] == "" ? null : $user->limpiarCadena($_GET['idtipodoc']),
+        'estado' => $_GET['estado'] == "" ? null : $user->limpiarCadena($_GET['estado']),
+        'dato' => $_GET['dato'] == "" ? null : $user->limpiarCadena($_GET['dato'])
+      ]));
+      break;
+    case 'filtrarUsuarios':
+      echo json_encode($user->filtrarUsuarios([
+        'numdoc' => $_GET['numdoc'] == "" ? null : $user->limpiarCadena($_GET['numdoc']),
+        'dato' => $_GET['dato'] == "" ? null : $user->limpiarCadena($_GET['dato']),
       ]));
       break;
     case 'getUsuarioPersona':
-      echo json_encode($user->getDataUserPersona(['idusuario'=>$user->limpiarCadena($_GET['idusuario'])]));
+      echo json_encode($user->getDataUserPersona(['idusuario' => $user->limpiarCadena($_GET['idusuario'])]));
       break;
   }
 }
@@ -82,40 +90,40 @@ if (isset($_POST['operation'])) {
       echo json_encode($respuesta);
       break;
     case 'updateUser':
-      $isUpdate=['respuesta'=>-1];
+      $isUpdate = ['respuesta' => -1];
       $datosEnviar = [
-        'idusuario' =>$user->limpiarCadena($_POST['idusuario']),
+        'idusuario' => $user->limpiarCadena($_POST['idusuario']),
         'idrol' => $user->limpiarCadena($_POST['idrol']),
         'usuario' => $user->limpiarCadena($_POST['usuario'])
       ];
       $respuesta = $user->updateUser($datosEnviar);
-      if($respuesta>0){
-        $isUpdate['respuesta']=$respuesta;
+      if ($respuesta > 0) {
+        $isUpdate['respuesta'] = $respuesta;
       }
       echo json_encode($isUpdate);
       break;
     case 'updateEstado':
-      $isUpdate=['respuesta'=>-1];
-      $datosEnviar=[
-        'idusuario'=>$user->limpiarCadena($_POST['idusuario']), 
-        'estado'=>$user->limpiarCadena($_POST['estado'])
+      $isUpdate = ['respuesta' => -1];
+      $datosEnviar = [
+        'idusuario' => $user->limpiarCadena($_POST['idusuario']),
+        'estado' => $user->limpiarCadena($_POST['estado'])
       ];
       $resp = $user->updateEstado($datosEnviar);
-      if($resp){
-        $isUpdate['respuesta']=1;
+      if ($resp) {
+        $isUpdate['respuesta'] = 1;
       }
       echo json_encode($isUpdate);
       break;
     case 'updateClaveAcceso':
-      $isUpdate=['respuesta'=>-1];
+      $isUpdate = ['respuesta' => -1];
 
-      $datosEnviar=[
-        'idusuario'=>$user->limpiarCadena($_POST['idusuario']), 
-        'contrasena'=>$user->limpiarCadena($_POST['contrasena'])
+      $datosEnviar = [
+        'idusuario' => $user->limpiarCadena($_POST['idusuario']),
+        'contrasena' => $user->limpiarCadena($_POST['contrasena'])
       ];
       $resp = $user->updateClaveAcceso($datosEnviar);
-      if($resp){
-        $isUpdate['respuesta']=1;
+      if ($resp) {
+        $isUpdate['respuesta'] = 1;
       }
       echo json_encode($isUpdate);
       break;

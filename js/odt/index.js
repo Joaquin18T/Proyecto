@@ -1,4 +1,5 @@
 $(document).ready(async () => {
+    alert("idusuarioxdd: "+ idusuario)
     function $q(object = null) {
         return document.querySelector(object);
     }
@@ -56,11 +57,18 @@ $(document).ready(async () => {
         ],
         dragBoards: false,
         widthBoard: '400px',
-        dropEl: function (el, target, source, sibling) {
+        dropEl: async function (el, target, source, sibling) {
             var cardId = el.getAttribute('data-eid'); // ID de la tarjeta
             var targetBoardId = target.parentElement.getAttribute('data-id'); // ID del board donde cayó la tarjeta
             console.log('Tarjeta ' + cardId + ' fue movida al board ' + targetBoardId);
-            window.location.href = `http://localhost/CMMS/views/odt/registrar-odt.php`
+            if (targetBoardId == "b-proceso") {
+                const idOdt = await registrarOdt(cardId)
+                console.log(idOdt)
+                window.localStorage.setItem("idtarea", cardId)
+                window.localStorage.setItem("idodt", idOdt.id)
+                window.location.href = `http://localhost/CMMS/views/odt/registrar-odt.php`
+            }
+            //window.cookie = ``            
         },
         click: function (el) {
             var cardId = el.getAttribute('data-eid'); // Obtener el ID de la tarjeta
@@ -84,25 +92,25 @@ $(document).ready(async () => {
             switch (tarea.nom_estado) {
                 case 'pendiente':
                     kanban.addElement('b-pendientes', {
-                        id: `task-${tarea.idtarea}`, // Usamos el idtarea como id de la tarjeta
+                        id: tarea.idtarea, // Usamos el idtarea como id de la tarjeta
                         title: tareaHTML // Usamos el HTML que hemos creado
                     });
                     break;
                 case 'En Proceso':
                     kanban.addElement('b-proceso', {
-                        id: `task-${tarea.idtarea}`,
+                        id: tarea.idtarea,
                         title: tareaHTML
                     });
                     break;
                 case 'En Revision':
                     kanban.addElement('b-revision', {
-                        id: `task-${tarea.idtarea}`,
+                        id: tarea.idtarea,
                         title: tareaHTML
                     });
                     break;
                 case 'Finalizada':
                     kanban.addElement('b-finalizadas', {
-                        id: `task-${tarea.idtarea}`,
+                        id: tarea.idtarea,
                         title: tareaHTML
                     });
                     break;
@@ -112,5 +120,15 @@ $(document).ready(async () => {
         });
 
         return tareas
+    }
+
+    async function registrarOdt(idtarea) {
+        const formOdt = new FormData()
+        formOdt.append("operation", "add")
+        formOdt.append("idtarea", idtarea)
+        formOdt.append("creado_por", idusuario)
+        const dataOdt = await fetch(`${host}ordentrabajo.controller.php`, { method: 'POST', body: formOdt })
+        const idodt = await dataOdt.json()
+        return idodt
     }
 })

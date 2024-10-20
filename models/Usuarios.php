@@ -91,6 +91,27 @@ class Usuario extends ExecQuery{
       die($e->getMessage());
     }
   }
+  
+  public function filtrarUsuarios($params=[]):array{
+    try{
+      $defaultParams=[
+        'numdoc'=>null,
+        'dato'=>null
+      ];
+
+      $realParams = array_merge($defaultParams, $params);
+      $cmd = parent::execQ("CALL sp_filtrar_usuarios(?,?)");
+      $cmd->execute(
+        array(
+          $realParams['numdoc'],
+          $realParams['dato']
+        )
+      );
+      return $cmd->fetchAll(PDO::FETCH_ASSOC);
+    }catch(Exception $e){
+      die($e->getMessage());
+    }
+  }
 
   public function updateUser($params=[]):int{
     try{

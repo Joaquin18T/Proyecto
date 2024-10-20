@@ -105,11 +105,12 @@ BEGIN
         INNER JOIN activos_vinculados_tarea AVT ON AVT.idtarea = TAR.idtarea
         INNER JOIN activos ACT ON ACT.idactivo = AVT.idactivo
         INNER JOIN plandetareas PT ON PT.idplantarea = TAR.idplantarea
-        INNER JOIN usuarios USU ON USU.idusuario = ODT.creado_por
+        INNER JOIN usuarios USU ON USU.id_usuario = ODT.creado_por
         INNER JOIN estados EST ON EST.idestado = ODT.idestado
         WHERE ODT.idorden_trabajo = _idodt;
 END //
 
+call obtenerTareaDeOdtGenerada(1)
 
 DROP PROCEDURE IF EXISTS `obtenerEvidenciasDiagnostico`
 DELIMITER //

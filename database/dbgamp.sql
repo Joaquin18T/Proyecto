@@ -49,9 +49,11 @@ CREATE TABLE USUARIOS
   usuario     	varchar(120) not null,
   contrasena 	varchar(120) not null,
   estado	  	CHAR(1) DEFAULT '1',  -- 1 , 0
+  asignacion	int		null default 7,
   CONSTRAINT fk_persona FOREIGN KEY (idpersona) REFERENCES PERSONAS(id_persona),
   CONSTRAINT fk_rol FOREIGN KEY (idrol) REFERENCES roles (idrol),
-  CONSTRAINT uk_idpersonaUser UNIQUE(idpersona,usuario)
+  CONSTRAINT uk_idpersonaUser UNIQUE(idpersona,usuario),
+  CONSTRAINT fk_asignacion FOREIGN KEY (asignacion) REFERENCES estados (idestado)
 )ENGINE=INNODB;
 
 CREATE TABLE categorias
@@ -235,7 +237,9 @@ CREATE TABLE `odt`
 	idorden_trabajo		int		auto_increment		primary key,
     idtarea				int	 	not null,
     creado_por			int		not null,
-    idestado			int		null default 2,
+    idestado			int		null default 9,
+    incompleto 		boolean		null default true,
+    eliminado		boolean		null default false,
     CONSTRAINT 			fk_idtarea4					FOREIGN KEY (idtarea)					REFERENCES tareas 	(idtarea) ON DELETE CASCADE,
     CONSTRAINT			fk_creado_por				foreign key (creado_por) 				REFERENCES usuarios	(id_usuario),
     CONSTRAINT			fk_idestado4				FOREIGN KEY	(idestado)					REFERENCES estados	(idestado)

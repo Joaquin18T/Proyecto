@@ -1,5 +1,5 @@
 <?php require_once '../header.php' ?>
-<main class="mainPlanTareas">
+<main class="bg-success">
     <h1>PLAN DE TAREAS</h1>
     <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
         <li class="nav-item" role="presentation">
