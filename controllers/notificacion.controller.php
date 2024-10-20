@@ -7,11 +7,22 @@ $notificacion = new Notificacion();
 if(isset($_GET['operation'])){
   switch($_GET['operation']){
     case 'listNotf':
-      echo json_encode($notificacion->listNotifications(['idusuario'=>$_GET['idusuario']]));
+      $cleanData = [
+        'idusuario'=>$_GET['idusuario']==""?null:$_GET['idusuario'],
+        'idnotificacion'=>$_GET['idnotificacion']==""?null:$_GET['idnotificacion']
+      ];
+      echo json_encode($notificacion->listNotifications($cleanData));
       break;
     case 'detalleNotf':
-      echo json_encode($notificacion->detalleNotificaciones(['idnotificacion'=>$_GET['idnotificacion']]));
+      $clearData = [
+        'idusuario'=>$notificacion->limpiarCadena($_GET['idusuario']),
+        'idactivo_resp'=>$notificacion->limpiarCadena($_GET['idactivo_resp'])
+      ];
+      echo json_encode($notificacion->detalleNotificaciones($clearData));
       break;
+    case 'dataRespNotf':
+      $cleanData = $notificacion->limpiarCadena($_GET['idusuario']);
+      echo json_encode($notificacion->dataRespNotificacion(['idusuario'=>$cleanData]));
   }
 }
 

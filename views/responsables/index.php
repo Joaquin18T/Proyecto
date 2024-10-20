@@ -1,7 +1,7 @@
 <?php
 require_once '../header.php';
 ?>
-<link href="https://unpkg.com/vanilla-datatables@latest/dist/vanilla-dataTables.min.css" rel="stylesheet" type="text/css">
+<!-- <link href="https://unpkg.com/vanilla-datatables@latest/dist/vanilla-dataTables.min.css" rel="stylesheet" type="text/css"> -->
 
 <h2>ASIGNACIONES</h2>
 <div class="row">
@@ -159,7 +159,7 @@ require_once '../header.php';
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- LIBRERIA -->
 <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
-<script src="../../js/responsables/index.js"></script>
+<script src="http://localhost/CMMS/js/responsables/index.js"></script>
 </body>
 
 </html>

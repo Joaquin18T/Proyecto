@@ -20,7 +20,7 @@ BEGIN
 END $$
 -- CALL sp_respact_add (2,3,'1', 'En perfectas condiciones', '{"imagen1":"http://nose/que/poner"}', 'equipo de trabajo',1,1);
 
-DROP VIEW IF EXISTS v_activo_resp;
+
 CREATE VIEW v_activo_resp AS
 	SELECT 
 	  RES.idactivo_resp,
@@ -54,9 +54,7 @@ CREATE VIEW v_activo_resp AS
             WHERE H2.idactivo_resp = H1.idactivo_resp
         )
     )AS UBI ON UBI.idactivo_resp = RES.idactivo_resp
-    WHERE ACT.idestado=1
-    GROUP BY ACT.idactivo
-    ORDER BY RES.fecha_asignacion DESC;
+
     
 DROP PROCEDURE IF EXISTS sp_search_resp;
 DELIMITER $$
@@ -65,7 +63,31 @@ CREATE PROCEDURE sp_search_resp
 	IN _idactivo_resp INT
 )
 BEGIN
-	SELECT * FROM v_activo_resp WHERE idactivo_resp=_idactivo_resp;
+	 SELECT 
+	  RES.idactivo_resp, RES.condicion_equipo, RES.autorizacion, RES.descripcion despresp, RES.imagenes,
+	  ACT.idactivo, ACT.cod_identificacion, ACT.descripcion, ACT.fecha_adquisicion, ACT.modelo, ACT.especificaciones,
+      SUB.subcategoria,
+      MAR.marca,
+	  UBI.ubicacion,
+	  EST.nom_estado
+	FROM activos_responsables RES
+	INNER JOIN activos ACT ON RES.idactivo = ACT.idactivo
+    INNER JOIN marcas MAR ON ACT.idmarca = MAR.idmarca
+	INNER JOIN usuarios USU ON RES.idusuario = USU.id_usuario
+    INNER JOIN subcategorias SUB ON ACT.idsubcategoria = SUB.idsubcategoria
+	INNER JOIN estados EST ON ACT.idestado = EST.idestado
+	INNER JOIN (
+		SELECT H1.idactivo_resp, UBI1.ubicacion, UBI1.idubicacion
+		FROM historial_activos H1
+        INNER JOIN ubicaciones UBI1 ON H1.idubicacion = UBI1.idubicacion
+        WHERE H1.fecha_movimiento = (
+			SELECT MAX(H2.fecha_movimiento)
+            FROM historial_activos H2
+            WHERE H2.idactivo_resp = H1.idactivo_resp
+        )
+    )UBI ON UBI.idactivo_resp = RES.idactivo_resp
+    WHERE RES.idactivo_resp = _idactivo_resp
+    GROUP BY ACT.idactivo;
 END $$
     
 DROP PROCEDURE IF EXISTS sp_update_responsable;
@@ -152,6 +174,7 @@ CREATE PROCEDURE sp_users_by_activo
 )
 BEGIN
 	SELECT
+    USU.id_usuario,
 	USU.usuario,
     PER.apellidos,
     RES.fecha_asignacion,
@@ -201,7 +224,8 @@ BEGIN
     )UBI ON UBI.idactivo_resp = RES.idactivo_resp
     WHERE 	(SUB.idsubcategoria = _idsubcategoria OR _idsubcategoria IS NULL) AND
 			(UBI.idubicacion = _idubicacion OR _idubicacion IS NULL) AND
-			(ACT.cod_identificacion LIKE CONCAT('%', _cod_identificacion, '%') OR _cod_identificacion IS NULL) AND ACT.idestado=1
+			(ACT.cod_identificacion LIKE CONCAT('%', _cod_identificacion, '%') OR _cod_identificacion IS NULL) AND 
+            ACT.idestado BETWEEN 1 AND 2
     GROUP BY ACT.idactivo
     ORDER BY RES.fecha_asignacion DESC;
 END $$
@@ -227,17 +251,55 @@ CREATE PROCEDURE sp_getresp_principal
 	IN _idactivo_resp INT
 )
 BEGIN
-	SELECT 
-		RES.idactivo_resp,
-		P.apellidos, P.nombres,
-        U.usuario
-	FROM activos_responsables RES
-    INNER JOIN usuarios U ON RES.idusuario = U.id_usuario
-    INNER JOIN personas P ON U.idpersona = P.id_persona
-    WHERE RES.idactivo_resp = _idactivo_resp;
+	DECLARE isResP INT DEFAULT 0;
+    
+    SELECT COUNT(*) INTO isResP
+    FROM activos_responsables WHERE es_responsable='1'
+    AND idactivo_resp = _idactivo_resp;
+    
+    IF isResP>0 THEN
+		SELECT 
+			RES.idactivo_resp,
+			P.apellidos, P.nombres,
+			U.usuario
+		FROM activos_responsables RES
+		INNER JOIN usuarios U ON RES.idusuario = U.id_usuario
+		INNER JOIN personas P ON U.idpersona = P.id_persona
+		WHERE RES.idactivo_resp = _idactivo_resp AND RES.es_responsable = '1';
+	ELSE
+		SELECT 
+			RES.idactivo_resp,
+			P.apellidos, P.nombres,
+			U.usuario
+		FROM activos_responsables RES
+		INNER JOIN usuarios U ON RES.idusuario = U.id_usuario
+		INNER JOIN personas P ON U.idpersona = P.id_persona
+		WHERE RES.idactivo_resp = _idactivo_resp
+        ORDER BY RES.fecha_asignacion ASC
+        LIMIT 1;
+	END IF;
 END $$
 
+-- CALL sp_getresp_principal(12);
 
-
-
+DROP PROCEDURE IF EXISTS sp_update_activo_responsable;
+DELIMITER $$
+CREATE PROCEDURE sp_update_activo_responsable
+(
+	OUT _is_update INT,
+    IN _idactivo_resp INT,
+    IN _idactivo INT,
+    IN _idusuario INT,
+    IN _es_responsable CHAR(1),
+    IN _descripcion VARCHAR(500),
+    IN _autorizacion INT
+)
+BEGIN
+	UPDATE activos_responsables SET
+		idusuario = _idusuario,
+		es_responsable = _es_responsable,
+        descripcion = _descripcion,
+        autorizacion = _autorizacion
+	WHERE idactivo_resp = _idactivo_resp;
+END $$
 

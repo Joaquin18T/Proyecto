@@ -2,6 +2,8 @@ document.addEventListener("DOMContentLoaded",()=>{
   const host = "http://localhost/CMMS/controllers/";
   let myTable = null;
   let idactivo_resp = 0;
+  let users=[];
+  let contNof = 0;
   function selector(value) {
     return document.querySelector(`#${value}`);
   }
@@ -68,8 +70,6 @@ document.addEventListener("DOMContentLoaded",()=>{
         <td>
           <button type="button" data-idresp=${element.idactivo_resp} class="btn btn-sm btn-primary btn-det" data-bs-toggle="modal" 
           data-bs-target="#modal-activo-resp">Detalles</button>
-
-          <button type="button" data-idresp=${element.idactivo_resp} class="btn btn-sm btn-primary btn-update-ubicacion">Edt. Ub.</button>
         </td>
       </tr>
       `;
@@ -83,16 +83,22 @@ document.addEventListener("DOMContentLoaded",()=>{
     });
 
     buttonDetail();
-    btnUpdateUbicacion();
     await usersByActivo();
+    createTable();
     
   }
-  //createTable();
 
-  searchActivoResponsable();
+  
   function createTable(){
+    let rows = $("#tbody-tb-activo-resp").find("tr");
+    //console.log(rows.length);
+    
     if (myTable) {
-      myTable.clear().rows.add($("#tbody-tb-activo-resp").find("tr")).draw();
+      if (rows.length > 1) {
+        myTable.clear().rows.add(rows).draw();
+      } else if(rows.length===1){
+        myTable.clear().draw(); // Limpia la tabla si no hay filas.
+      }
     } else {
       // Inicializa DataTable si no ha sido inicializado antes
       myTable = $("#tb-activo-resp").DataTable({
@@ -106,18 +112,17 @@ document.addEventListener("DOMContentLoaded",()=>{
             previous: "Anterior",
             next: "Siguiente",
           },
-          emptyTable: "No hay datos disponibles",
           search: "Buscar:",
           info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+          emptyTable: "No se encontraron registros"
         },
       });
     }
   }
-
+  searchActivoResponsable();
   function searchActivoResponsable(){
     const filters = document.querySelectorAll(".filter");
     selector("tb-activo-resp tbody").innerHTML="";
-    createTable();
     filters.forEach(x=>{
       x.addEventListener("change",async()=>{
         await showData();
@@ -164,12 +169,19 @@ document.addEventListener("DOMContentLoaded",()=>{
   }
 
   selector("list-sidebar-activos").addEventListener("change",async()=>{
-    const params = new URLSearchParams();
-    params.append("operation", "usersByActivo");
-    params.append("idactivo", selector("list-sidebar-activos").value);
-    const data = await getDataUsuarios(params);
+    const data = await usersActivo(selector("list-sidebar-activos").value);
+    console.log("sb activos", data);
+    
     renderListUsers(data);
   });
+
+  async function usersActivo(valor){
+    const params = new URLSearchParams();
+    params.append("operation", "usersByActivo");
+    params.append("idactivo", parseInt(valor));
+    const data = await getDataUsuarios(params);
+    return data;
+  }
 
   function renderListUsers(data){
     const list = selector("list-users");
@@ -265,61 +277,5 @@ document.addEventListener("DOMContentLoaded",()=>{
       contain.appendChild(element);      
     });
     selector("espec").appendChild(contain);
-  }
-
-  //ACTUALIZAR UBICACION
-  function btnUpdateUbicacion() {
-    const buttons = document.querySelectorAll(".btn-update-ubicacion");
-    buttons.forEach(x=>{
-      x.addEventListener("click",async()=>{
-        idactivo_resp = x.getAttribute("data-idresp");
-        const dataResp = await getResPrincipal(idactivo_resp);
-        selector("sb-responsable").value =`${dataResp.apellidos} ${dataResp.nombres} - ${dataResp.usuario}`;
-        const sidebar = selector("sb-ubicacion-update");
-        const offCanvas = new bootstrap.Offcanvas(sidebar);
-        offCanvas.show();
-      });
-    });
-  }
-
-  async function getResPrincipal(id){
-    const params = new URLSearchParams();
-    params.append("operation", "getResponasblePrin");
-    params.append("idactivo_resp", parseInt(id));
-
-    const data = await getDatos(`${host}respActivo.controller.php`,params);
-    return data[0];
-  }
-
-  selector("form-update-ubicacion").addEventListener("submit",async(e)=>{
-    e.preventDefault();
-    
-    if(confirm("¿Deseas actualizarlo?")){
-      const resp = await updateUbicacion();
-      if(resp.mensaje==="Historial guardado"){
-        alert("Se ha actualizado la ubicacion");
-        const sidebar = bootstrap.Offcanvas.getOrCreateInstance(selector("sb-ubicacion-update"));
-        sidebar.hide();
-        await showData();
-      }else{
-        alert("Hubo un error al actualizar");
-      }
-    }
-    
-  });
-
-  async function updateUbicacion(){
-    const params = new FormData();
-    params.append("operation", "add");
-    params.append("idactivo_resp", parseInt(idactivo_resp));
-    params.append("idubicacion", parseInt(selector("sb-ubicacion").value));
-
-    const data = await fetch(`${host}historialactivo.controller.php`, {
-      method:'POST',
-      body:params
-    });
-    const addNewUbicacion = await data.json();
-
-    return addNewUbicacion;
   }
 });

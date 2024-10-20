@@ -65,6 +65,7 @@ if (isset($_POST['operation'])) {
         }
       }else{
         $msg['respuesta']="max";
+        //$msg['mb'] = $fileSize;
       }
       echo json_encode($msg);
       break;

@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const host="http://localhost/CMMS/controllers";
   let idactivo = 0;
-
+  let myTable = null;
   selector("tb-colaboradores tbody").innerHTML=`<tr><td colspan=7 class="text-center">No hay resultados</td></tr>`;
   /**
    * Selecciona elementos mediante la id
@@ -100,6 +100,38 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
     });
     addEventResp();
+    createTable();
+  }
+
+  function createTable(){
+    let rows = $("#tbody-colaboradores").find("tr");
+    //console.log(rows.length);
+    
+    if (myTable) {
+      if (rows.length > 1) {
+        myTable.clear().rows.add(rows).draw();
+      } else if(rows.length===1){
+        myTable.clear().draw(); // Limpia la tabla si no hay filas.
+      }
+    } else {
+      // Inicializa DataTable si no ha sido inicializado antes
+      myTable = $("#tb-colaboradores").DataTable({
+        paging: true,
+        searching: false,
+        lengthMenu: [5, 10, 15, 20],
+        pageLength: 5,
+        language: {
+          lengthMenu: "Mostrar _MENU_ filas por página",
+          paginate: {
+            previous: "Anterior",
+            next: "Siguiente",
+          },
+          search: "Buscar:",
+          info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+          emptyTable: "No se encontraron registros"
+        },
+      });
+    }
   }
 
   function addEventResp(){

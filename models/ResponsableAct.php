@@ -173,9 +173,9 @@ class ResponsableAct extends ExecQuery{
   }
 }
 
-// $resp = new ResponsableAct();
+//$resp = new ResponsableAct();
 
-// echo json_encode($resp->getResponsablePrin(['idactivo_resp'=>3]));
+// echo json_encode($resp->getResponsablePrin(['idactivo_resp'=>6]));
 
 // echo json_encode($resp->listResp_activo());
 
@@ -195,7 +195,7 @@ class ResponsableAct extends ExecQuery{
 // $data = $resp->existResponsable(['idactivo'=>4]);
 // echo var_dump($data[0]['cantidad']);
 
-// echo json_encode($resp->getRespById(['idactivo_resp'=>1]));
+//echo json_encode($resp->getRespById(['idactivo_resp'=>6]));
 
 
 // echo json_encode($resp->add([

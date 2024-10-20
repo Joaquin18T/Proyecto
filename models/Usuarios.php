@@ -178,7 +178,7 @@ class Usuario extends ExecQuery{
   }
 }
 
-//echo (password_hash('contrasena2', PASSWORD_BCRYPT));
+//echo (password_hash('contrasena7', PASSWORD_BCRYPT));
 // $user = new Usuario();
 
 // echo json_encode($user->getDataUserPersona(['idusuario'=>1]));

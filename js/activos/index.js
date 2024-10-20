@@ -104,7 +104,7 @@ document.addEventListener("DOMContentLoaded", () => {
     data.forEach((x) => {
       let especificaciones = JSON.parse(x.especificaciones);
       $selector("#table-activos tbody").innerHTML += `
-      <tr >
+      <tr>
         <td>${x.idactivo}</td>
         <td>${x.subcategoria}</td>
         <td>${x.categoria}</td>
@@ -132,12 +132,20 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     buttonsUpdate();
     showDetalleBaja();
+    createTable();
   }
-  createTable();
+  
 
   function createTable() {
+    let rows = $("#tb-body-activo").find("tr");
+    //console.log(rows.length);
+    
     if (myTable) {
-      myTable.clear().rows.add($("#tb-body-activo").find("tr")).draw();
+      if (rows.length > 1) {
+        myTable.clear().rows.add(rows).draw();
+      } else if(rows.length===1){
+        myTable.clear().draw(); // Limpia la tabla si no hay filas.
+      }
     } else {
       // Inicializa DataTable si no ha sido inicializado antes
       myTable = $("#table-activos").DataTable({
@@ -151,16 +159,20 @@ document.addEventListener("DOMContentLoaded", () => {
             previous: "Anterior",
             next: "Siguiente",
           },
-          emptyTable: "No hay datos disponibles",
           search: "Buscar:",
           info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+          emptyTable: "No se encontraron registros"
         },
       });
+      // if (rows.length > 0) {
+      //   myTable.rows.add(rows).draw(); // Si hay filas, agrégalas.
+      // }
     }
   }
 
   changeByFilters();
   function changeByFilters() {
+    
     const filters = document.querySelectorAll(".filter");
     $selector("#table-activos tbody").innerHTML = "";
     filters.forEach((x) => {

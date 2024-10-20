@@ -167,21 +167,6 @@ $host = "http://localhost/CMMS/";
               <li class="nav-item">
                 <a
                   class="nav-link"
-                  href="<?= $host ?>views/responsables/resp-activo">
-                  <span class="sidebar-text">Asignar Resp.</span>
-                </a>
-              </li>
-            </ul>
-          </div>
-          <div
-            class="multi-level collapse"
-            role="list"
-            id="submenu-app"
-            aria-expanded="false">
-            <ul class="flex-column nav">
-              <li class="nav-item">
-                <a
-                  class="nav-link"
                   href="<?= $host ?>views/responsables/select-responsable">
                   <span class="sidebar-text">Resp. Principal</span>
                 </a>
@@ -339,7 +324,7 @@ $host = "http://localhost/CMMS/";
   <main class="content">
     <!-- NAVBAR-HEADER -->
     <nav
-      class="navbar navbar-top navbar-expand navbar-dashboard navbar-dark ps-0 pe-2 pb-0">
+      class="navbar navbar-top navbar-expand navbar-dashboard navbar-dark ps-0 pb-0">
       <div class="container-fluid px-0">
         <div
           class="d-flex justify-content-between w-100"
@@ -348,7 +333,7 @@ $host = "http://localhost/CMMS/";
           <!-- Navbar links (PERFIL USUARIO) -->
           <ul class="navbar-nav align-items-center">
             <!-- LOGO NOTIFICACION -->
-            <li class="nav-item dropdown">
+            <li class="nav-item dropdown me-4">
               <a
                 class="nav-link text-dark notification-bell unread dropdown-toggle"
                 href="#"
@@ -369,27 +354,9 @@ $host = "http://localhost/CMMS/";
                   <a href="#" class="text-center text-primary fw-bold border-bottom border-light py-3">
                     Notifications
                   </a>
-                  <a href="#" class="list-group-item list-group-item-action border-bottom">
-                    <div class="row align-items-center">
-                      <div class="col-auto">
-                        <!-- Avatar -->
-                        <img alt="Image placeholder" src="#" class="avatar-md rounded" />
-                      </div>
-                      <div class="col ps-0 ms-2">
-                        <div class="d-flex justify-content-between align-items-center">
-                          <div>
-                            <h4 class="h6 mb-0 text-small">Neil Sims</h4>
-                          </div>
-                          <div class="text-end">
-                            <small class="text-danger">2 hrs ago</small>
-                          </div>
-                        </div>
-                        <p class="font-small mt-1 mb-0">
-                          You've been assigned a task for "Awesome new project".
-                        </p>
-                      </div>
-                    </div>
-                  </a>
+                  <div class="" id="list-notificaciones">
+
+                  </div>
                   <a href="#" class="dropdown-item text-center fw-bold rounded-bottom py-3">
                     <svg
                       class="icon icon-xxs text-gray-400 me-1"
@@ -410,7 +377,7 @@ $host = "http://localhost/CMMS/";
             <!-- FIN LOGO NOTIFICACION -->
 
             <!-- USER - LOGOUT -->
-            <li class="nav-item dropdown ms-lg-3">
+            <li class="nav-item dropdown ms-lg-3 me-2">
               <a
                 class="nav-link dropdown-toggle pt-1 px-0"
                 href="#"
