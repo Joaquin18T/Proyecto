@@ -73,6 +73,7 @@ document.addEventListener("DOMContentLoaded",()=>{
 
 
   function showDatos(data){
+    //selector("rol").value=data.idrol;
     selector("numDoc").value = data.num_doc==undefined?selector("numDoc").value:data.num_doc;
     selector("tipodoc").value=data.idtipodoc;
     selector("apellidos").value=data.apellidos;
@@ -83,14 +84,14 @@ document.addEventListener("DOMContentLoaded",()=>{
     selector("usuario").value=data.usuario;
     selector("rol").value=data.idrol;
     
-    if(data.usuario!==null){
-      //selector("rol").value=data.idrol;
-      selector("usuario").value=data.usuario;
-    }else{
-      //selector("rol").disabled=false;
-      alert("No tiene usuario");
-      //limpiar los campos de usuario y desactivarlos
-    }
+    // if(data.usuario!==null){
+    //   //selector("rol").value=data.idrol;
+    //   selector("usuario").value=data.usuario;
+    // }else{
+    //   //selector("rol").disabled=false;
+    //   alert("No tiene usuario");
+    //   //limpiar los campos de usuario y desactivarlos
+    // }
     
   }
 

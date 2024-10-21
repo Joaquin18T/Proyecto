@@ -286,12 +286,10 @@ DROP PROCEDURE IF EXISTS sp_update_activo_responsable;
 DELIMITER $$
 CREATE PROCEDURE sp_update_activo_responsable
 (
-	OUT _is_update INT,
     IN _idactivo_resp INT,
     IN _idactivo INT,
     IN _idusuario INT,
     IN _es_responsable CHAR(1),
-    IN _descripcion VARCHAR(500),
     IN _autorizacion INT
 )
 BEGIN

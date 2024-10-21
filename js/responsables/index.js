@@ -23,18 +23,6 @@ document.addEventListener("DOMContentLoaded",()=>{
     })
   })();
 
-  (async () => {
-    const data = await getDatos("http://localhost/CMMS/controllers/ubicacion.controller.php", "operation=getAll");
-    data.forEach(x => {
-      //console.log(x);
-      const element = createOption(x.idubicacion, x.ubicacion);
-      selector("ubicacion").appendChild(element);
-
-      const elementSB = createOption(x.idubicacion, x.ubicacion);
-      selector("sb-ubicacion").appendChild(elementSB);
-    });
-  })();
-
   (async()=>{
     await showData();
     
@@ -70,6 +58,8 @@ document.addEventListener("DOMContentLoaded",()=>{
         <td>
           <button type="button" data-idresp=${element.idactivo_resp} class="btn btn-sm btn-primary btn-det" data-bs-toggle="modal" 
           data-bs-target="#modal-activo-resp">Detalles</button>
+          <button type="button" data-idresp=${element.idactivo_resp} data-idactivo=${element.idactivo} 
+          class="btn btn-sm btn-primary btn-update">Editar A.</button>
         </td>
       </tr>
       `;
@@ -82,41 +72,69 @@ document.addEventListener("DOMContentLoaded",()=>{
       selector("list-sidebar-activos").appendChild(option);
     });
 
-    buttonDetail();
-    await usersByActivo();
-    createTable();
+    createTable(data);
+    chargerEventsButtons();
     
   }
 
+  function chargerEventsButtons(){
+    document.querySelector(".table-responsive").addEventListener("click",async(e)=>{
+      if(e.target){
+        if(e.target.classList.contains("btn-colab")){
+          await usersByActivo(e);
+        }
+        else if(e.target.classList.contains("btn-det")){
+          await buttonDetail(e);
+        }else if(e.target.classList.contains("btn-update")){
+          btnActualizarAsg(e);
+        }
+
+      }
+    });
+  }
+
+  function btnActualizarAsg(e){
+    //delegacion de eventos
+    console.log(e.target.getAttribute("data-idactivo"));
+        
+    if(confirm("¿Deseas actualizar sus asignaciones?")){
+      const id = e.target.getAttribute("data-idresp");
+      const idactivo = e.target.getAttribute("data-idactivo");
+      localStorage.setItem("idresp_act", parseInt(id));
+      localStorage.setItem("idactivo", parseInt(idactivo));
+      window.location.href=`http://localhost/CMMS/views/responsables/update-asignacion`;
+    }
+  }
   
-  function createTable(){
+  function createTable(data){
     let rows = $("#tbody-tb-activo-resp").find("tr");
     //console.log(rows.length);
-    
-    if (myTable) {
-      if (rows.length > 1) {
-        myTable.clear().rows.add(rows).draw();
-      } else if(rows.length===1){
-        myTable.clear().draw(); // Limpia la tabla si no hay filas.
-      }
-    } else {
-      // Inicializa DataTable si no ha sido inicializado antes
-      myTable = $("#tb-activo-resp").DataTable({
-        paging: true,
-        searching: false,
-        lengthMenu: [5, 10, 15, 20],
-        pageLength: 5,
-        language: {
-          lengthMenu: "Mostrar _MENU_ filas por página",
-          paginate: {
-            previous: "Anterior",
-            next: "Siguiente",
+    if(data.length>0){
+      if (myTable) {
+        if (rows.length > 0) {
+          myTable.clear().rows.add(rows).draw();
+        } else if(rows.length===1){
+          myTable.clear().draw(); // Limpia la tabla si no hay filas.
+        }
+      } else {
+        // Inicializa DataTable si no ha sido inicializado antes
+        myTable = $("#tb-activo-resp").DataTable({
+          paging: true,
+          searching: false,
+          lengthMenu: [5, 10, 15, 20],
+          pageLength: 5,
+          language: {
+            lengthMenu: "Mostrar _MENU_ filas por página",
+            paginate: {
+              previous: "Anterior",
+              next: "Siguiente",
+            },
+            search: "Buscar:",
+            info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+            emptyTable: "No se encontraron registros"
           },
-          search: "Buscar:",
-          info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-          emptyTable: "No se encontraron registros"
-        },
-      });
+        });
+      }
     }
   }
   searchActivoResponsable();
@@ -135,37 +153,30 @@ document.addEventListener("DOMContentLoaded",()=>{
     });
   }
 
-  function buttonDetail(){
-    const data = listOfButtons("btn-det");
+  async function buttonDetail(e){
+    console.log(e.target.getAttribute("data-idresp"));
+    let value=e.target.getAttribute("data-idresp");
 
-    data.forEach(x=>{
-      x.addEventListener("click",async(e)=>{
-        console.log(e.target.dataset.idresp);
-        let value=e.target.dataset.idresp;
+    const data = await getDatos("http://localhost/CMMS/controllers/respActivo.controller.php",`operation=getById&&idactivo_resp=${value}`);
+    let condicion = replaceWords(data[0].condicion_equipo,['<p>','</p>'],'');   
     
-        const data = await getDatos("http://localhost/CMMS/controllers/respActivo.controller.php",`operation=getById&&idactivo_resp=${value}`);
-        let condicion = replaceWords(data[0].condicion_equipo,['<p>','</p>'],'');   
+    const autorizacion = await getUserById(data[0].autorizacion);
+    const especificaciones = stringToJson(data[0].especificaciones);
+    selector("div-content").innerHTML="";
+    selector("div-content").innerHTML=`
+      <p><strong>Marca:</strong> <span>${data[0].marca}</span></p>
+      <p><strong>Modelo:</strong> <span>${data[0].modelo}</span></p>
+      <p><strong>Descripcion:</strong> <span>${data[0].descripcion}</span></p>
+      <p><strong>Fecha Adquisición:</strong> <span>${data[0].fecha_adquisicion}</span></p>
+      <p><strong>Condición:</strong> <span>${condicion}</span></p>
+      <p><strong>Ubicación Actual:</strong> <span>${data[0].ubicacion}</span></p>
+      <p><strong>Estado:</strong> <span>${data[0].nom_estado}</span></p>
+      <p><strong>Autorizacion:</strong> <span>${autorizacion[0].usuario}</span></p>
+      <div id="espec"><strong>Especificaciones: </strong> 
         
-        const autorizacion = await getUserById(data[0].autorizacion);
-        const especificaciones = stringToJson(data[0].especificaciones);
-        selector("div-content").innerHTML="";
-        selector("div-content").innerHTML=`
-          <p><strong>Marca:</strong> <span>${data[0].marca}</span></p>
-          <p><strong>Modelo:</strong> <span>${data[0].modelo}</span></p>
-          <p><strong>Descripcion:</strong> <span>${data[0].descripcion}</span></p>
-          <p><strong>Fecha Adquisición:</strong> <span>${data[0].fecha_adquisicion}</span></p>
-          <p><strong>Condición:</strong> <span>${condicion}</span></p>
-          <p><strong>Ubicación Actual:</strong> <span>${data[0].ubicacion}</span></p>
-          <p><strong>Estado:</strong> <span>${data[0].nom_estado}</span></p>
-          <p><strong>Autorizacion:</strong> <span>${autorizacion[0].usuario}</span></p>
-          <div id="espec"><strong>Especificaciones: </strong> 
-            
-          </div>
-        `;
-        showEspecificaciones(especificaciones);
-        
-      });
-    });
+      </div>
+    `;
+    showEspecificaciones(especificaciones);
   }
 
   selector("list-sidebar-activos").addEventListener("change",async()=>{
@@ -200,26 +211,21 @@ document.addEventListener("DOMContentLoaded",()=>{
     });
   }
 
-  async function usersByActivo(){
-    const dataButtons = document.querySelectorAll(".btn-colab");
-    dataButtons.forEach(x=>{
-      x.addEventListener("click",async(e)=>{
-        const value = e.target.dataset.idactivo;
+  async function usersByActivo(e){
+    const value = e.target.getAttribute("data-idactivo");
 
-        const params = new URLSearchParams();
-        params.append("operation", "usersByActivo");
-        params.append("idactivo", value);
+    const params = new URLSearchParams();
+    params.append("operation", "usersByActivo");
+    params.append("idactivo", value);
 
-        const data = await getDataUsuarios(params);  
-        const sidebar = selector("sidebar");
-        const offCanvas = new bootstrap.Offcanvas(sidebar);
+    const data = await getDataUsuarios(params);  
+    const sidebar = selector("sidebar");
+    const offCanvas = new bootstrap.Offcanvas(sidebar);
 
-        renderListUsers(data);
-        
-        offCanvas.show();
-             
-      });
-    });
+    renderListUsers(data);
+    
+    offCanvas.show();
+         
   }
 
   async function getDataUsuarios(params){

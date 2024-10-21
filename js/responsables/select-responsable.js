@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let idactivo = 0;
   let myTable = null;
   selector("tb-colaboradores tbody").innerHTML=`<tr><td colspan=7 class="text-center">No hay resultados</td></tr>`;
+  
   /**
    * Selecciona elementos mediante la id
    */
@@ -47,14 +48,20 @@ document.addEventListener("DOMContentLoaded", () => {
           //list.classList.remove('visible');
           //idactivo = x.idactivo;
           //o
-          idactivo = e.target.value;
-          let data = await filterUsuarios(e.target.value);
-          await showDataTable(data)
-          console.log(data);
-        });
+          
+          idactivo = parseInt(e.target.value);
+          console.log("idactivo", idactivo);
 
+          const data = await filterUsuarios(idactivo);
+          await showDataTable(data);
+          
+          //idactivo=0;
+          //console.log(data);
+        });
+        
         lista.appendChild(element);
       });
+      
     }else{
       const element = document.createElement("li");
       element.textContent="No hay resultados";
@@ -79,12 +86,15 @@ document.addEventListener("DOMContentLoaded", () => {
     return data;
   }
 
-  async function showDataTable(data){
+  async function showDataTable(data=[]){
+    //console.log(data);
     selector("tb-colaboradores tbody").innerHTML="";
-    if(data.length===0){
-      selector("tb-colaboradores tbody").innerHTML=`<tr><td colspan=6 class="text-center">No hay resultados</td></tr>`;
+    if(data.length==0){
+      selector("tb-colaboradores tbody").innerHTML=`<tr><td colspan=7 class="text-center">No hay resultados</td></tr>`;
     }
-    console.log(data);
+    
+    console.log(data.length);
+  
     
     data.forEach((x, index)=>{
       selector("tb-colaboradores tbody").innerHTML+=`
@@ -99,38 +109,41 @@ document.addEventListener("DOMContentLoaded", () => {
         </tr>
       `;
     });
+    createTable(data);
     addEventResp();
-    createTable();
   }
+  
 
-  function createTable(){
-    let rows = $("#tbody-colaboradores").find("tr");
-    //console.log(rows.length);
-    
-    if (myTable) {
-      if (rows.length > 1) {
-        myTable.clear().rows.add(rows).draw();
-      } else if(rows.length===1){
-        myTable.clear().draw(); // Limpia la tabla si no hay filas.
+  function createTable(data){
+    if(data.length>0){
+      let rows = $("#tbody-colaboradores").find("tr");
+  
+      if (myTable) {
+        if (rows.length > 0) {
+          myTable.clear().rows.add(rows).draw();
+        } else if(rows.length===1){
+          myTable.clear().draw(); // Limpia la tabla si no hay filas.
+        }
       }
-    } else {
-      // Inicializa DataTable si no ha sido inicializado antes
-      myTable = $("#tb-colaboradores").DataTable({
-        paging: true,
-        searching: false,
-        lengthMenu: [5, 10, 15, 20],
-        pageLength: 5,
-        language: {
-          lengthMenu: "Mostrar _MENU_ filas por página",
-          paginate: {
-            previous: "Anterior",
-            next: "Siguiente",
+      if(!myTable){
+        // Inicializa DataTable si no ha sido inicializado antes
+        myTable = $("#tb-colaboradores").DataTable({
+          paging: true,
+          searching: false,
+          lengthMenu: [5, 10, 15, 20],
+          pageLength: 5,
+          language: {
+            lengthMenu: "Mostrar _MENU_ filas por página",
+            paginate: {
+              previous: "Anterior",
+              next: "Siguiente",
+            },
+            search: "Buscar:",
+            info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+            emptyTable: "No se encontraron registros"
           },
-          search: "Buscar:",
-          info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-          emptyTable: "No se encontraron registros"
-        },
-      });
+        });
+      }
     }
   }
 

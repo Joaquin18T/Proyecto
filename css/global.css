@@ -1,0 +1,6 @@
+.input-rdo{
+  background-color: red; /* Fondo claro */
+  color: black; /* Texto oscuro */
+  border: 1px solid #ccc; /* Borde sutil */
+  cursor: default; /* Indicador de solo lectura */
+}
