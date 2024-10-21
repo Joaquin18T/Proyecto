@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     createTable(data);
 
-    loadUpdate();
+    chargerEventButtons();
   }
 
   function createTable(data){
@@ -94,7 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (myTable) {
         if (rows.length > 0) {
           myTable.clear().rows.add(rows).draw();
-        } else if(rows.length===1){
+        } else if(rows.length===0){
           myTable.clear().draw(); // Limpia la tabla si no hay filas.
         }
       } else {
@@ -133,22 +133,25 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
-
+  function chargerEventButtons(){
+    document.querySelector(".table-responsive").addEventListener("click",(e)=>{
+      if(e.target){
+        if(e.target.classList.contains("update-user")){
+          loadUpdate(e);
+        }
+      }
+    });
+  }
   /**
    * Obtiene la id y abre el modal para confirmar la actualizacion
    */
-  function loadUpdate() {
-    const buttonsUpdate = document.querySelectorAll(".update-user");
-    buttonsUpdate.forEach((x) => {
-      x.addEventListener("click", () => {
-        const iduser = x.getAttribute("data-iduser");
-        localStorage.setItem("iduser", iduser);
-        console.log(localStorage.getItem("iduser"));
+  function loadUpdate(e) {
+    const iduser = e.target.getAttribute("data-iduser");
+    localStorage.setItem("iduser", iduser);
+    console.log(localStorage.getItem("iduser"));
 
-        const modalImg = new bootstrap.Modal(selector("modal-update-user"));
-        modalImg.show();
-      });
-    });
+    const modalImg = new bootstrap.Modal(selector("modal-update-user"));
+    modalImg.show();
   }
 
   selector("aceppt-update").addEventListener("click",()=>{

@@ -110,7 +110,7 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
     });
     createTable(data);
-    addEventResp();
+    chargerEventsButtons();
   }
   
 
@@ -147,24 +147,28 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function addEventResp(){
-    const buttons = document.querySelectorAll(".btn-add");
-    buttons.forEach(x=>{
-      x.addEventListener("click",async()=>{
-        //Agregar alerta sobre que eligio a un usuario que ya es responsable principal
-        const {respuesta} = await getResponsable();
-        if(respuesta>0){
-          alert("Ya elegiste un responsable al activo elegido");
-        }else{
-          if(confirm("¿Deseas que el usuario sea el responsable principal?")){
-            const id = x.getAttribute("data-idresp");
-            const {respuesta} = await addResponsable(id);
-            console.log(respuesta);
-            alert("Has elegido al responsable principal");
-          }
+  function chargerEventsButtons(){
+    document.querySelector(".table-responsive").addEventListener("click",async(e)=>{
+      if(e.target){
+        if(e.target.classList.contains("btn-add")){
+          await addEventResp(e);
         }
-      });
+      }
     });
+  }
+
+  async function addEventResp(e){
+    const {respuesta} = await getResponsable();
+    if(respuesta>0){
+      alert("Ya elegiste un responsable al activo elegido");
+    }else{
+      if(confirm("¿Deseas que el usuario sea el responsable principal?")){
+        const id = e.target.getAttribute("data-idresp");
+        const {respuesta} = await addResponsable(id);
+        console.log(respuesta);
+        alert("Has elegido al responsable principal");
+      }
+    }
   }
 
 

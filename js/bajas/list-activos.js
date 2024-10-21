@@ -53,6 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
     params.append("operation", "sinServicio");
     params.append("fecha_adquisicion", selector("fecha_adquisicion").value);
     params.append("idestado", selector("estado").value);
+    params.append("cod_identificacion", selector("cod_identificacion").value);
     const data = await getDatos(`${host}bajaActivo.controller.php`, params);
     console.log(data);
 
@@ -85,76 +86,82 @@ document.addEventListener("DOMContentLoaded", () => {
       </tr>
       `;
     });
-    btnRegistrar();
-    console.log(isSelect);
-    
     if(isSelect===0){
-      createTable();
+      createTable(data);
     }
+    chargerEventsButtons();
+    //console.log(isSelect);
   }
 
-  function createTable() {
+  function createTable(data) {
     let rows = $("#table-activos-tbody").find("tr");
     //console.log(rows.length);
-    if (globals.myTable) {
-      if (rows.length > 1) {
-        globals.myTable.clear().rows.add(rows).draw();
-      } else if (rows.length === 1) {
-        globals.myTable.clear().draw(); // Limpia la tabla si no hay filas.
-      }
-    } else {
-      // Inicializa DataTable si no ha sido inicializado antes
-      globals.myTable = $("#table-activos").DataTable({
-        paging: true,
-        searching: false,
-        lengthMenu: [5, 10, 15, 20],
-        pageLength: 5,
-        language: {
-          lengthMenu: "Mostrar _MENU_ filas por página",
-          paginate: {
-            previous: "Anterior",
-            next: "Siguiente",
+    if(data.length>0){
+      if (globals.myTable) {
+        if (rows.length > 0) {
+          globals.myTable.clear().rows.add(rows).draw();
+        } else if (rows.length === 1) {
+          globals.myTable.clear().draw(); // Limpia la tabla si no hay filas.
+        }
+      } else {
+        // Inicializa DataTable si no ha sido inicializado antes
+        globals.myTable = $("#table-activos").DataTable({
+          paging: true,
+          searching: false,
+          lengthMenu: [5, 10, 15, 20],
+          pageLength: 5,
+          language: {
+            lengthMenu: "Mostrar _MENU_ filas por página",
+            paginate: {
+              previous: "Anterior",
+              next: "Siguiente",
+            },
+            search: "Buscar:",
+            info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+            emptyTable: "No se encontraron registros",
           },
-          search: "Buscar:",
-          info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-          emptyTable: "No se encontraron registros",
-        },
-      });
-      // if (rows.length > 0) {
-      //   myTable.rows.add(rows).draw(); // Si hay filas, agrégalas.
-      // }
+        });
+        // if (rows.length > 0) {
+        //   myTable.rows.add(rows).draw(); // Si hay filas, agrégalas.
+        // }
+      }
     }
   }
 
-  function btnRegistrar() {
-    const btnRegistrar = selectorAll("sb-registrar");
-    btnRegistrar.forEach((x) => {
-      x.addEventListener("click", async () => {
-        
-        globals.idactivo = x.getAttribute("data-id");
-
-        const valor = await getActivoById(parseInt(globals.idactivo));
-        selector("activo").value = valor.descripcion;
-        globals.cod_identificacion = valor.cod_identificacion;
-
-        let user = x.getAttribute("data-user");
-        console.log("user existe", user === "");
-
-        if (user === "") {
-          globals.no_responsable = true;
-        } else {
-          globals.user_responsable = x.getAttribute("data-user");
-          console.log("user resp", globals.user_responsable);
+  function chargerEventsButtons(){
+    document.querySelector(".table-responsive").addEventListener("click",async(e)=>{
+      if(e.target){
+        if(e.target.classList.contains("sb-registrar")){
+          await btnRegistrar(e);
         }
-        console.log(globals.no_responsable);
-
-        const sidebar = selector("sidebar-baja");
-        const offCanvas = new bootstrap.Offcanvas(sidebar);
-
-        offCanvas.show();
-      });
+      }
     });
   }
+
+  async function btnRegistrar(e) {
+    globals.idactivo = e.target.getAttribute("data-id");
+
+    const valor = await getActivoById(parseInt(globals.idactivo));
+    selector("activo").value = valor.descripcion;
+    globals.cod_identificacion = valor.cod_identificacion;
+
+    let user = e.target.getAttribute("data-user");
+    console.log("user existe", user === "");
+
+    if (user === "") {
+      globals.no_responsable = true;
+    } else {
+      globals.user_responsable = e.target.getAttribute("data-user");
+      console.log("user resp", globals.user_responsable);
+    }
+    console.log(globals.no_responsable);
+
+    const sidebar = selector("sidebar-baja");
+    const offCanvas = new bootstrap.Offcanvas(sidebar);
+
+    offCanvas.show();
+  }
+
   async function saveFile() {
     let params = new FormData();
     let fileInput = selector("documentacion");
@@ -178,6 +185,12 @@ document.addEventListener("DOMContentLoaded", () => {
       x.addEventListener("change", async () => {
         await showData();
       });
+      if(x.id==="cod_identificacion"){
+        x.addEventListener("keyup",async()=>{
+          isSelect=0;
+          await showData();
+        });
+      }
     });
   }
 

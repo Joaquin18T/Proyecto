@@ -44,7 +44,7 @@ CREATE TABLE `activos` (
 
 insert  into `activos`(`idactivo`,`idsubcategoria`,`idmarca`,`idestado`,`modelo`,`cod_identificacion`,`fecha_adquisicion`,`descripcion`,`especificaciones`) values 
 (1,2,1,1,'14-EP','123ABC','2024-10-16','Laptop 14-EP 16 RAM','{\"ram\":\"16GB\", \"disco\":\"solido\"}'),
-(2,10,1,5,'Monitor 4K','MON123','2024-10-16','Monitor LG de 27 pulgadas','{\"resolucion\":\"3840x2160\"}'),
+(2,10,1,3,'Monitor 4K','MON123','2024-10-16','Monitor LG de 27 pulgadas','{\"resolucion\":\"3840x2160\"}'),
 (3,11,2,5,'Teclado Mecánico','TEC123','2024-10-16','Teclado mecánico HP','{\"tipo\":\"mecánico\", \"conectividad\":\"inalámbrico\"}'),
 (4,7,4,2,'Compresor Industrial','COMP123','2024-10-16','Compresor Caterpillar de 10HP','{\"potencia\":\"10HP\"}'),
 (5,6,5,4,'Camión de Carga Hyundai','CAM123','2024-10-16','Camión de carga pesada Hyundai','{\"capacidad\":\"10 toneladas\"}'),
@@ -153,8 +153,7 @@ CREATE TABLE `bajas_activo` (
 /*Data for the table `bajas_activo` */
 
 insert  into `bajas_activo`(`idbaja_activo`,`idactivo`,`fecha_baja`,`motivo`,`coment_adicionales`,`ruta_doc`,`aprobacion`) values 
-(1,3,'2024-10-20 22:32:31','problemas frecuentes en su funcionamiento',NULL,'http://docs/pdf/doc.pdf',1),
-(23,5,'2024-10-20 23:39:23','dasadasd',NULL,'C:/xampp/htdocs/CMMS/uploads/CAM123-Plan mantenimiento.pdf',1);
+(1,3,'2024-10-20 22:32:31','problemas frecuentes en su funcionamiento',NULL,'http://docs/pdf/doc.pdf',1);
 
 /*Table structure for table `categorias` */
 
@@ -702,35 +701,38 @@ CREATE TABLE `usuarios` (
   `usuario` varchar(120) NOT NULL,
   `contrasena` varchar(120) NOT NULL,
   `estado` char(1) DEFAULT '1',
+  `asignacion` int(11) DEFAULT 7,
   PRIMARY KEY (`id_usuario`),
   UNIQUE KEY `uk_idpersonaUser` (`idpersona`,`usuario`),
   KEY `fk_rol` (`idrol`),
+  KEY `fk_asignacion` (`asignacion`),
+  CONSTRAINT `fk_asignacion` FOREIGN KEY (`asignacion`) REFERENCES `estados` (`idestado`),
   CONSTRAINT `fk_persona` FOREIGN KEY (`idpersona`) REFERENCES `personas` (`id_persona`),
   CONSTRAINT `fk_rol` FOREIGN KEY (`idrol`) REFERENCES `roles` (`idrol`)
 ) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `usuarios` */
 
-insert  into `usuarios`(`id_usuario`,`idpersona`,`idrol`,`usuario`,`contrasena`,`estado`) values 
-(1,1,1,'j.gonzalez','$2y$10$TpMmHZcum7YJqXOqTrsDy.WheLpUnU98OZjc4WqLgPke9HlX6ZaJS','1'),
-(2,2,2,'a.smith','$2y$10$HdD325QAWm7QpH7KXtRdROBKe39KwDQr6l4K83u2a0w5h/d6yNgau','1'),
-(3,3,2,'c.martinez','$2y$10$x45pTq2wG/jFtZkOPhvsMe9hReDbWqjo7sv5U37MTL2g10BglS4jG','1'),
-(4,4,2,'pablo35a','$2y$10$0xJpbL03XkLI5Zz/lCfyVu6HTYSDKKUpEfLF6BywNTBDJofh9YNlO','1'),
-(5,4,2,'r.avalos','$2y$10$VrxeMCQteaNdX6LwxoZEYevp8BCwKTpIKTVebChbXcxnNX7BTIFaW','1'),
-(6,5,1,'p.avalos','$2y$10$j1KccY6Iex7h19WR0pfMpumhp.dsjJkBCcFUbtVwbPCHw7hECJNyW','1'),
-(7,7,2,'manuelaL','$2y$10$N/fJ6vi73q6jINKfOcz71e0d/HpC0EhkL5Pqw4KwH2AscAX2G/L6u','1'),
-(8,16,1,'garcia.juan','contrasena1','1'),
-(9,17,2,'perez.ana','contrasena2','1'),
-(10,18,1,'lopez.carlos','contrasena3','1'),
-(11,19,2,'martinez.laura','contrasena4','1'),
-(12,20,1,'sanchez.pedro','$2y$10$Q1zxS16fPXZNYyKkTMqLE.xgeBijyEm88.49s1DRJSTZnwUj5dOne','1'),
-(13,21,2,'ramirez.marta','contrasena6','1'),
-(14,22,1,'torres.jorge','$2y$10$/w29oS1sTWIU7fJphQkoIeox2MbOlR8YLEOOG199o0Am5HZ9wADfa','1'),
-(15,23,2,'hernandez.lucia','contrasena8','1'),
-(16,24,1,'andreaBTS','$2y$10$b0jhCsgzy8s14q6g.zZQ/OGzQGwJVqvQBrPhB.WLiK/77a60QXTHu','1'),
-(17,25,1,'julianV','$2y$10$tMndXYFd4w81.vC3l1iP8.YQMPDyKdQwlewBKa5HiLISk4K7r0Ki6','1'),
-(18,26,2,'joel33','$2y$10$eRbOkniRKCYi2LCMaJZjJuQsGukOQv0Jt/UOPnFPD1jOXvrWeiLQS','1'),
-(19,27,1,'manuelV','$2y$10$4L2drSBWMLPhL6y/QPc.quj0FeHwql4JzxaQ6ivYktbgDS5kl2JQq','1');
+insert  into `usuarios`(`id_usuario`,`idpersona`,`idrol`,`usuario`,`contrasena`,`estado`,`asignacion`) values 
+(1,1,1,'j.gonzalez','$2y$10$TpMmHZcum7YJqXOqTrsDy.WheLpUnU98OZjc4WqLgPke9HlX6ZaJS','1',7),
+(2,2,2,'a.smith','$2y$10$HdD325QAWm7QpH7KXtRdROBKe39KwDQr6l4K83u2a0w5h/d6yNgau','1',7),
+(3,3,2,'c.martinez','$2y$10$x45pTq2wG/jFtZkOPhvsMe9hReDbWqjo7sv5U37MTL2g10BglS4jG','1',7),
+(4,4,2,'pablo35a','$2y$10$0xJpbL03XkLI5Zz/lCfyVu6HTYSDKKUpEfLF6BywNTBDJofh9YNlO','1',7),
+(5,4,2,'r.avalos','$2y$10$VrxeMCQteaNdX6LwxoZEYevp8BCwKTpIKTVebChbXcxnNX7BTIFaW','1',7),
+(6,5,1,'p.avalos','$2y$10$j1KccY6Iex7h19WR0pfMpumhp.dsjJkBCcFUbtVwbPCHw7hECJNyW','1',7),
+(7,7,2,'manuelaL','$2y$10$N/fJ6vi73q6jINKfOcz71e0d/HpC0EhkL5Pqw4KwH2AscAX2G/L6u','1',7),
+(8,16,1,'garcia.juan','contrasena1','1',7),
+(9,17,2,'perez.ana','contrasena2','1',7),
+(10,18,1,'lopez.carlos','contrasena3','1',7),
+(11,19,2,'martinez.laura','contrasena4','1',7),
+(12,20,1,'sanchez.pedro','$2y$10$Q1zxS16fPXZNYyKkTMqLE.xgeBijyEm88.49s1DRJSTZnwUj5dOne','1',7),
+(13,21,2,'ramirez.marta','contrasena6','1',7),
+(14,22,1,'torres.jorge','$2y$10$/w29oS1sTWIU7fJphQkoIeox2MbOlR8YLEOOG199o0Am5HZ9wADfa','1',7),
+(15,23,2,'hernandez.lucia','contrasena8','1',7),
+(16,24,1,'andreaBTS','$2y$10$b0jhCsgzy8s14q6g.zZQ/OGzQGwJVqvQBrPhB.WLiK/77a60QXTHu','1',7),
+(17,25,1,'julianV','$2y$10$tMndXYFd4w81.vC3l1iP8.YQMPDyKdQwlewBKa5HiLISk4K7r0Ki6','1',7),
+(18,26,2,'joel33','$2y$10$eRbOkniRKCYi2LCMaJZjJuQsGukOQv0Jt/UOPnFPD1jOXvrWeiLQS','1',7),
+(19,27,1,'manuelV','$2y$10$4L2drSBWMLPhL6y/QPc.quj0FeHwql4JzxaQ6ivYktbgDS5kl2JQq','1',7);
 
 /* Procedure structure for procedure `actualizarActivoPorTarea` */
 
@@ -1114,7 +1116,8 @@ DELIMITER $$
 
 /*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_activos_sin_servicio`(
     IN _fecha_adquisicion DATE,
-    IN _idestado INT
+    IN _idestado INT,
+    IN _cod_identificacion CHAR(40)
 )
 BEGIN
 	SELECT distinct
@@ -1141,9 +1144,10 @@ BEGIN
     )UBI ON UBI.idactivo_resp = RES.idactivo_resp
     INNER JOIN activos ACT ON RES.idactivo = ACT.idactivo
     INNER JOIN estados EST ON ACT.idestado = EST.idestado
-    AND (ACT.fecha_adquisicion = _fecha_adquisicion OR _fecha_adquisicion IS NULL)
-    AND (EST.idestado = _idestado OR _idestado IS NULL)
-    WHERE EST.idestado >1 AND EST.idestado<5 AND EST.idestado !=4;
+    WHERE  (ACT.fecha_adquisicion = _fecha_adquisicion OR _fecha_adquisicion IS NULL)
+    AND (EST.idestado = _idestado OR _idestado IS NULL) AND
+    (ACT.cod_identificacion LIKE CONCAT('%',_cod_identificacion,'%') OR _cod_identificacion IS NULL) AND
+	EST.idestado >1 AND EST.idestado<5 AND EST.idestado !=4;
 END */$$
 DELIMITER ;
 
@@ -1546,7 +1550,8 @@ BEGIN
         TD.tipodoc,
         P.num_doc,
         P.telefono,
-        P.genero
+        P.genero,
+        U.asignacion
 	FROM usuarios U
     INNER JOIN roles R ON U.idrol = R.idrol
     INNER JOIN personas P ON U.idpersona = P.id_persona
@@ -1554,7 +1559,7 @@ BEGIN
     WHERE (R.idrol = _idrol OR _idrol IS NULL) 
     AND (U.estado = _estado OR _estado IS NULL) 
     AND (TD.idtipodoc=_idtipodoc OR _idtipodoc IS NULL)
-    AND (P.apellidos LIKE CONCAT('%', _dato ,'%') OR P.nombres LIKE CONCAT('%', _dato ,'%') OR _dato IS NULL);
+    AND (CONCAT(P.apellidos,' ',P.nombres) LIKE CONCAT('%', _dato ,'%') OR _dato IS NULL);
 END */$$
 DELIMITER ;
 

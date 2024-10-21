@@ -50,7 +50,8 @@ DELIMITER $$
 CREATE PROCEDURE sp_activos_sin_servicio
 (
     IN _fecha_adquisicion DATE,
-    IN _idestado INT
+    IN _idestado INT,
+    IN _cod_identificacion CHAR(40)
 )
 BEGIN
 	SELECT distinct
@@ -77,11 +78,12 @@ BEGIN
     )UBI ON UBI.idactivo_resp = RES.idactivo_resp
     INNER JOIN activos ACT ON RES.idactivo = ACT.idactivo
     INNER JOIN estados EST ON ACT.idestado = EST.idestado
-    AND (ACT.fecha_adquisicion = _fecha_adquisicion OR _fecha_adquisicion IS NULL)
-    AND (EST.idestado = _idestado OR _idestado IS NULL)
-    WHERE EST.idestado >1 AND EST.idestado<5 AND EST.idestado !=4;
+    WHERE  (ACT.fecha_adquisicion = _fecha_adquisicion OR _fecha_adquisicion IS NULL)
+    AND (EST.idestado = _idestado OR _idestado IS NULL) AND
+    (ACT.cod_identificacion LIKE CONCAT('%',_cod_identificacion,'%') OR _cod_identificacion IS NULL) AND
+	EST.idestado >1 AND EST.idestado<5 AND EST.idestado !=4;
 END $$
--- CALL sp_activos_sin_servicio(null, null);
+-- CALL sp_activos_sin_servicio(null, null, 'C');
 DROP PROCEDURE IF EXISTS sp_data_baja_activo;
 DELIMITER $$
 CREATE PROCEDURE sp_data_baja_activo

@@ -6,7 +6,7 @@ ALTER TABLE historial_activos AUTO_INCREMENT = 1;
 
 
 select *from activos_responsables;
-select*from historial_activos where idactivo_resp=1;
+select*from historial_activos where idactivo_resp=5;
 select*from notificaciones ;
 select*from activos;
 select*from usuarios;

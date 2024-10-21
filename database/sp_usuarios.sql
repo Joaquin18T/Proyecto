@@ -17,7 +17,7 @@ BEGIN
     WHERE US.estado=1;
 END $$
 
-call sp_list_users
+-- call sp_list_users
 
 DROP PROCEDURE IF EXISTS sp_list_persona_users;
 DELIMITER $$
@@ -47,9 +47,9 @@ BEGIN
     WHERE (R.idrol = _idrol OR _idrol IS NULL) 
     AND (U.estado = _estado OR _estado IS NULL) 
     AND (TD.idtipodoc=_idtipodoc OR _idtipodoc IS NULL)
-    AND (P.apellidos LIKE CONCAT('%', _dato ,'%') OR P.nombres LIKE CONCAT('%', _dato ,'%') OR _dato IS NULL);
+    AND (CONCAT(P.apellidos,' ',P.nombres) LIKE CONCAT('%', _dato ,'%') OR _dato IS NULL);
 END $$
--- CALL sp_list_persona_users(null,1,null,null);
+-- CALL sp_list_persona_users(null,null,null,'Smith Anna');
         
 DROP PROCEDURE IF EXISTS sp_filtrar_usuarios;
 DELIMITER $$
