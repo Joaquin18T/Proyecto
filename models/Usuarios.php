@@ -179,11 +179,11 @@ class Usuario extends ExecQuery{
 }
 
 //echo (password_hash('contrasena7', PASSWORD_BCRYPT));
-// $user = new Usuario();
+//$user = new Usuario();
 
 // echo json_encode($user->getDataUserPersona(['idusuario'=>1]));
 
-// echo json_encode($user->listFilters([]));
+//echo json_encode($user->listFilters(['dato'=>'Smith Anna']));
 
 // $clave = password_hash("juan241", PASSWORD_BCRYPT);
 // echo json_encode($user->updateClaveAcceso(['idusuario'=>8,'contrasena'=>$clave]));
