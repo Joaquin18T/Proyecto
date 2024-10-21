@@ -16,9 +16,9 @@ class Diagnostico extends ExecQuery
           $params['diagnostico'],
         )
       );
-      $response = parent::execQuerySimple("SELECT @iddiagnostico as iddiagnostico")->fetch(\PDO::FETCH_ASSOC);
+      $response = parent::execQuerySimple("SELECT @iddiagnostico as iddiagnostico")->fetch(PDO::FETCH_ASSOC);
       return (int) $response['iddiagnostico'];
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
       die($e->getMessage());
     }
   }
@@ -33,7 +33,7 @@ class Diagnostico extends ExecQuery
         $params['evidencia']
       ));
       return $status;
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
       die($e->getMessage());
     }
   }
@@ -45,10 +45,25 @@ class Diagnostico extends ExecQuery
       $sp->execute(array(
         $params['iddiagnostico']
       ));
-      return $sp->fetchAll(\PDO::FETCH_ASSOC);
+      return $sp->fetchAll(PDO::FETCH_ASSOC);
 
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
       die($e->getMessage());
     }
-  } // ME QUEDE ACA
+  }
+
+  
+  public function obtenerDiagnostico($params = []): array
+  {
+    try {
+      $sp = parent::execQ("CALL obtenerDiagnostico(?,?)");
+      $sp->execute(array(
+        $params['idordentrabajo'],
+        $params['idtipodiagnostico']
+      ));
+      return $sp->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+      die($e->getMessage());
+    }
+  }
 }

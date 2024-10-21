@@ -71,12 +71,12 @@ BEGIN
     INNER JOIN roles R ON U.idrol = R.idrol
     INNER JOIN personas P ON U.idpersona = P.id_persona
     INNER JOIN tipo_doc TD ON P.idtipodoc = TD.idtipodoc
-    AND (P.num_doc=_numdoc OR _numdoc IS NULL)
+    AND (P.num_doc LIKE CONCAT('%', _numdoc ,'%') OR _numdoc IS NULL)
     AND (P.apellidos LIKE CONCAT('%', _dato ,'%') OR P.nombres LIKE CONCAT('%', _dato ,'%') OR _dato IS NULL);
 END $$
 
 -- select * from personas;
--- CALL sp_filtrar_usuarios(72754753,null);
+-- CALL sp_filtrar_usuarios(7,null);
 
 DROP PROCEDURE IF EXISTS sp_user_login;
 DELIMITER $$

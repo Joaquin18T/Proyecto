@@ -63,7 +63,7 @@ DELIMITER //
 CREATE PROCEDURE `registrarEvidenciaDiagnostico`
 (
 	IN _iddiagnostico INT,
-    IN _evidencia BLOB
+    IN _evidencia VARCHAR(80)
 )
 BEGIN
 	INSERT INTO evidencias_diagnostico (iddiagnostico, evidencia)

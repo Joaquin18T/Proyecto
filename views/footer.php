@@ -54,3 +54,7 @@
 <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"> -->
 <!-- Script personzalizado -->
 <script src="http://localhost/CMMS/js/dashboard/select-option.js"></script>
+<!-- SWEET ALERT -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- Libreria que simplifica sweet alert -->
+ <script src="http://localhost/linofino/js/swalcustom.js"></script>

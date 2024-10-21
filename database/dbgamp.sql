@@ -258,7 +258,7 @@ CREATE TABLE `diagnosticos`
 	iddiagnostico		int	auto_increment primary key,
     idorden_trabajo		int	not null,
 	idtipo_diagnostico	int	not null,
-    diagnostico			varchar(300)	not null,
+    diagnostico			varchar(300)	default null,
     CONSTRAINT			fk_idorden_trabajo3		foreign key (idorden_trabajo)	references odt (idorden_trabajo) ON DELETE CASCADE,
     CONSTRAINT			fk_idtipo_diagnostico	foreign key (idtipo_diagnostico) references tipo_diagnosticos (idtipo_diagnostico)
 )ENGINE=INNODB;
@@ -268,7 +268,7 @@ CREATE TABLE `evidencias_diagnostico`
 (
 	idevidencias_diagnostico	int	auto_increment primary key,
     iddiagnostico				int not null,
-    evidencia					BLOB	not null,
+    evidencia					VARCHAR(80)	not null,
 	CONSTRAINT 					fk_iddiagnostico	foreign key (iddiagnostico) references diagnosticos (iddiagnostico) ON DELETE CASCADE
 )ENGINE=INNODB;	
 
