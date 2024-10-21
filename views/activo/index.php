@@ -3,7 +3,7 @@
 <div class="row">
   <div class="col-md-12">
     <div class="card">
-      <div class="card-header card-header d-flex justify-content-between m-0">
+      <div class="card-header d-flex justify-content-between m-0">
         <div class="mb-0 pt-1">Lista de Activos</div>
         <a href="<?= $host ?>views/activo/register-activo" class="btn btn-outline-success btn-sm text-end" type="button">Registrar</a>
       </div>

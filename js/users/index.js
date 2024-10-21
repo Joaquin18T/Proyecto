@@ -53,6 +53,8 @@ document.addEventListener("DOMContentLoaded", () => {
     params.append("idtipodoc", selector("tipodoc").value);
 
     const data = await getDatos(`${host}usuarios.controller.php`, params);
+    console.log(data);
+    
     selector("tb-usuarios tbody").innerHTML = "";
     if(data.length===0){
       selector("tbody-usuarios").innerHTML = `
@@ -80,39 +82,40 @@ document.addEventListener("DOMContentLoaded", () => {
         </tr>
       `;
     });
+    createTable(data);
 
-    loadUpdate();
-    createTable();
+    chargerEventButtons();
   }
 
-  function createTable(){
+  function createTable(data){
     let rows = $("#tbody-usuarios").find("tr");
     //console.log(rows.length);
-    
-    if (myTable) {
-      if (rows.length > 1) {
-        myTable.clear().rows.add(rows).draw();
-      } else if(rows.length===1){
-        myTable.clear().draw(); // Limpia la tabla si no hay filas.
-      }
-    } else {
-      // Inicializa DataTable si no ha sido inicializado antes
-      myTable = $("#tb-usuarios").DataTable({
-        paging: true,
-        searching: false,
-        lengthMenu: [5, 10, 15, 20],
-        pageLength: 5,
-        language: {
-          lengthMenu: "Mostrar _MENU_ filas por página",
-          paginate: {
-            previous: "Anterior",
-            next: "Siguiente",
+    if(data.length>0){
+      if (myTable) {
+        if (rows.length > 0) {
+          myTable.clear().rows.add(rows).draw();
+        } else if(rows.length===0){
+          myTable.clear().draw(); // Limpia la tabla si no hay filas.
+        }
+      } else {
+        // Inicializa DataTable si no ha sido inicializado antes
+        myTable = $("#tb-usuarios").DataTable({
+          paging: true,
+          searching: false,
+          lengthMenu: [5, 10, 15, 20],
+          pageLength: 5,
+          language: {
+            lengthMenu: "Mostrar _MENU_ filas por página",
+            paginate: {
+              previous: "Anterior",
+              next: "Siguiente",
+            },
+            search: "Buscar:",
+            info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+            emptyTable: "No se encontraron registros"
           },
-          search: "Buscar:",
-          info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-          emptyTable: "No se encontraron registros"
-        },
-      });
+        });
+      }
     }
   }
   
@@ -130,22 +133,25 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
-
+  function chargerEventButtons(){
+    document.querySelector(".table-responsive").addEventListener("click",(e)=>{
+      if(e.target){
+        if(e.target.classList.contains("update-user")){
+          loadUpdate(e);
+        }
+      }
+    });
+  }
   /**
    * Obtiene la id y abre el modal para confirmar la actualizacion
    */
-  function loadUpdate() {
-    const buttonsUpdate = document.querySelectorAll(".update-user");
-    buttonsUpdate.forEach((x) => {
-      x.addEventListener("click", () => {
-        const iduser = x.getAttribute("data-iduser");
-        localStorage.setItem("iduser", iduser);
-        console.log(localStorage.getItem("iduser"));
+  function loadUpdate(e) {
+    const iduser = e.target.getAttribute("data-iduser");
+    localStorage.setItem("iduser", iduser);
+    console.log(localStorage.getItem("iduser"));
 
-        const modalImg = new bootstrap.Modal(selector("modal-update-user"));
-        modalImg.show();
-      });
-    });
+    const modalImg = new bootstrap.Modal(selector("modal-update-user"));
+    modalImg.show();
   }
 
   selector("aceppt-update").addEventListener("click",()=>{

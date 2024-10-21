@@ -8,7 +8,8 @@ if (isset($_GET['operation'])) {
     case 'sinServicio':
       $params = [
         'fecha_adquisicion' => $_GET['fecha_adquisicion'] == "" ? null : $_GET['fecha_adquisicion'],
-        'idestado' => $_GET['idestado'] == "" ? null : $_GET['idestado']
+        'idestado' => $_GET['idestado'] == "" ? null : $_GET['idestado'],
+        'cod_identificacion' => $_GET['cod_identificacion'] == "" ? null : $_GET['cod_identificacion'],
       ];
       echo json_encode($baja->activosBaja($params));
       break;
@@ -53,8 +54,9 @@ if (isset($_POST['operation'])) {
       $fileSize = $_FILES['file']['size']; //maximo 30MB  
       $fileError = $_FILES['file']['error'];
 
-      $msg = ['respuesta'=>''];
-      if($fileSize<6){
+      $msg = ['respuesta'=>'','mb'=>0];
+      $maxSize = 6 *1024*1024;
+      if($fileSize<$maxSize){
         $code = $_POST['code'];
   
         $ukFileName = $code . "-" . $fileName; //Nombre al archivo
@@ -65,7 +67,7 @@ if (isset($_POST['operation'])) {
         }
       }else{
         $msg['respuesta']="max";
-        //$msg['mb'] = $fileSize;
+        $msg['mb'] = $fileSize;
       }
       echo json_encode($msg);
       break;

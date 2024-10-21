@@ -9,7 +9,6 @@ $host = "http://localhost/CMMS/";
 ?>
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,11 +22,10 @@ $host = "http://localhost/CMMS/";
   <!-- Volt CSS -->
   <link type="text/css" href="http://localhost/CMMS/css/dashboard/volt.css" rel="stylesheet" />
   <!-- Estilos personalizados -->
-  <!-- Asignaciones -->
   <link rel="stylesheet" href="http://localhost/CMMS/css/responsables/list-asignaciones.css">
+  <link rel="stylesheet" href="http://localhost/CMMS/css/global.css">
   <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <!-- Usuarios -->
    
   <!-- jKanban CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jkanban@1.2.0/dist/jkanban.min.css">

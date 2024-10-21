@@ -183,7 +183,7 @@ class ResponsableAct extends ExecQuery{
 
 // $valor = $resp->test(['idactivo_resp'=>6]);
 // var_dump(count($valor));
-// echo json_encode($resp->usersByActivo(['idactivo'=>7]));
+//echo json_encode($resp->usersByActivo(['idactivo'=>8]));
 
 //echo json_encode($resp->chooseResponsable(['idactivo_resp'=>24]));
 

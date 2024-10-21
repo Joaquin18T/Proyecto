@@ -74,13 +74,13 @@ CREATE PROCEDURE sp_search_activo_resp
 BEGIN
 	SELECT DISTINCT ACT.idactivo, ACT.descripcion, SUB.subcategoria
 	FROM activos ACT
-    INNER JOIN activos_responsables RES ON ACT.idactivo = RES.idactivo
+    -- INNER JOIN activos_responsables RES ON ACT.idactivo = RES.idactivo
 	INNER JOIN subcategorias SUB ON ACT.idsubcategoria = SUB.idsubcategoria
     INNER JOIN marcas MAR ON ACT.idmarca = MAR.idmarca
-	WHERE ACT.descripcion LIKE CONCAT('%', _descripcion,'%') AND ACT.idestado!=4 
+	WHERE ACT.descripcion LIKE CONCAT('%', _descripcion,'%') AND ACT.idestado!=4 AND ACT.idestado!=5
 	ORDER BY SUB.subcategoria ASC;
 END $$
-
+CALL sp_search_activo_resp('');
 DROP VIEW IF EXISTS v_all_activos;
 CREATE VIEW v_all_activos AS
 	SELECT 
@@ -214,10 +214,8 @@ CREATE PROCEDURE sp_search_update_activo
 )
 BEGIN
 		SELECT
-		ACT.idactivo,
-        ACT.idsubcategoria,
+		ACT.idactivo, ACT.idsubcategoria, ACT.idmarca, MAR.marca,
         CAT.categoria,
-        ACT.idmarca,
         EST.nom_estado,
         ACT.modelo,
         ACT.cod_identificacion,

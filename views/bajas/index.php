@@ -15,7 +15,13 @@
               <div class="row g-3 mb-3">
                 <div class="col-md-2">
                   <div class="form-floating">
-                    <input type="date" id="fecha_adquisicion" class="form-control filter" >
+                    <input type="text" id="cod_identificacion" class="form-control filter">
+                    <label for="cod_identificacion">Cod. Identif.</label>
+                  </div>
+                </div>
+                <div class="col-md-2">
+                  <div class="form-floating">
+                    <input type="date" id="fecha_adquisicion" class="form-control filter">
                     <label for="fecha_adquisicion">Fecha</label>
                   </div>
                 </div>
@@ -82,7 +88,7 @@
         <input type="text" class="form-control" id="activo" disabled>
         <label for="activo" class="form-label">Activo Seleccionado</label>
       </div>
-  
+
       <div class="form-floating mt-2 h-25">
         <textarea name="motivo" id="motivo" class="form-control h-100" style="text-decoration: none; resize:none" required></textarea>
         <label for="motivo" class="form-label">Motivo</label>
@@ -109,5 +115,5 @@
 <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
 <script src="<?= $host ?>js/bajas/list-activos.js"></script>
 </body>
-</html>
 
+</html>

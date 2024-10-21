@@ -50,10 +50,11 @@ DELIMITER $$
 CREATE PROCEDURE sp_activos_sin_servicio
 (
     IN _fecha_adquisicion DATE,
-    IN _idestado INT
+    IN _idestado INT,
+    IN _cod_identificacion CHAR(40)
 )
 BEGIN
-	SELECT
+	SELECT distinct
 		ACT.idactivo,
         ACT.fecha_adquisicion,
         ACT.cod_identificacion,
@@ -64,15 +65,25 @@ BEGIN
         U.id_usuario = RES.idusuario AND RES.es_responsable='1') as dato,
         UBI.ubicacion
 	FROM historial_activos HIS
-    INNER JOIN ubicaciones UBI ON HIS.idubicacion = UBI.idubicacion
-    INNER JOIN activos_responsables RES ON HIS.idactivo_resp = RES.idactivo_resp
-    RIGHT JOIN activos ACT ON RES.idactivo = ACT.idactivo
+	INNER JOIN activos_responsables RES ON HIS.idactivo_resp = RES.idactivo_resp
+	INNER JOIN (
+		SELECT H1.idactivo_resp, UBI1.ubicacion, UBI1.idubicacion
+		FROM historial_activos H1
+        INNER JOIN ubicaciones UBI1 ON H1.idubicacion = UBI1.idubicacion
+        WHERE H1.fecha_movimiento = (
+			SELECT MAX(H2.fecha_movimiento)
+            FROM historial_activos H2
+            WHERE H2.idactivo_resp = H1.idactivo_resp
+        )
+    )UBI ON UBI.idactivo_resp = RES.idactivo_resp
+    INNER JOIN activos ACT ON RES.idactivo = ACT.idactivo
     INNER JOIN estados EST ON ACT.idestado = EST.idestado
-    AND (ACT.fecha_adquisicion = _fecha_adquisicion OR _fecha_adquisicion IS NULL)
-    AND (EST.idestado = _idestado OR _idestado IS NULL)
-    WHERE EST.idestado >1 AND EST.idestado<5 AND EST.idestado !=4;
+    WHERE  (ACT.fecha_adquisicion = _fecha_adquisicion OR _fecha_adquisicion IS NULL)
+    AND (EST.idestado = _idestado OR _idestado IS NULL) AND
+    (ACT.cod_identificacion LIKE CONCAT('%',_cod_identificacion,'%') OR _cod_identificacion IS NULL) AND
+	EST.idestado >1 AND EST.idestado<5 AND EST.idestado !=4;
 END $$
-CALL sp_activos_sin_servicio('2024-10-16', null);
+-- CALL sp_activos_sin_servicio(null, null, 'C');
 DROP PROCEDURE IF EXISTS sp_data_baja_activo;
 DELIMITER $$
 CREATE PROCEDURE sp_data_baja_activo
@@ -83,3 +94,4 @@ BEGIN
 	SELECT idbaja_activo, fecha_baja, motivo, coment_adicionales, ruta_doc, aprobacion FROM bajas_activo
     WHERE idactivo = _idactivo;
 END $$
+-- CALL sp_data_baja_activo(3)

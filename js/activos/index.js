@@ -130,43 +130,55 @@ document.addEventListener("DOMContentLoaded", () => {
       showEspecificaciones(especificaciones);
       especificaciones = "";
     });
-    buttonsUpdate();
-    showDetalleBaja();
-    createTable();
+    createTable(data);
+    chargerEventsButton();
   }
   
+  function chargerEventsButton(){
+    document.querySelector(".table-responsive").addEventListener("click",async(e)=>{
+      if(e.target){
+        if(e.target.classList.contains("modal-update")){
+          buttonsUpdate(e);
+        }
+        else if(e.target.classList.contains("btn-baja")){
+          await showDetalleBaja(e);
+        }
+      }
+    });
+  }
 
-  function createTable() {
+  function createTable(data) {
     let rows = $("#tb-body-activo").find("tr");
     //console.log(rows.length);
-    
-    if (myTable) {
-      if (rows.length > 1) {
-        myTable.clear().rows.add(rows).draw();
-      } else if(rows.length===1){
-        myTable.clear().draw(); // Limpia la tabla si no hay filas.
-      }
-    } else {
-      // Inicializa DataTable si no ha sido inicializado antes
-      myTable = $("#table-activos").DataTable({
-        paging: true,
-        searching: false,
-        lengthMenu: [5, 10, 15, 20],
-        pageLength: 5,
-        language: {
-          lengthMenu: "Mostrar _MENU_ filas por página",
-          paginate: {
-            previous: "Anterior",
-            next: "Siguiente",
+    if(data.length>0){
+      if (myTable) {
+        if (rows.length > 0) {
+          myTable.clear().rows.add(rows).draw();
+        } else if(rows.length===1){
+          myTable.clear().draw(); // Limpia la tabla si no hay filas.
+        }
+      } else {
+        // Inicializa DataTable si no ha sido inicializado antes
+        myTable = $("#table-activos").DataTable({
+          paging: true,
+          searching: false,
+          lengthMenu: [5, 10, 15, 20],
+          pageLength: 5,
+          language: {
+            lengthMenu: "Mostrar _MENU_ filas por página",
+            paginate: {
+              previous: "Anterior",
+              next: "Siguiente",
+            },
+            search: "Buscar:",
+            info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+            emptyTable: "No se encontraron registros"
           },
-          search: "Buscar:",
-          info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-          emptyTable: "No se encontraron registros"
-        },
-      });
-      // if (rows.length > 0) {
-      //   myTable.rows.add(rows).draw(); // Si hay filas, agrégalas.
-      // }
+        });
+        // if (rows.length > 0) {
+        //   myTable.rows.add(rows).draw(); // Si hay filas, agrégalas.
+        // }
+      }
     }
   }
 
@@ -202,50 +214,45 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  function buttonsUpdate() {
-    const buttons = document.querySelectorAll(".modal-update");
-    buttons.forEach((x) => {
-      x.addEventListener("click", (e) => {
-        const id = e.target.dataset.id;
-        localStorage.setItem("id", id);
+  function buttonsUpdate(e) {
+    const id = e.target.getAttribute("data-id");
+    localStorage.setItem("id", id);
 
-        const modalImg = new bootstrap.Modal($selector("#modal-update"));
-        modalImg.show();
-      });
-    });
+    const modalImg = new bootstrap.Modal($selector("#modal-update"));
+    modalImg.show();
   }
 
-  function showDetalleBaja() {
-    const btnBajas = document.querySelectorAll(".btn-baja");
+  async function showDetalleBaja(e) {
+    const id = parseInt(e.target.getAttribute("data-id"));
+    console.log(id);
+    
+    const desc = await getDescripcion(id);
+    $selector("#desc").textContent = desc;
 
-    btnBajas.forEach((x) => {
-      x.addEventListener("click", async () => {
-        const id = parseInt(x.getAttribute("data-id"));
-        const desc = await getDescripcion(id);
-        $selector("#desc").textContent = desc;
+    const dataBaja = await dataActivoBaja(id);
+    
+    await showDataBajaActivo(dataBaja);
+    showPDF(dataBaja.ruta_doc);
 
-        const dataBaja = await dataActivoBaja(id);
-        await showDataBajaActivo(dataBaja);
-        showPDF(dataBaja.ruta_doc);
+    const sidebar = $selector("#activo-baja-detalle");
+    const offCanvas = new bootstrap.Offcanvas(sidebar);
 
-        const sidebar = $selector("#activo-baja-detalle");
-        const offCanvas = new bootstrap.Offcanvas(sidebar);
-
-        offCanvas.show();
-      });
-    });
+    offCanvas.show();
   }
 
   async function dataActivoBaja(idactivo) {
     const params = new URLSearchParams();
     params.append("operation", "dataBajaActivo");
     params.append("idactivo", idactivo);
-
+    
     const data = await getDatos(`${host}bajaActivo.controller.php`, params);
+    console.log(data);
     return data[0];
   }
 
   async function showDataBajaActivo(data) {
+    //console.log(data);
+    
     const aprobacion = await getUser(data.aprobacion);
 
     $selector(
