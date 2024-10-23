@@ -6,6 +6,9 @@
             <div id="kanban-container"></div>
         </div>
     </div>
+    <div class="row">
+        
+    </div>
     <!--     <div class="tablero">
         <div class="col-tablero" data-idcolumna="pendientes">
             <div class="nom-col">
@@ -41,7 +44,7 @@
         </div>
     </div> -->
 
-
+    
 
     <!-- ************************************* INICIO MODAL DE REVISION  ***************************************************** -->
     <!-- <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRightRevision"

@@ -519,8 +519,6 @@ $(document).ready(async () => {
                     </li>
                 `
             });
-
-
         }
 
         //registrarActivosOk = true

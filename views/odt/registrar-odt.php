@@ -1,6 +1,6 @@
 <?php require_once '../header.php' ?>
 
-<div class="container-fluid py-1">
+<div class="container-fluid py-1" id="contenedor-registrar-odt">
     <div class="row gx-0 gy-1 gx-md-3 row-cols-1 row-cols-md-2 tab-content d-md-flex"><!--  style="height: 90vh;" -->
         <div class="contenedor-diagnostico-evidencia col align-items-stretch tab-pane show pe-0 fade d-md-flex active kanban-col mb-3">
             <div class="card border-0 pb-3 w-100">
@@ -25,7 +25,7 @@
                 </div>
             </div>
         </div>
-
+        
         <div class="contenedor-responsables col align-items-stretch tab-pane show pe-0 fade d-md-flex active kanbancol mb-3">
             <div class="card border-0 pb-3 w-100">
                 <div class="card-body p-4">

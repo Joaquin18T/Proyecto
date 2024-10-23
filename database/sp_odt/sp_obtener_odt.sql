@@ -18,14 +18,13 @@ BEGIN
         PT.incompleto
         FROM tareas TAR
         LEFT JOIN plandetareas PT ON PT.idplantarea = TAR.idplantarea
-        LEFT JOIN activos_vinculados_tarea AVT ON AVT.idtarea = TAR.idtarea
-        LEFT JOIN activos ACT ON ACT.idactivo = AVT.idactivo
+        INNER JOIN activos_vinculados_tarea AVT ON AVT.idtarea = TAR.idtarea
+        INNER JOIN activos ACT ON ACT.idactivo = AVT.idactivo
         LEFT JOIN tipo_prioridades TP ON TP.idtipo_prioridad = TAR.idtipo_prioridad
         LEFT JOIN estados EST ON EST.idestado = TAR.idestado
         WHERE PT.eliminado = 0 AND PT.incompleto = 0;
 END //
 
-call obtenerTareas()
 
 DROP PROCEDURE IF EXISTS `obtenerTareasPorEstado`
 DELIMITER //
@@ -50,8 +49,6 @@ BEGIN
         WHERE EST.idestado = _idestado;
 END //
 
-call obtenerTareasPorEstado(9)
-
 DROP PROCEDURE IF EXISTS `obtenerTareasOdt`
 DELIMITER //
 CREATE PROCEDURE `obtenerTareasOdt` (
@@ -72,10 +69,10 @@ BEGIN
         DODT.clasificacion
     FROM odt ODT
     INNER JOIN responsables_asignados_odt RA ON RA.idorden_trabajo = ODT.idorden_trabajo
-    INNER JOIN usuarios USURES ON USURES.idusuario = RA.idresponsable
-    INNER JOIN personas PERRES ON PERRES.idpersona = USURES.idpersona
-    INNER JOIN usuarios USUCRE ON USUCRE.idusuario = ODT.creado_por
-    INNER JOIN personas PERCRE ON PERCRE.idpersona = USUCRE.idpersona
+    INNER JOIN usuarios USURES ON USURES.id_usuario = RA.idresponsable
+    INNER JOIN personas PERRES ON PERRES.id_persona = USURES.idpersona
+    INNER JOIN usuarios USUCRE ON USUCRE.id_usuario = ODT.creado_por
+    INNER JOIN personas PERCRE ON PERCRE.id_persona = USUCRE.idpersona
     INNER JOIN tareas TAR ON TAR.idtarea = ODT.idtarea
     INNER JOIN activos_vinculados_tarea AVT ON AVT.idtarea = TAR.idtarea
     INNER JOIN activos ACT ON ACT.idactivo = AVT.idactivo
@@ -83,9 +80,10 @@ BEGIN
     INNER JOIN estados EST ON EST.idestado = ODT.idestado
     LEFT JOIN detalle_odt DODT ON DODT.clasificacion = EST.idestado 
     WHERE ODT.borrador = _borrador
-    GROUP BY ODT.idorden_trabajo, TAR.descripcion, TAR.fecha_inicio, TAR.fecha_vencimiento, PERCRE.nombres, PERCRE.apellidos, TAR.idtarea, ACT.descripcion, EST.estado;
+    GROUP BY ODT.idorden_trabajo, TAR.descripcion, TAR.fecha_inicio, TAR.fecha_vencimiento, PERCRE.nombres, PERCRE.apellidos, TAR.idtarea, ACT.descripcion, EST.nom_estado;
 END //
 
+call obtenerTareasOdt(0);
 
 DROP PROCEDURE IF EXISTS `obtenerTareaDeOdtGenerada`
 DELIMITER //

@@ -4,7 +4,7 @@ require_once 'ExecQuery.php';
 
 class Diagnostico extends ExecQuery
 {
-  
+
   public function registrarDiagnostico($params = []): int
   {
     try {
@@ -37,7 +37,7 @@ class Diagnostico extends ExecQuery
       die($e->getMessage());
     }
   }
-  
+
   public function obtenerEvidenciasDiagnostico($params = []): array
   {
     try {
@@ -46,13 +46,12 @@ class Diagnostico extends ExecQuery
         $params['iddiagnostico']
       ));
       return $sp->fetchAll(PDO::FETCH_ASSOC);
-
     } catch (Exception $e) {
       die($e->getMessage());
     }
   }
 
-  
+
   public function obtenerDiagnostico($params = []): array
   {
     try {
@@ -62,6 +61,35 @@ class Diagnostico extends ExecQuery
         $params['idtipodiagnostico']
       ));
       return $sp->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+      die($e->getMessage());
+    }
+  }
+
+  public function eliminarEvidencia($params = []): bool
+  {
+    try {
+      $status = false;
+      $sp = parent::execQ("CALL eliminarEvidenciaOdt(?)");
+      $status = $sp->execute(array(
+        $params['idevidenciasdiagnostico']
+      ));
+      return $status;
+    } catch (Exception $e) {
+      die($e->getMessage());
+    }
+  }
+
+  public function actualizarDiagnostico($params = []): bool
+  {
+    try {
+      $status = false;
+      $sp = parent::execQ("CALL actualizarDiagnosticoOdt(?,?)");
+      $status = $sp->execute(array(
+        $params['iddiagnostico'],
+        $params['diagnostico']
+      ));
+      return $status;
     } catch (Exception $e) {
       die($e->getMessage());
     }

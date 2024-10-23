@@ -20,6 +20,7 @@ $(document).ready(async () => {
     let iddiagnosticoGenerado = -1
     let hayDiagnostico = false
     //CONTAINERS DIV
+    const contenedorRegistrarOdt = $q("#contenedor-registrar-odt")
     const previewContainer = $q("#preview-container")
     //INPUTS 
     const filters = $all(".filter")
@@ -34,10 +35,13 @@ $(document).ready(async () => {
     let responsablesElegidos = []
     //BOTONES
     const btnAgregarResponsable = $q("#btnAgregarResponsable");
+    const btnCrearOdt = $q("#btnCrearOdt")
     //renderTablaUsuarios()
+    await verificarDiagnosticoRegistrado()
+    await verificarIdsGenerados() // SI ESTO SUCEDE LO DEMAS EN GENERAL NO DEBERIA DE EJECUTAR
     await filtrarUsuariosList()
     await renderResponsablesOdt()
-    await verificarDiagnosticoRegistrado()
+    await verificarEvidenciasRegistradas()
     //sestadoBotonConfirmarAsignacion()
 
     // ************************************ FUNCIONES PARA OBTENER DATOS ************************************
@@ -81,7 +85,7 @@ $(document).ready(async () => {
         const params = new URLSearchParams()
         params.append("operation", "obtenerEvidenciasDiagnostico")
         params.append("iddiagnostico", iddiagnostico)
-        const evidencias = await getDatos(`${host}diagnostico.controller.php`,params)
+        const evidencias = await getDatos(`${host}diagnostico.controller.php`, params)
         return evidencias
         //previewContainer.innerHTML = '';
     }
@@ -234,34 +238,27 @@ $(document).ready(async () => {
                 if (subida.guardado === 'success') {
                     showToast(subida.message, 'INFO')
                     //renderizar imagen
-                    previewContainer.innerHTML = '';
 
-                    const figureElement = document.createElement('figure');
-                    figureElement.classList.add('position-relative', 'w-100', 'mb-3', 'd-flex', 'justify-content-center'); // Añadimos d-flex y justify-content-center
+                    // Renderizar imagen y botón usando HTML directo
+                    const imgSrc = URL.createObjectURL(evidenciaImagen); // Crear URL temporal de la imagen
 
-                    const imgElement = document.createElement('img');
-                    imgElement.classList.add('img-fluid'); // Bootstrap clase para imágenes fluidas
-                    imgElement.src = URL.createObjectURL(evidenciaImagen); // Mostrar la imagen como previa
-                    imgElement.style.maxWidth = '500px';
-                    imgElement.alt = 'Imagen subida';
+                    previewContainer.innerHTML = `
+                        <div class="card mb-3 text-center">
+                            <img src="${imgSrc}" class="card-img-top modal-img" alt="Evidencia" style="max-width: 500px;">
+                            <div class="card-footer">
+                                <button class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRightEvidencias" id="btnAbrirModalSidebar">
+                                    Ver todas las evidencias
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    //
+                    const btnAbrirModalSidebar = $q("#btnAbrirModalSidebar")
+                    btnAbrirModalSidebar.addEventListener("click", () => {
+                        console.log("clickeando dxdxdxd")
+                        abrirModalSidebar()
+                    })
 
-                    const figcaptionElement = document.createElement('figcaption');
-                    figcaptionElement.classList.add('position-absolute', 'bottom-0', 'w-100', 'text-center', 'bg-dark', 'text-white', 'p-2', 'pe-auto');
-                    figcaptionElement.style.maxWidth = '500px';
-                    figcaptionElement.textContent = 'Ver todas las evidencias';
-
-                    // Añadir el event listener para abrir el modal
-                    figcaptionElement.addEventListener('click', function () {
-                        abrirModalSidebar('offcanvasRightEvidencias');
-                        console.log("abriendo sidebar");
-                    });
-
-                    // Añadir img y figcaption al figure
-                    figureElement.appendChild(imgElement);
-                    figureElement.appendChild(figcaptionElement);
-
-                    // Añadir figure al contenedor
-                    previewContainer.appendChild(figureElement);
                 } else {
                     showToast(subida.message, 'ERROR')
                 }
@@ -270,6 +267,18 @@ $(document).ready(async () => {
             }
 
         }
+    })
+
+    btnCrearOdt.addEventListener("click", async () => {
+        habilitarBeforeUnload = false;
+        //VERIFICAACION        
+        const actualizado = await actualizarDiagnosticoEntrada()
+        console.log("actualizado diagnostico:? ", actualizado)
+
+        const odtActualizado = await actualizarEstadoOdt()
+        console.log("odt actualizado?: ", odtActualizado)
+        window.localStorage.removeItem("idodt")
+        window.location.href = 'http://localhost/CMMS/views/odt'
     })
 
     // ****************************** FIN DE EVENTOS ************************************
@@ -318,29 +327,6 @@ $(document).ready(async () => {
             await eliminarLiResponsable()
         }
     }
-
-    /*     async function crearOdt() {
-            //if (colDiagnosticoOk && colResponsablesOk) {
-            //btnCrearOdt.disabled = false
-            alert("EL REGISTRO DE LA ODT HA SIDO FINALIZADA, puedes proceder a darle clikc")
-            btnCrearOdt.addEventListener("click", async () => {
-                habilitarBeforeUnload = false;
-    
-                const form = new FormData()
-                form.append("operation", "actualizarBorradorOdt")
-                form.append("idordentrabajo", window.localStorage.getItem("idodt"))
-                form.append("borrador", ())
-                const fOdtActualizado = await fetch(`${host}ordentrabajo.controller.php`, { method: 'PUT', body: form })
-                const estadoBorradorCambiado = fOdtActualizado.json()
-                window.localStorage.removeItem("idodt") //esto lo borrare para cuando se intente regresar no se pueda modificar ocasionando confusiones y bugs
-                await actualizarEstadoTarea()
-                if (estadoBorradorCambiado) {
-                    alert("EL ODT YA  NO ES BORRADOR: ", estadoBorradorCambiado)
-                    window.location.href = '/usuario/tareas/odt'
-                }
-            })
-            //}
-        } */
 
     //ESTO SE EJECUTARA CUANDO SE CREE POR PRIMERA VEZ LA ORDEN DE TRABAJO
     async function registrarDiagnosticoEntrada() {
@@ -416,6 +402,13 @@ $(document).ready(async () => {
         return responsableEliminado
     }
 
+    async function eliminarEvidenciaOdt(idevidencia) {
+        const formEliminacion = new FormData()
+        formEliminacion.append("operation", "eliminarEvidencia")
+        const fEliminado = await fetch(`${host}diagnostico.controller.php/${idevidencia}`, { method: 'POST', body: formEliminacion })
+        const eliminado = await fEliminado.json()
+        return eliminado
+    }
     // ******************************* FIN DE SECCION DE ELIMINACIONES **********************************
 
     // *************************** SECCION DE VERIFICACION ***********************************************
@@ -430,7 +423,7 @@ $(document).ready(async () => {
             return
         } else {
             const diagnostico = await registrarDiagnosticoEntrada()
-            alert("se creo un nuevo diagnostico")
+            //alert("se creo un nuevo diagnostico")
             hayDiagnostico = true
             console.log("id diagnostico generado: ", diagnostico.id)
             iddiagnosticoGenerado = diagnostico.id
@@ -438,15 +431,48 @@ $(document).ready(async () => {
         }
     }
 
+    async function verificarEvidenciasRegistradas() {
+        const evidenciasObtenidas = await obtenerEvidencias(iddiagnosticoGenerado);
+        console.log("Evidencias obtenidas: ", evidenciasObtenidas);
+        //previewContainer.innerHTML = ''
+        if (evidenciasObtenidas.length > 0) {
+            previewContainer.innerHTML += `
+            <button class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRightEvidencias" id="btnAbrirModalSidebar">
+                Ver todas las evidencias
+            </button>
+            `
+            const btnAbrirModalSidebar = $q("#btnAbrirModalSidebar")
+            btnAbrirModalSidebar.addEventListener("click", () => {
+                console.log("clickeando dxdxdxd")
+                abrirModalSidebar()
+            })
+        }
+    }
+
+    async function verificarIdsGenerados() {
+        if(iddiagnosticoGenerado == -1 && !window.localStorage.getItem("idodt")){ // SI NO HAY ID GENERADO Y NO EXISTE ESE ITEM EN LOCALSTORAGE
+            contenedorRegistrarOdt.innerHTML = ''
+            contenedorRegistrarOdt.innerHTML = `
+            <div class="container-fluid">
+                <div class="row">
+                    <h1 class="">No puedes registrar una orden ahora mismo.</h1>
+                </div>
+            </div>
+            `
+            console.log("BODY BORRADO")
+            return 
+        }
+    }
+
     // ************************* SECCION DE MODALES *******************************************************
 
-    async function abrirModalSidebar(modalId) {
-        const modalSidebar = document.getElementById(modalId); // Obtener el modal por ID
+    async function abrirModalSidebar() {
+        /* const modalSidebar = document.getElementById(modalId); // Obtener el modal por ID
         const bsOffcanvas = new bootstrap.Offcanvas(modalSidebar); // Usar Bootstrap Offcanvas API
         bsOffcanvas.show(); // Mostrar el modal
 
         console.log('Modal abierto: ' + modalId); // Confirmar que la función se llama
-
+ */
         // Limpiar y rellenar el modal con las evidencias
         const modalEvidenciasContainer = document.getElementById("modal-evidencias-container");
         modalEvidenciasContainer.innerHTML = ''; // Limpiar el contenedor
@@ -456,17 +482,67 @@ $(document).ready(async () => {
         console.log("Evidencias obtenidas: ", evidenciasObtenidas);
 
         // Iterar sobre cada evidencia y crear elementos de imagen
-        /* evidenciasObtenidas.forEach(evidenciaObj => {
-            const imgSrc = evidenciaObj.evidencia; // Acceder a la propiedad 'evidencia' del objeto
-            const imgElement = document.createElement('img');
-            imgElement.src = `http://localhost/img/subidas/${imgSrc}`; // Ajustar la ruta a la imagen
+        evidenciasObtenidas.forEach(evidenciaObj => {
+            const imgSrc = evidenciaObj.evidencia;
+            modalEvidenciasContainer.innerHTML += `
+            <div class="card mb-3 text-center" data-id="${evidenciaObj.idevidencias_diagnostico}">
+                <img src="http://localhost/CMMS/dist/images/evidencias/${imgSrc}" class="card-img-top modal-img" alt="Evidencia ${imgSrc}">
+                <div class="card-footer">
+                    <button class="btn btn-primary btn-evidencia-eliminar" data-id="${evidenciaObj.idevidencias_diagnostico}">Eliminar</button>
+                </div>
+            </div>
+            `
+            // Acceder a la propiedad 'evidencia' del objeto
+            /* const imgElement = document.createElement('img');
+            imgElement.src = `http://localhost/CMMS/dist/images/evidencias/${imgSrc}`; // Ajustar la ruta a la imagen
             imgElement.alt = `Evidencia ${imgSrc}`;
-            imgElement.classList.add('modal-img'); // Añadir clase para estilo (opcional)
+            imgElement.classList.add('modal-img'); */ // Añadir clase para estilo (opcional)
 
             // Añadir la imagen al contenedor del modal
-            modalEvidenciasContainer.appendChild(imgElement);
-        }); */
+            //modalEvidenciasContainer.appendChild(imgElement);
+        });
+
+        const btnsEvidenciaEliminar = $all(".btn-evidencia-eliminar")
+        btnsEvidenciaEliminar.forEach(btn => {
+            btn.addEventListener("click", async () => {
+                const idevidencia = btn.getAttribute("data-id")
+                console.log("id evidencia: ", idevidencia)
+                const eliminado = await eliminarEvidenciaOdt(idevidencia);
+                console.log("evidencia eliminado: ", eliminado)
+                const listItem = document.querySelector(`div[data-id="${idevidencia}"]`);
+                if (listItem) {
+                    listItem.remove();
+                }
+            })
+        }) //ME QUEDE ACA FALTA HACER EL SPU ELIMINAR EVIDENCIA DIAGNOSTICO, HACER SU CONTROLER Y SU MODAL Y SU FUNCION PARA JAVASCRIPT
+
     }
 
     //************************** FIN SECCION DE MODALES *************************************************** */
+
+    async function actualizarDiagnosticoEntrada() {
+        const formActualizacion = new FormData()
+        formActualizacion.append("operation", "actualizarDiagnostico")
+        formActualizacion.append("iddiagnostico", iddiagnosticoGenerado)
+        formActualizacion.append("diagnostico", txtDiagnosticoEntrada.value)
+        const fActualizado = await fetch(`${host}diagnostico.controller.php`, { method: 'POST', body: formActualizacion })
+        const actualizado = await fActualizado.json()
+        return actualizado
+    }
+
+    async function actualizarEstadoOdt() {
+        //VERIFICACION: 
+        const responsablesAsignados = await obtenerResponsablesAsignados()
+        const diagnosticoEntrada = await obtenerDiagnosticoEntrada()
+        const evidencias = await obtenerEvidencias(iddiagnosticoGenerado)
+
+        const formActualizacion = new FormData()
+        formActualizacion.append("operation", "actualizarBorradorOdt")
+        formActualizacion.append("idordentrabajo", window.localStorage.getItem("idodt"))
+        formActualizacion.append("borrador", (responsablesAsignados.length > 0 && diagnosticoEntrada.length == 1 && evidencias.length > 0) ? 0 : 1)
+        const Factualizado = await fetch(`${host}ordentrabajo.controller.php`, { method: 'POST', body: formActualizacion })
+        const actualizado = await Factualizado.json()
+        return actualizado
+    }
+    // ******************************** SECCION DE ACTUALIZACIONES ******************************************
 });
