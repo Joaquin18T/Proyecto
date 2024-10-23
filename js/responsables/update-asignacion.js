@@ -108,35 +108,41 @@ document.addEventListener("DOMContentLoaded", () => {
 
   selector("update-test").addEventListener("click",async(e)=>{
     e.preventDefault();
-    if(confirm("¿?")){
+    if(confirm("¿Estas seguro de actualizar la asignacion?")){
+      const chkEsResP =  contChks(".chk_es_responsable", "data-iduser"); //muestra los id que estan marcados
+      const chkDes = contChks(".chk_designar", "data-iduser");//muestra los id que estan marcados
+  
+      const diferentCL = getDiferent(globals.contDes[1], chkDes[1]); //idusuario
+  
+      const chkIdRespDes = contChks(".chk_designar", "data-idresp");
+      const diferentRespCL = getDiferent(globals.contIdResDes[1], chkIdRespDes[1]); //idactivo_resp
+  
+      const verifyCL = isSameChks(globals.contDes, chkDes);
+      const verifyRP = isSameChks(globals.contResP, chkEsResP);
+  
+      //console.log(verifyRP);
+      
+      // console.log("diferente user", diferentCL);
+      // console.log("diferente resp_act", diferentRespCL);
+      
+      let updated=false;
+      if(!verifyCL){
+        const data = await cascadeUpdateAsignacion(diferentCL, diferentRespCL,"Designacion", "Te han designado de un activo");
+        console.log("designacion", data);
+        updated=true;
+      }
+      if(!verifyRP){
+        const data = await changeResponsableP();
+        console.log("change principal", data);
+        updated=true;
+      }
+
+      if(updated){
+        alert("Las asignaciones se han actualizado");
+        updated=false;
+      }
 
     }
-    const chkEsResP =  contChks(".chk_es_responsable", "data-iduser"); //muestra los id que estan marcados
-    const chkDes = contChks(".chk_designar", "data-iduser");//muestra los id que estan marcados
-
-    const diferentCL = getDiferent(globals.contDes[1], chkDes[1]); //idusuario
-
-    const chkIdRespDes = contChks(".chk_designar", "data-idresp");
-    const diferentRespCL = getDiferent(globals.contIdResDes[1], chkIdRespDes[1]); //idactivo_resp
-
-    const verifyCL = isSameChks(globals.contDes, chkDes);
-    const verifyRP = isSameChks(globals.contResP, chkEsResP);
-
-    //console.log(verifyRP);
-    
-    // console.log("diferente user", diferentCL);
-    // console.log("diferente resp_act", diferentRespCL);
-    
-
-    if(!verifyCL){
-      const data = await cascadeUpdateAsignacion(diferentCL, diferentRespCL,"Designacion", "Te han designado de un activo");
-      console.log("designacion", data);
-    }
-    if(!verifyRP){
-      const data = await changeResponsableP();
-      console.log("change principal", data);
-    }
-    
   });
 
   function isSameChks(before=[], after=[]){
