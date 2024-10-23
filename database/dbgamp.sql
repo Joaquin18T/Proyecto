@@ -40,6 +40,13 @@ CREATE TABLE permisos
     CONSTRAINT fk_idrol FOREIGN KEY(idrol) REFERENCES roles(idrol)
 )ENGINE=INNODB;
 
+CREATE TABLE estados
+(
+	idestado 	INT AUTO_INCREMENT PRIMARY KEY,
+    tipo_estado VARCHAR(50) NOT NULL,
+    nom_estado	VARCHAR(50) NOT NULL,
+    CONSTRAINT uk_nom_estado UNIQUE(nom_estado)
+)ENGINE=INNODB;
 
 CREATE TABLE USUARIOS
 (
@@ -50,10 +57,10 @@ CREATE TABLE USUARIOS
   contrasena 	varchar(120) not null,
   estado	  	CHAR(1) DEFAULT '1',  -- 1 , 0
   asignacion	int		null default 7,
-  CONSTRAINT fk_persona FOREIGN KEY (idpersona) REFERENCES PERSONAS(id_persona),
-  CONSTRAINT fk_rol FOREIGN KEY (idrol) REFERENCES roles (idrol),
-  CONSTRAINT uk_idpersonaUser UNIQUE(idpersona,usuario),
-  CONSTRAINT fk_asignacion FOREIGN KEY (asignacion) REFERENCES estados (idestado)
+  CONSTRAINT fk_persona1 FOREIGN KEY (idpersona) REFERENCES PERSONAS(id_persona),
+  CONSTRAINT fk_rol1 FOREIGN KEY (idrol) REFERENCES roles (idrol),
+  CONSTRAINT uk_idpersonaUser1 UNIQUE(idpersona,usuario),
+  CONSTRAINT fk_asignacion1 FOREIGN KEY (asignacion) REFERENCES estados (idestado)
 )ENGINE=INNODB;
 
 CREATE TABLE categorias
@@ -86,13 +93,6 @@ CREATE TABLE ubicaciones
     CONSTRAINT uk_ubicacion UNIQUE(ubicacion)
 )ENGINE=INNODB;
 
-CREATE TABLE estados
-(
-	idestado 	INT AUTO_INCREMENT PRIMARY KEY,
-    tipo_estado VARCHAR(50) NOT NULL,
-    nom_estado	VARCHAR(50) NOT NULL,
-    CONSTRAINT uk_nom_estado UNIQUE(nom_estado)
-)ENGINE=INNODB;
 
 CREATE TABLE activos
 (

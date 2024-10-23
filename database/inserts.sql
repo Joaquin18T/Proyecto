@@ -24,6 +24,20 @@ INSERT INTO ROLES (rol) VALUES
 ('Administrador'),
 ('Usuario');
 
+INSERT INTO estados(tipo_estado, nom_estado)
+	VALUES
+		('activo', 'Activo'),
+		('activo', 'En Mantenimiento'),
+		('activo', 'Fuera de Servicio'),
+        ('activo', 'Absoleto'),
+		('activo', 'Baja'),
+		('responsable', 'Asignado'),
+		('responsable', 'No Asignado'),
+		('orden', 'pendiente'),
+		('orden', 'proceso'),
+		('orden', 'revision'),
+        ('orden', 'finalizado');
+        
 INSERT INTO USUARIOS (idpersona, idrol, usuario, contrasena) VALUES 
 (1, 1, 'j.gonzalez', '$2y$10$TpMmHZcum7YJqXOqTrsDy.WheLpUnU98OZjc4WqLgPke9HlX6ZaJS'),
 (2, 2, 'a.smith', '$2y$10$HdD325QAWm7QpH7KXtRdROBKe39KwDQr6l4K83u2a0w5h/d6yNgau'),
@@ -82,19 +96,7 @@ INSERT INTO marcas(marca)
 		('FenWick'),
 		('ABB');
         
-INSERT INTO estados(tipo_estado, nom_estado)
-	VALUES
-		('activo', 'Activo'),
-		('activo', 'En Mantenimiento'),
-		('activo', 'Fuera de Servicio'),
-        ('activo', 'Absoleto'),
-		('activo', 'Baja'),
-		('responsable', 'Asignado'),
-		('responsable', 'No Asignado'),
-		('orden', 'pendiente'),
-		('orden', 'proceso'),
-		('orden', 'revision'),
-        ('orden', 'finalizado');
+
 
 INSERT INTO activos(idsubcategoria, idmarca, modelo, cod_identificacion, fecha_adquisicion, descripcion, especificaciones)
 	VALUES
