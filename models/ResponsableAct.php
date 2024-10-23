@@ -171,9 +171,61 @@ class ResponsableAct extends ExecQuery{
       error_log("Error: ".$e->getMessage());
     }
   }
+
+  public function updateAsignacion($params=[]):bool{
+    try{
+      $respuesta = false;
+      $cmd = parent::execQ("CALL sp_update_activo_responsable(?,?,?,?)");
+      $respuesta=$cmd->execute(
+        array(
+          $params['idactivo_resp'],
+          $params['idactivo'],
+          $params['idusuario'],
+          $params['autorizacion']
+        )
+      );
+      return $respuesta;
+    }catch(Exception $e){
+      error_log("Error: ".$e->getMessage());
+    }
+  }
+
+  public function updateChangePrincipal($params=[]):bool{
+    try{
+      $respuesta = false;
+      $cmd = parent::execQ("CALL sp_update_asignacion_principal(?,?,?,?,?)");
+      $respuesta=$cmd->execute(
+        array(
+          $params['idactivo_resp'],
+          $params['idactivo'],
+          $params['idusuario'],
+          $params['es_responsable'],
+          $params['autorizacion']
+        )
+      );
+      return $respuesta;
+    }catch(Exception $e){
+      error_log("Error: ".$e->getMessage());
+    }
+  }
 }
 
 //$resp = new ResponsableAct();
+
+// echo json_encode($resp->updateAsignacion([
+//   'idactivo_resp'=>2,
+//   'idactivo'=>1,
+//   'idusuario'=>8,
+//   'autorizacion'=>1,
+// ]));
+
+// echo json_encode($resp->updateChangePrincipal([
+//   'idactivo_resp'=>16,
+//   'idactivo'=>1,
+//   'idusuario'=>7,
+//   'es_responsable'=>'0',
+//   'autorizacion'=>1,
+// ]));
 
 // echo json_encode($resp->getResponsablePrin(['idactivo_resp'=>6]));
 

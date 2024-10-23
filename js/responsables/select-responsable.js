@@ -109,8 +109,8 @@ document.addEventListener("DOMContentLoaded", () => {
         </tr>
       `;
     });
-    createTable(data);
     chargerEventsButtons();
+    createTable(data);
   }
   
 

@@ -87,5 +87,35 @@ if(isset($_POST['operation'])){
       }
       echo json_encode($estado);
       break;
+    case 'updateAsignacion':
+      $estado = ['respuesta'=>-1];
+      $cleanData = [
+        'idactivo_resp'=>$respAct->limpiarCadena($_POST['idactivo_resp']),
+        'idactivo'=>$respAct->limpiarCadena($_POST['idactivo']),
+        'idusuario'=>$respAct->limpiarCadena($_POST['idusuario']),
+        'autorizacion'=>$respAct->limpiarCadena($_POST['autorizacion'])
+      ];
+      $resp = $respAct->updateAsignacion($cleanData);
+      if($resp){
+        $estado['respuesta']=1;
+      }
+      echo json_encode($estado);
+      break;
+    case 'updateResponsableP':
+      $estado = ['respuesta'=>-1];
+      $cleanData=[
+        'idactivo_resp'=>$respAct->limpiarCadena($_POST['idactivo_resp']),
+        'idactivo'=>$respAct->limpiarCadena($_POST['idactivo']),
+        'idusuario'=>$respAct->limpiarCadena($_POST['idusuario']),
+        'es_responsable'=>$respAct->limpiarCadena($_POST['es_responsable']),
+        'autorizacion'=>$respAct->limpiarCadena($_POST['autorizacion'])
+      ];
+
+      $resp = $respAct->updateChangePrincipal($cleanData);
+      if($resp){
+        $estado['respuesta']=1;
+      }
+      echo json_encode($estado);
+      break;
   }
 }

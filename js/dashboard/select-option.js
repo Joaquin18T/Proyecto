@@ -219,4 +219,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
     selector("list-notificaciones").innerHTML+=element;
   }
+
+  function removeExtraBackdrops() {
+    // Selecciona todas las capas de sombra (modal-backdrop y offcanvas-backdrop)
+    const backdrops = document.querySelectorAll(
+      ".modal-backdrop, .offcanvas-backdrop"
+    );
+
+    // Si hay más de una capa de sombra, eliminamos las duplicadas
+    if (backdrops.length > 1) {
+      backdrops.forEach((backdrop, index) => {
+        if (index > 0) {
+          backdrop.remove();
+        }
+      });
+    }
+  }
+  $("#modal-update, #activo-baja-detalle").on(
+    "shown.bs.modal shown.bs.offcanvas",
+    function () {
+      removeExtraBackdrops();
+    }
+  );
 });

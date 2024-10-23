@@ -302,7 +302,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const params = new URLSearchParams();
     params.append("operation", "updateEstado");
     params.append("idactivo", globals.idactivo);
-    params.append("idestado", 4);
+    params.append("idestado", 5);
 
     const data = await fetch(`${host}activo.controller.php`, {
       method: "POST",

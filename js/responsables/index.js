@@ -194,21 +194,30 @@ document.addEventListener("DOMContentLoaded",()=>{
     return data;
   }
 
-  function renderListUsers(data){
+  function renderListUsers(data=[]){
     const list = selector("list-users");
     list.innerHTML="";
-    data.forEach(x=>{
+    console.log("colabs", data);
+    
+    if(data.length===0){
       const li = document.createElement("li");
       li.classList.add('list-group-item', 'mt-2');
-      li.innerHTML=`
-        <strong>Usuario: </strong>${x.usuario}<br>
-        <strong>Apellidos: </strong>${x.apellidos}<br>
-        <strong>Nombres: </strong>${x.nombres}<br>
-        <strong>Fecha asig.: </strong>${x.fecha_asignacion}<br>
-        <strong>Tipo Asig.: </strong>${parseInt(x.es_responsable)===0?'Colaborador':'Responsable Principal'}<br>
-      `;
+      li.innerHTML="<strong>No tiene colaboradores asignados</strong>";
       list.appendChild(li);
-    });
+    }else{
+      data.forEach(x=>{
+        const li = document.createElement("li");
+        li.classList.add('list-group-item', 'mt-2');
+        li.innerHTML=`
+          <strong>Usuario: </strong>${x.usuario}<br>
+          <strong>Apellidos: </strong>${x.apellidos}<br>
+          <strong>Nombres: </strong>${x.nombres}<br>
+          <strong>Fecha asig.: </strong>${x.fecha_asignacion}<br>
+          <strong>Tipo Asig.: </strong>${parseInt(x.es_responsable)===0?'Colaborador':'Responsable Principal'}<br>
+        `;
+        list.appendChild(li);
+      });
+    }
   }
 
   async function usersByActivo(e){

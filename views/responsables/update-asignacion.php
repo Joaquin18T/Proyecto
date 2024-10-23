@@ -2,30 +2,33 @@
 require_once '../header.php';
 ?>
 <style>
-  .input-rdo{
-  background-color: white; /* Fondo claro */
-  color: black; /* Texto oscuro */
-  cursor: default; /* Indicador de solo lectura */
-}
+  .input-rdo {
+    background-color: white;
+    /* Fondo claro */
+    color: black;
+    /* Texto oscuro */
+    cursor: default;
+    /* Indicador de solo lectura */
+  }
 </style>
 <h2>Asignaciones</h2>
 <div class="row">
   <div class="col-md-12">
-    <div class="card">
-      <div class="card-header d-flex justify-content-between m-0">
-        <div class="mb-0 pt-1">Actualizar asignaciones</div>
-        <button class="btn btn-sm btn-success m-0" id="update-test">Actualizar</button>
-      </div>
-      <div class="card-body">
-        <div class="col-md-12">
-          <div class="card">
-            <div class="card-header">Datos del Activo</div>
-            <form action="" id="update-asignacion">
+    <form action="" id="update-asignacion">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between m-0">
+          <div class="mb-0 pt-1">Actualizar asignaciones</div>
+          <button class="btn btn-sm btn-success m-0" type="submit" id="update-test">Actualizar</button>
+        </div>
+        <div class="card-body">
+          <div class="col-md-12">
+            <div class="card">
+              <div class="card-header">Datos del Activo</div>
               <div class="card-body">
                 <div class="row">
                   <div class="col-md-2">
                     <div class="form-floating">
-                      <input type="text" class="input-rdo form-control" id="cod_identificacion"  readonly>
+                      <input type="text" class="input-rdo form-control" id="cod_identificacion" readonly>
                       <label for="cod_identificacion" class="form-label">C. Identificacion</label>
                     </div>
                   </div>
@@ -89,11 +92,11 @@ require_once '../header.php';
                   </div>
                 </div>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </form>
   </div>
 </div>
 <?php require_once '../footer.php' ?>

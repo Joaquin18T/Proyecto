@@ -133,7 +133,7 @@ BEGIN
 	ELSE
 		SELECT COUNT(idusuario) INTO _cantidad 
 		FROM activos_responsables
-		WHERE idactivo = _idactivo AND es_responsable = 0;
+		WHERE idactivo = _idactivo AND es_responsable = 0 AND fecha_designacion IS NULL;
     END IF;
 END $$
 
@@ -150,10 +150,10 @@ BEGIN
     USU.usuario
     FROM activos_responsables
     INNER JOIN usuarios USU ON activos_responsables.idusuario = USU.id_usuario
-    WHERE idactivo=_idactivo AND idusuario = _idusuario;
+    WHERE idactivo=_idactivo AND idusuario = _idusuario AND fecha_designacion IS NULL;
 END $$
 
-DROP PROCEDURE IF EXISTS sp_ubicacion_activo,
+DROP PROCEDURE IF EXISTS sp_ubicacion_activo;
 DELIMITER $$
 CREATE PROCEDURE  sp_ubicacion_activo
 (
@@ -163,9 +163,11 @@ BEGIN
 	SELECT DISTINCT UBI.idubicacion, UBI.ubicacion FROM historial_activos HIS
     INNER JOIN ubicaciones UBI ON HIS.idubicacion = UBI.idubicacion
     INNER JOIN activos_responsables RES ON HIS.idactivo_resp = RES.idactivo_resp
-    WHERE RES.idactivo = _idactivo;
+    WHERE RES.idactivo = _idactivo
+    ORDER BY HIS.fecha_movimiento DESC
+    LIMIT 1;
 END $$
-
+-- CALL sp_ubicacion_activo(8)
 DROP PROCEDURE IF EXISTS sp_users_by_activo;
 DELIMITER $$
 CREATE PROCEDURE sp_users_by_activo
@@ -177,15 +179,16 @@ BEGIN
     USU.id_usuario,
 	USU.usuario,
     PER.apellidos,
+    RES.idactivo_resp,
     RES.fecha_asignacion,
     PER.nombres,
     RES.es_responsable
     FROM activos_responsables RES
     INNER JOIN usuarios USU ON RES.idusuario = USU.id_usuario
     INNER JOIN personas PER ON USU.idpersona = PER.id_persona
-    WHERE RES.idactivo = _idactivo;
+    WHERE RES.idactivo = _idactivo AND RES.fecha_designacion IS NULL;
 END $$
-
+-- CALL sp_users_by_activo(1);
 DROP PROCEDURE IF EXISTS sp_search_activo_responsable;
 DELIMITER $$
 CREATE PROCEDURE sp_search_activo_responsable
@@ -226,6 +229,7 @@ BEGIN
 			(UBI.idubicacion = _idubicacion OR _idubicacion IS NULL) AND
 			(ACT.cod_identificacion LIKE CONCAT('%', _cod_identificacion, '%') OR _cod_identificacion IS NULL) AND 
             ACT.idestado BETWEEN 1 AND 2
+            
     GROUP BY ACT.idactivo
     ORDER BY RES.fecha_asignacion DESC;
 END $$
@@ -281,10 +285,30 @@ BEGIN
 END $$
 
 -- CALL sp_getresp_principal(12);
-
+-- designacion
 DROP PROCEDURE IF EXISTS sp_update_activo_responsable;
 DELIMITER $$
 CREATE PROCEDURE sp_update_activo_responsable
+(
+    IN _idactivo_resp INT,
+    IN _idactivo INT,
+    IN _idusuario INT,
+    IN _autorizacion INT
+)
+BEGIN
+	UPDATE activos_responsables SET
+		idactivo = _idactivo,
+		idusuario = _idusuario,
+        autorizacion = _autorizacion,
+        fecha_designacion = NOW()
+	WHERE idactivo_resp = _idactivo_resp;
+END $$
+-- CALL sp_update_activo_responsable(2, 1, 8, 1);
+
+-- cambiar de responsable principal
+DROP PROCEDURE IF EXISTS sp_update_asignacion_principal;
+DELIMITER $$
+CREATE PROCEDURE sp_update_asignacion_principal
 (
     IN _idactivo_resp INT,
     IN _idactivo INT,
@@ -294,10 +318,10 @@ CREATE PROCEDURE sp_update_activo_responsable
 )
 BEGIN
 	UPDATE activos_responsables SET
+		idactivo = _idactivo,
 		idusuario = _idusuario,
 		es_responsable = _es_responsable,
-        descripcion = _descripcion,
         autorizacion = _autorizacion
 	WHERE idactivo_resp = _idactivo_resp;
 END $$
-
+-- CALL sp_update_asignacion_principal(16, 1,7,'0',1);
