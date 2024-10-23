@@ -121,3 +121,17 @@ CREATE PROCEDURE `obtenerEvidenciasDiagnostico`
 BEGIN
 	SELECT * FROM evidencias_diagnostico WHERE iddiagnostico = _iddiagnostico;
 END //
+
+DROP PROCEDURE IF EXISTS `obtenerDiagnostico`
+DELIMITER //
+CREATE PROCEDURE `obtenerDiagnostico`
+( 
+    IN _idordentrabajo INT,
+    IN _idtipodiagnostico INT
+)
+BEGIN
+	SELECT * FROM diagnosticos
+    WHERE idorden_trabajo = _idordentrabajo AND idtipo_diagnostico = _idtipodiagnostico;
+END //
+
+select * from diagnosticos;

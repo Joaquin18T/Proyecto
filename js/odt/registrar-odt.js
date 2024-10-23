@@ -1,4 +1,5 @@
 $(document).ready(async () => {
+
     function $q(object = null) {
         return document.querySelector(object);
     }
@@ -13,83 +14,130 @@ $(document).ready(async () => {
     }
 
     // VARIABLES
+    const idodtgenerada = window.localStorage.getItem("idodt")
     const host = "http://localhost/CMMS/controllers/";
     let tbResponsables = null
+    let iddiagnosticoGenerado = -1
+    let hayDiagnostico = false
+    //CONTAINERS DIV
+    const previewContainer = $q("#preview-container")
+    //INPUTS 
     const filters = $all(".filter")
+    const tbodyResponsables = $q("#responsablesBodyTable");
     const npusuario = $q("#txtNombresApellidos") // FILTRO DE NOMBRES Y APELLIDOS
     const documentoIdentidad = $q("#txtDni")
-    renderTablaActivos()
+    const txtDiagnosticoEntrada = $q("#diagnostico-entrada")
+    const evidenciasInput = $q("#evidencias-img-input")
+    //UL
+    const ulResponsablesAsignados = $q(".contenedor-responsables-asignados")
+    //LISTA
+    let responsablesElegidos = []
+    //BOTONES
+    const btnAgregarResponsable = $q("#btnAgregarResponsable");
+    //renderTablaUsuarios()
     await filtrarUsuariosList()
+    await renderResponsablesOdt()
+    await verificarDiagnosticoRegistrado()
+    //sestadoBotonConfirmarAsignacion()
 
-    async function renderUsuarios() { // RENDERIZAR USUARIOS QUE SERIVIRA PARA ASIGNAR RESPONSABLES AL ODT
+    // ************************************ FUNCIONES PARA OBTENER DATOS ************************************
+    async function obtenerUsuarios() { // RENDERIZAR USUARIOS QUE SERIVIRA PARA ASIGNAR RESPONSABLES AL ODT
         const params = new URLSearchParams();
-
-        // Verifica los valores de los inputs
-        console.log("Valor de npusuario:", npusuario.value);
-        console.log("Valor de documentoIdentidad:", documentoIdentidad.value);
-
         params.append("operation", "filtrarUsuarios");
-        params.append("numdoc", npusuario.value ? npusuario.value : "");
-        params.append("dato", documentoIdentidad.value ? documentoIdentidad.value : "");
-
+        params.append("dato", npusuario.value.trim() === "" ? "" : npusuario.value);
+        params.append("numdoc", documentoIdentidad.value.trim() === "" ? "" : documentoIdentidad.value);
         const usuarios = await getDatos(`${host}usuarios.controller.php`, params);
         return usuarios;
     }
 
-    async function filtrarUsuariosList() {
-        const usuarios = await renderUsuarios()
+    async function obtenerUsuario(idusuario) {
+        const params = new URLSearchParams()
+        params.append("operation", "getUserById")
+        params.append("idusuario", idusuario)
+        const usuario = await getDatos(`${host}usuarios.controller.php`, params)
+        return usuario
+    }
 
-        //activosList.innerHTML = "";
+    async function obtenerResponsablesAsignados() {
+        const params = new URLSearchParams()
+        params.append("operation", "obtenerResponsables")
+        params.append("idodt", window.localStorage.getItem("idodt"))
+        const responsables = getDatos(`${host}responsablesAsignados.controller.php`, params)
+        return responsables
+    }
+
+    async function obtenerDiagnosticoEntrada() {
+        const paramsDiagnosticoBuscar = new URLSearchParams()
+        paramsDiagnosticoBuscar.append("operation", "obtenerDiagnostico")
+        paramsDiagnosticoBuscar.append("idordentrabajo", window.localStorage.getItem("idodt"))
+        paramsDiagnosticoBuscar.append("idtipodiagnostico", 1)
+        const diagnosticoObtenido = await getDatos(`${host}diagnostico.controller.php`, paramsDiagnosticoBuscar)
+        return diagnosticoObtenido
+    }
+
+
+    async function obtenerEvidencias(iddiagnostico) {
+        console.log("ID DIAGNOSTICO AAA: ", iddiagnostico)
+        const params = new URLSearchParams()
+        params.append("operation", "obtenerEvidenciasDiagnostico")
+        params.append("iddiagnostico", iddiagnostico)
+        const evidencias = await getDatos(`${host}diagnostico.controller.php`,params)
+        return evidencias
+        //previewContainer.innerHTML = '';
+    }
+    // ************************************ FIN DE FUNCIONES PARA OBTENER DATOS ******************************
+
+    // paso 1: FILTRAR Y ELEGIR Y GUARDAR EN UNA LISTA LOS USUARIOS ELEGIDOS A SER RESPONSABLES 
+    async function filtrarUsuariosList() {
+        const usuarios = await obtenerUsuarios()
+        tbodyResponsables.innerHTML = "";
         console.log("usuarios fitlrados", usuarios);
-        /* for (let i = 0; i < data.length; i++) {
-            activosList.innerHTML += `
+        for (let i = 0; i < usuarios.length; i++) {
+            tbodyResponsables.innerHTML += `
             <tr>
                 <th scope="row">
-                    <input type="checkbox" class="activo-checkbox" data-descact="${data[i].descripcion}" data-idactivo="${data[i].idactivo}" data-idactivoresp="${data[i].idactivo_resp}">
+                    <input type="checkbox" class="usuario-checkbox" data-idusuario="${usuarios[i].id_usuario}">
                 </th>
-                <td>${data[i].descripcion}</td>
-                <td>${data[i].marca}</td>
-                <td>${data[i].modelo}</td>
+                <td>${usuarios[i].nombres}</td>
+                <td>${usuarios[i].usuario}</td>
+                <td>${usuarios[i].rol}</td>
+                <td>${usuarios[i].num_doc}</td>
             </tr>
             `;
         }
+        //estadoBotonConfirmarAsignacion()
+        renderTablaUsuarios()
 
-        renderTablaActivos()
-
-        const chkActivo = $all(".activo-checkbox")
-        chkActivo.forEach(chk => {
-            const idActivoRespCheckbox = parseInt(chk.getAttribute("data-idactivoresp"));
-            const idActivoCheckbox = parseInt(chk.getAttribute("data-idactivo"));
-            const descripcionActivoCheckbox = chk.getAttribute("data-descact");
-
-            const activoEncontrado = activosElegidos.find(activo => activo.idactivo === idActivoCheckbox);
-            if (activoEncontrado) {
-                chk.checked = true;
+        const chkUsuarios = $all(".usuario-checkbox")
+        chkUsuarios.forEach(chk => {
+            const idRespCheckbox = parseInt(chk.getAttribute("data-idusuario"));
+            console.log("xd", idRespCheckbox)
+            const usuarioEncontrado = responsablesElegidos.find(usuario => usuario.idresponsable === idRespCheckbox);
+            if (usuarioEncontrado) {
+                chk.checked = true;  // Marcar si ya estaba seleccionado
             }
 
             chk.addEventListener("change", () => {
-                console.log("activos seleccionados despues de cambiar el filtro: ", activosElegidos)
+                console.log("activos seleccionados despues de cambiar el filtro: ", responsablesElegidos)
 
 
                 if (chk.checked) {
-                    const found = activosElegidos.find(activo => activo.idactivo === idActivoCheckbox);
+                    const found = responsablesElegidos.find(usuario => usuario.idresponsable === idRespCheckbox);
                     if (!found) {
-                        activosElegidos.push({
-                            idact_resp: idActivoRespCheckbox,
-                            idactivo: idActivoCheckbox,
-                            descripcion: descripcionActivoCheckbox,
-                            idtarea: parseInt(selectElegirTareaParaActivo.value)
+                        responsablesElegidos.push({
+                            idorden_trabajo: idodtgenerada,
+                            idresponsable: idRespCheckbox
                         });
                     }
 
                 } else {
                     // Si está desmarcado
-                    activosElegidos = activosElegidos.filter(activo => activo.idactivo !== idActivoCheckbox);
+                    responsablesElegidos = responsablesElegidos.filter(usuario => usuario.idresponsable !== idRespCheckbox);
                 }
 
-                console.log(activosElegidos);
+                console.log(responsablesElegidos);
             })
-        }) */
+        })
 
     }
 
@@ -99,9 +147,10 @@ $(document).ready(async () => {
         })
     })
 
-    function renderTablaActivos() {
+    // ******************************* SECCION DE RENDERIZADO DE DATOS EN INTERFAZ ****************************
+    function renderTablaUsuarios() {
         if (tbResponsables) {
-            tbResponsables.clear().rows.add($(activosList).find('tr')).draw();
+            tbResponsables.clear().rows.add($(tbodyResponsables).find('tr')).draw();
         } else {
             // Inicializa DataTable si no ha sido inicializado antes
             tbResponsables = $('#tablaResponsables').DataTable({
@@ -123,4 +172,301 @@ $(document).ready(async () => {
         }
     }
 
+    async function renderResponsablesOdt() {
+        const responsablesData = await obtenerResponsablesAsignados()
+        console.log("responsablesData: ", responsablesData)
+        for (let i = 0; i < responsablesData.length; i++) {
+            ulResponsablesAsignados.innerHTML += `
+                <li class="list-group-item d-flex justify-content-between align-items-center mb-3" data-id=${responsablesData[i].idresponsable_asignado} data-idresponsable=${responsablesData[i].idresponsable}>
+                    ${responsablesData[i].nombres}
+                    <span class="bg-white btn-eliminar-responsable" data-id=${responsablesData[i].idresponsable_asignado} data-idresponsable=${responsablesData[i].idresponsable}>
+                        <i class="fa-solid fa-trash text-dark"></i>
+                    </span>
+                </li>
+                
+            `
+        }
+        if (responsablesData.length > 0) {
+            alert("SI HAY RESPONSABLES")
+        }
+        //await crearOdt()
+        await eliminarLiResponsable()
+    }
+
+    // ****************************** FIN DE SECCIO DE RENDERIZADOS DE DATOS EN INTERFAZ ************************
+
+    // ******************************* EVENTOS *******************************************
+    btnAgregarResponsable.addEventListener('click', async () => {
+        const checkboxes = $all(".usuario-checkbox") // DESMARCAR TODOS LOS CHECKVBOXES UNA VEZ AGREGADOS
+        await registrarResponsable()
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = false;
+        });
+
+        // Limpiar la lista de responsables asignados
+        responsablesElegidos = [];
+        //estadoBotonConfirmarAsignacion()
+    });
+
+    evidenciasInput.addEventListener('change', async (e) => {
+        if (iddiagnosticoGenerado == -1) {
+            // Verificar que haya un diagnóstico antes de subir las evidencias
+            console.log("NO SE CREO UN DIAGNOSTICO , MUY RARO")
+            return
+        } else {
+            const evidenciaImagen = e.target.files[0] //ME QUEE ACAAAAA falta capturar el nombre de imagen y subir la evidencia
+            console.log(e)
+            // Verificar que el archivo exista
+            if (!evidenciaImagen) {
+                alert("No se ha seleccionado ninguna imagen.");
+                return;
+            }
+
+            // Crear el objeto FormData y añadir los datos
+            const formEvidencia = new FormData();
+            formEvidencia.append("operation", "registrarEvidenciaDiagnostico")
+            formEvidencia.append("iddiagnostico", iddiagnosticoGenerado);
+            formEvidencia.append("evidencia", evidenciaImagen); // Aquí se añade el archivo de evidencia (imagen)
+
+            try {
+                const Frespuesta = await fetch(`${host}diagnostico.controller.php`, { method: 'POST', body: formEvidencia })
+                const subida = await Frespuesta.json();
+                if (subida.guardado === 'success') {
+                    showToast(subida.message, 'INFO')
+                    //renderizar imagen
+                    previewContainer.innerHTML = '';
+
+                    const figureElement = document.createElement('figure');
+                    figureElement.classList.add('position-relative', 'w-100', 'mb-3', 'd-flex', 'justify-content-center'); // Añadimos d-flex y justify-content-center
+
+                    const imgElement = document.createElement('img');
+                    imgElement.classList.add('img-fluid'); // Bootstrap clase para imágenes fluidas
+                    imgElement.src = URL.createObjectURL(evidenciaImagen); // Mostrar la imagen como previa
+                    imgElement.style.maxWidth = '500px';
+                    imgElement.alt = 'Imagen subida';
+
+                    const figcaptionElement = document.createElement('figcaption');
+                    figcaptionElement.classList.add('position-absolute', 'bottom-0', 'w-100', 'text-center', 'bg-dark', 'text-white', 'p-2', 'pe-auto');
+                    figcaptionElement.style.maxWidth = '500px';
+                    figcaptionElement.textContent = 'Ver todas las evidencias';
+
+                    // Añadir el event listener para abrir el modal
+                    figcaptionElement.addEventListener('click', function () {
+                        abrirModalSidebar('offcanvasRightEvidencias');
+                        console.log("abriendo sidebar");
+                    });
+
+                    // Añadir img y figcaption al figure
+                    figureElement.appendChild(imgElement);
+                    figureElement.appendChild(figcaptionElement);
+
+                    // Añadir figure al contenedor
+                    previewContainer.appendChild(figureElement);
+                } else {
+                    showToast(subida.message, 'ERROR')
+                }
+            } catch (error) {
+                console.error('Error en la petición:', error);
+            }
+
+        }
+    })
+
+    // ****************************** FIN DE EVENTOS ************************************
+
+    // ********************************* SECCION DE REGISTROS ***********************************
+    // REGISTROS FUNCIONES
+    async function registrarResponsablesAsignados(idresponsable) {
+        console.log("ID ODT A ASIGNARLE: ", window.localStorage.getItem("idodt"))
+        const formResponsableAsignado = new FormData()
+        formResponsableAsignado.append("operation", "asignarResponsables")
+        formResponsableAsignado.append("idordentrabajo", window.localStorage.getItem("idodt"))
+        formResponsableAsignado.append("idresponsable", idresponsable)
+        const fresponsableId = await fetch(`${host}responsablesAsignados.controller.php`, { method: 'POST', body: formResponsableAsignado })
+        const responsableId = await fresponsableId.json()
+        return responsableId
+    }
+
+    //REGISTRAR A CADA USUARIOS ELEGIDO COMO RESPONSABLE SEGUN LA LISTA
+    async function registrarResponsable() {
+        /* const chkboxesMarcados = $all(".usuario-checkbox:checked");
+        chkboxesMarcados.forEach(chkbox => {
+            responsablesElegidos.push(chkbox.value)
+            console.log("chk valorr: ", chkbox.value)
+        }) */
+
+        console.log('Responsables asignados:', responsablesElegidos);
+        // EL ID RESPONSABLE SE REFIERE AL IDUSUARIO , osea son lo mismo solo que yo le puse diferente nombre por tabla
+        if (responsablesElegidos.length > 0) {
+            for (let i = 0; i < responsablesElegidos.length; i++) {
+                const responsableId = await registrarResponsablesAsignados(responsablesElegidos[i].idresponsable);
+                console.log("responsableId: ", responsableId.idresponsableasignado) //YA RECIBE EL ID RESPONSABLE ID // ME QUEDE ACA
+                const usuarioData = await obtenerUsuario(responsablesElegidos[i].idresponsable)
+                console.log("usuarioData: ", usuarioData)
+                // responsableId => idresponsable_odt
+                // idusuario que pertenece => usuarioData[0].idusuario                
+                ulResponsablesAsignados.innerHTML += `
+                    <li class="list-group-item d-flex justify-content-between align-items-center mb-3" data-id=${responsableId.idresponsableasignado} data-idresponsable=${usuarioData[0].idusuario}>
+                        ${usuarioData[0].dato}
+                        <span class="bg-white btn-eliminar-responsable" data-id=${responsableId.idresponsableasignado} data-idresponsable=${usuarioData[0].idusuario}>
+                            <i class="fa-solid fa-trash text-dark"></i>
+                        </span>
+                    </li>
+                `
+            }
+            //await crearOdt() // UNA VEZ TENIENDO RESPONSABLES ASIGNADOS podremos finalizar el registro de la ODT
+            await eliminarLiResponsable()
+        }
+    }
+
+    /*     async function crearOdt() {
+            //if (colDiagnosticoOk && colResponsablesOk) {
+            //btnCrearOdt.disabled = false
+            alert("EL REGISTRO DE LA ODT HA SIDO FINALIZADA, puedes proceder a darle clikc")
+            btnCrearOdt.addEventListener("click", async () => {
+                habilitarBeforeUnload = false;
+    
+                const form = new FormData()
+                form.append("operation", "actualizarBorradorOdt")
+                form.append("idordentrabajo", window.localStorage.getItem("idodt"))
+                form.append("borrador", ())
+                const fOdtActualizado = await fetch(`${host}ordentrabajo.controller.php`, { method: 'PUT', body: form })
+                const estadoBorradorCambiado = fOdtActualizado.json()
+                window.localStorage.removeItem("idodt") //esto lo borrare para cuando se intente regresar no se pueda modificar ocasionando confusiones y bugs
+                await actualizarEstadoTarea()
+                if (estadoBorradorCambiado) {
+                    alert("EL ODT YA  NO ES BORRADOR: ", estadoBorradorCambiado)
+                    window.location.href = '/usuario/tareas/odt'
+                }
+            })
+            //}
+        } */
+
+    //ESTO SE EJECUTARA CUANDO SE CREE POR PRIMERA VEZ LA ORDEN DE TRABAJO
+    async function registrarDiagnosticoEntrada() {
+        const formDiagnostico = new FormData()
+        formDiagnostico.append("operation", "registrarDiagnostico")
+        formDiagnostico.append("idordentrabajo", window.localStorage.getItem("idodt"))
+        formDiagnostico.append("idtipodiagnostico", 1)
+        formDiagnostico.append("diagnostico", txtDiagnosticoEntrada.value == "" ? "" : txtDiagnosticoEntrada.value)
+        const FidDiagnosticoRegistrado = await fetch(`${host}diagnostico.controller.php`, { method: "POST", body: formDiagnostico })
+        const idDiagnosticoRegistrado = await FidDiagnosticoRegistrado.json()
+        return idDiagnosticoRegistrado
+    }
+    //BOTONES FUNCIONES
+    /* function estadoBotonConfirmarAsignacion() {
+        const checkboxes = $all(".usuario-checkbox");
+
+        // Función para verificar el estado de los checkboxes y activar/desactivar el botón
+        function verificarEstadoCheckboxes() {
+            const algunoSeleccionado = Array.from(checkboxes).some(chk => chk.checked);
+            btnAgregarResponsable.disabled = !algunoSeleccionado; // Desactivar si no hay seleccionado
+        }
+
+        // Asignar evento 'change' a cada checkbox
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener("change", verificarEstadoCheckboxes);
+        });
+
+        // Llamar a la función para verificar el estado inicial de los checkboxes
+        verificarEstadoCheckboxes();
+    }
+ */
+
+    // *************************** SECCION DE ELIMIACIONES *******************************************
+    async function eliminarLiResponsable() {
+        const botonesEliminarResponsable = $all(".btn-eliminar-responsable");
+        botonesEliminarResponsable.forEach(boton => {
+            boton.addEventListener('click', async (event) => {
+                const idresponsable = boton.getAttribute("data-id");
+                console.log("id responsable: ", idresponsable)
+                //alert(idresponsable) DEPURAR CUANDO SEA NECESARIO
+                const eliminado = await eliminarResponsablesOdt(idresponsable);
+                if (!eliminado.eliminado) {
+                    alert("OCURRIO UN ERROR AL ELIMINAR RESPONSABLE")
+                }
+                console.log("paso...: ", eliminado.eliminado)
+                /* console.log("resposables elegidos : ", responsablesElegidos)
+                responsablesElegidos = responsablesElegidos.filter(id => id.idresponsable !== idresponsable); */
+
+                // Actualizar el DOM eliminando el elemento <li>
+                const listItem = document.querySelector(`li[data-id="${idresponsable}"]`);
+                if (listItem) {
+                    listItem.remove();
+                }
+                //VERIFICAR SI HAY AUN RESPONSABLES ASIGNADOS REGISTRADOS 
+                /* const responsablesData = await obtenerResponsablesPorOdt(window.localStorage.getItem("idodt"))
+                console.log("responsablesData: ", responsablesData)
+
+                if (responsablesData.length > 0) {
+                    colResponsablesOk = true
+                } else {
+                    btnCrearOdt.disabled = true
+                } */
+
+            });
+        });
+    }
+
+    async function eliminarResponsablesOdt(idresponsableasignado) {
+        const formEliminacion = new FormData()
+        formEliminacion.append("operation", "eliminarResponsableOdt")
+        const fResEliminacion = await fetch(`${host}responsablesAsignados.controller.php/${idresponsableasignado}`, { method: 'POST', body: formEliminacion })
+        const responsableEliminado = await fResEliminacion.json()
+        return responsableEliminado
+    }
+
+    // ******************************* FIN DE SECCION DE ELIMINACIONES **********************************
+
+    // *************************** SECCION DE VERIFICACION ***********************************************
+
+    async function verificarDiagnosticoRegistrado() {
+        const diagnostico = await obtenerDiagnosticoEntrada()
+        if (diagnostico.length == 1) {
+            hayDiagnostico = true
+            alert("ya hay un diagnostico registrado")
+            txtDiagnosticoEntrada.value = diagnostico[0].diagnostico
+            iddiagnosticoGenerado = diagnostico[0].iddiagnostico
+            return
+        } else {
+            const diagnostico = await registrarDiagnosticoEntrada()
+            alert("se creo un nuevo diagnostico")
+            hayDiagnostico = true
+            console.log("id diagnostico generado: ", diagnostico.id)
+            iddiagnosticoGenerado = diagnostico.id
+            return
+        }
+    }
+
+    // ************************* SECCION DE MODALES *******************************************************
+
+    async function abrirModalSidebar(modalId) {
+        const modalSidebar = document.getElementById(modalId); // Obtener el modal por ID
+        const bsOffcanvas = new bootstrap.Offcanvas(modalSidebar); // Usar Bootstrap Offcanvas API
+        bsOffcanvas.show(); // Mostrar el modal
+
+        console.log('Modal abierto: ' + modalId); // Confirmar que la función se llama
+
+        // Limpiar y rellenar el modal con las evidencias
+        const modalEvidenciasContainer = document.getElementById("modal-evidencias-container");
+        modalEvidenciasContainer.innerHTML = ''; // Limpiar el contenedor
+
+        // Obtener evidencias desde la API o fuente de datos
+        const evidenciasObtenidas = await obtenerEvidencias(iddiagnosticoGenerado);
+        console.log("Evidencias obtenidas: ", evidenciasObtenidas);
+
+        // Iterar sobre cada evidencia y crear elementos de imagen
+        /* evidenciasObtenidas.forEach(evidenciaObj => {
+            const imgSrc = evidenciaObj.evidencia; // Acceder a la propiedad 'evidencia' del objeto
+            const imgElement = document.createElement('img');
+            imgElement.src = `http://localhost/img/subidas/${imgSrc}`; // Ajustar la ruta a la imagen
+            imgElement.alt = `Evidencia ${imgSrc}`;
+            imgElement.classList.add('modal-img'); // Añadir clase para estilo (opcional)
+
+            // Añadir la imagen al contenedor del modal
+            modalEvidenciasContainer.appendChild(imgElement);
+        }); */
+    }
+
+    //************************** FIN SECCION DE MODALES *************************************************** */
 });

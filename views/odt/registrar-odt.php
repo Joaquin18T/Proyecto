@@ -19,7 +19,7 @@
                         <hr>
                         <div class="contenedor-diagnostico-entrada">
                             <h2 class="fs-5 fw-normal text-dark mb-2">Dianostico de Entrada</h2>
-                            <textarea class="comment-textarea form-control" rows="5" placeholder="Escribe tu comentario aquí..."></textarea>
+                            <textarea class="comment-textarea form-control" id="diagnostico-entrada" rows="5" placeholder="Escribe tu comentario aquí..."></textarea>
                         </div>
                     </div>
                 </div>
@@ -56,7 +56,6 @@
                                             <th>Nombres</th>
                                             <th>Usuario</th>
                                             <th>Rol</th>
-                                            <th>Tipo documento</th>
                                             <th>Numero documento</th>
                                         </tr>
                                     </thead>
@@ -64,7 +63,7 @@
                                 </table>
                             </div>
                             <div class="card-footer">
-                                <button type="button" class="btn btn-primary" id="btnAgregarResponsable" disabled>Agregar</button>
+                                <button type="button" class="btn btn-primary" id="btnAgregarResponsable">Agregar</button>
                             </div>
                         </div>
 
@@ -83,7 +82,7 @@
         </div>
     </div>
     <div class="row justify-content-center">
-        <button id="btnCrearOdt" class="mb-3 btn btn-primary" disabled>Crear Odt</button>
+        <button id="btnCrearOdt" class="mb-3 btn btn-primary">Crear Odt</button>
     </div>
     <!-- MODAL DE MOSTRAR RESPONSABLES -->
     <!-- <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRightResponsables" aria-labelledby="offcanvasRightResponsablesLabel">
