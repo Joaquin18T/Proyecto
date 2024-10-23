@@ -108,6 +108,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   selector("update-test").addEventListener("click",async(e)=>{
     e.preventDefault();
+    if(confirm("¿?")){
+
+    }
     const chkEsResP =  contChks(".chk_es_responsable", "data-iduser"); //muestra los id que estan marcados
     const chkDes = contChks(".chk_designar", "data-iduser");//muestra los id que estan marcados
 
