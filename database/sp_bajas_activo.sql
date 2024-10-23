@@ -81,7 +81,7 @@ BEGIN
     WHERE  (ACT.fecha_adquisicion = _fecha_adquisicion OR _fecha_adquisicion IS NULL)
     AND (EST.idestado = _idestado OR _idestado IS NULL) AND
     (ACT.cod_identificacion LIKE CONCAT('%',_cod_identificacion,'%') OR _cod_identificacion IS NULL) AND
-	EST.idestado >1 AND EST.idestado<5 AND EST.idestado !=4;
+	EST.idestado >1 AND EST.idestado<5;
 END $$
 -- CALL sp_activos_sin_servicio(null, null, 'C');
 DROP PROCEDURE IF EXISTS sp_data_baja_activo;

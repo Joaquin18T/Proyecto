@@ -133,28 +133,29 @@ document.addEventListener("DOMContentLoaded", () => {
     createTable(data);
     chargerEventsButton();
   }
-  
-  function chargerEventsButton(){
-    document.querySelector(".table-responsive").addEventListener("click",async(e)=>{
-      if(e.target){
-        if(e.target.classList.contains("modal-update")){
-          buttonsUpdate(e);
+
+  function chargerEventsButton() {
+    document
+      .querySelector(".table-responsive")
+      .addEventListener("click", async (e) => {
+        if (e.target) {
+          if (e.target.classList.contains("modal-update")) {
+            buttonsUpdate(e);
+          } else if (e.target.classList.contains("btn-baja")) {
+            await showDetalleBaja(e);
+          }
         }
-        else if(e.target.classList.contains("btn-baja")){
-          await showDetalleBaja(e);
-        }
-      }
-    });
+      });
   }
 
   function createTable(data) {
     let rows = $("#tb-body-activo").find("tr");
     //console.log(rows.length);
-    if(data.length>0){
+    if (data.length > 0) {
       if (myTable) {
         if (rows.length > 0) {
           myTable.clear().rows.add(rows).draw();
-        } else if(rows.length===1){
+        } else if (rows.length === 1) {
           myTable.clear().draw(); // Limpia la tabla si no hay filas.
         }
       } else {
@@ -172,7 +173,7 @@ document.addEventListener("DOMContentLoaded", () => {
             },
             search: "Buscar:",
             info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-            emptyTable: "No se encontraron registros"
+            emptyTable: "No se encontraron registros",
           },
         });
         // if (rows.length > 0) {
@@ -184,7 +185,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   changeByFilters();
   function changeByFilters() {
-    
     const filters = document.querySelectorAll(".filter");
     $selector("#table-activos tbody").innerHTML = "";
     filters.forEach((x) => {
@@ -225,12 +225,12 @@ document.addEventListener("DOMContentLoaded", () => {
   async function showDetalleBaja(e) {
     const id = parseInt(e.target.getAttribute("data-id"));
     console.log(id);
-    
+
     const desc = await getDescripcion(id);
     $selector("#desc").textContent = desc;
 
     const dataBaja = await dataActivoBaja(id);
-    
+
     await showDataBajaActivo(dataBaja);
     showPDF(dataBaja.ruta_doc);
 
@@ -244,7 +244,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const params = new URLSearchParams();
     params.append("operation", "dataBajaActivo");
     params.append("idactivo", idactivo);
-    
+
     const data = await getDatos(`${host}bajaActivo.controller.php`, params);
     console.log(data);
     return data[0];
@@ -252,7 +252,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function showDataBajaActivo(data) {
     //console.log(data);
-    
+
     const aprobacion = await getUser(data.aprobacion);
 
     $selector(
@@ -288,6 +288,15 @@ document.addEventListener("DOMContentLoaded", () => {
     index = 0;
   }
 
+  // $selector("#view-pdf-baja").addEventListener("click",(e)=>{
+  //   e.preventDefault();
+  //   const sidebar = bootstrap.Offcanvas.getOrCreateInstance(
+  //     $selector("#activo-baja-detalle")
+  //   );
+  //   sidebar.hide();
+
+  // });
+
   async function getUser(iduser) {
     const params = new URLSearchParams();
     params.append("operation", "getUserById");
@@ -306,4 +315,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
     return data[0].descripcion;
   }
+
 });

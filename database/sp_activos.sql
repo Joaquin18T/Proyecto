@@ -81,6 +81,7 @@ BEGIN
 	ORDER BY SUB.subcategoria ASC;
 END $$
 CALL sp_search_activo_resp('');
+
 DROP VIEW IF EXISTS v_all_activos;
 CREATE VIEW v_all_activos AS
 	SELECT 
@@ -123,15 +124,15 @@ BEGIN
         ROL.rol,
         RES.es_responsable,
         (SELECT COUNT(R.idactivo_resp) FROM activos_responsables R
-WHERE R.idusuario = RES.idusuario) as cantidad,
+WHERE R.idusuario = RES.idusuario AND R.fecha_designacion IS NULL) as cantidad,
         USU.estado
 	FROM activos_responsables RES
     INNER JOIN usuarios USU ON RES.idusuario = USU.id_usuario
     INNER JOIN personas PER ON USU.idpersona = PER.id_persona
     INNER JOIN roles ROL ON USU.idrol = ROL.idrol
-    WHERE RES.idactivo = _idactivo;
+    WHERE RES.idactivo = _idactivo AND RES.fecha_designacion IS NULL;
 END $$
-
+-- CALL sp_search_by_activo(1);
 DROP PROCEDURE IF EXISTS sp_list_activos;
 DELIMITER $$
 CREATE PROCEDURE sp_list_activos
