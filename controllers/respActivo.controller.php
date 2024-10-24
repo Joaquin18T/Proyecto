@@ -49,8 +49,11 @@ if(isset($_GET['operation'])){
       echo json_encode($respAct->listResp_activo());
       break;
     case 'getResponasblePrin':
-      $cleanData = $respAct->limpiarCadena($_GET['idactivo_resp']);
-      echo json_encode($respAct->getResponsablePrin(['idactivo_resp'=>$cleanData]));
+      $cleanData = [
+        'idactivo_resp'=> $respAct->limpiarCadena($_GET['idactivo_resp']),
+        'idactivo'=> $respAct->limpiarCadena($_GET['idactivo'])
+      ];
+      echo json_encode($respAct->getResponsablePrin($cleanData));
       break;
   }
 }

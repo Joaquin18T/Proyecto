@@ -167,7 +167,7 @@ BEGIN
     ORDER BY HIS.fecha_movimiento DESC
     LIMIT 1;
 END $$
--- CALL sp_ubicacion_activo(8)
+-- CALL sp_ubicacion_activo(3)
 DROP PROCEDURE IF EXISTS sp_users_by_activo;
 DELIMITER $$
 CREATE PROCEDURE sp_users_by_activo
@@ -189,6 +189,7 @@ BEGIN
     WHERE RES.idactivo = _idactivo AND RES.fecha_designacion IS NULL;
 END $$
 -- CALL sp_users_by_activo(1);
+
 DROP PROCEDURE IF EXISTS sp_search_activo_responsable;
 DELIMITER $$
 CREATE PROCEDURE sp_search_activo_responsable
@@ -229,11 +230,10 @@ BEGIN
 			(UBI.idubicacion = _idubicacion OR _idubicacion IS NULL) AND
 			(ACT.cod_identificacion LIKE CONCAT('%', _cod_identificacion, '%') OR _cod_identificacion IS NULL) AND 
             ACT.idestado BETWEEN 1 AND 2
-            
     GROUP BY ACT.idactivo
-    ORDER BY RES.fecha_asignacion DESC;
+    ORDER BY RES.idactivo_resp desc;
 END $$
-CALL sp_search_activo_responsable(null, null, null);
+-- CALL sp_search_activo_responsable(null, null, null);
 
 DROP PROCEDURE IF EXISTS sp_list_resp_activo;
 DELIMITER $$
@@ -252,14 +252,15 @@ DROP PROCEDURE IF EXISTS sp_getresp_principal;
 DELIMITER $$
 CREATE PROCEDURE sp_getresp_principal
 (
-	IN _idactivo_resp INT
+	IN _idactivo_resp INT,
+	IN _idactivo INT
 )
 BEGIN
 	DECLARE isResP INT DEFAULT 0;
     
     SELECT COUNT(*) INTO isResP
     FROM activos_responsables WHERE es_responsable='1'
-    AND idactivo_resp = _idactivo_resp;
+    AND idactivo = _idactivo;
     
     IF isResP>0 THEN
 		SELECT 
@@ -269,7 +270,7 @@ BEGIN
 		FROM activos_responsables RES
 		INNER JOIN usuarios U ON RES.idusuario = U.id_usuario
 		INNER JOIN personas P ON U.idpersona = P.id_persona
-		WHERE RES.idactivo_resp = _idactivo_resp AND RES.es_responsable = '1';
+		WHERE RES.idactivo = _idactivo AND RES.es_responsable = '1';
 	ELSE
 		SELECT 
 			RES.idactivo_resp,
@@ -279,12 +280,12 @@ BEGIN
 		INNER JOIN usuarios U ON RES.idusuario = U.id_usuario
 		INNER JOIN personas P ON U.idpersona = P.id_persona
 		WHERE RES.idactivo_resp = _idactivo_resp
-        ORDER BY RES.fecha_asignacion ASC
+        ORDER BY RES.fecha_asignacion asc
         LIMIT 1;
 	END IF;
 END $$
 
--- CALL sp_getresp_principal(12);
+-- CALL sp_getresp_principal(4,3);
 -- designacion
 DROP PROCEDURE IF EXISTS sp_update_activo_responsable;
 DELIMITER $$

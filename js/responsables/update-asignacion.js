@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+  selector("update-test").disabled = true;
   const globals = {
     id: localStorage.getItem("idresp_act"),
     idactivo: localStorage.getItem("idactivo"),
@@ -9,8 +10,9 @@ document.addEventListener("DOMContentLoaded", () => {
     contDes:0,
     contIdResP:0,
     contIdResDes:0,
+    idRes:0
   };
-  console.log(globals.id);
+  //console.log(globals.id);
   
   function selector(value) {
     return document.querySelector(`#${value}`);
@@ -63,12 +65,20 @@ document.addEventListener("DOMContentLoaded", () => {
       const element = createOption(x.idubicacion, x.ubicacion);
       selector("ubicacion").appendChild(element);
     });
-    await getUbicacion();
+    const id = await getUbicacion();
+    selector("ubicacion").value = id.idubicacion;
   })();
 
   async function showDataUsuario(){
     const data = await usersByActivo();
-    //console.log(data);
+    
+    if(data.length===0){
+      selector("tb-asignacion").innerHTML=`
+        <tr>
+          <td>No hay ningun usuario asignado para este activo</td>
+        </tr>
+      `;
+    }
     
     data.forEach(x=>{
       selector("tb-asignacion").innerHTML+=`
@@ -86,6 +96,9 @@ document.addEventListener("DOMContentLoaded", () => {
     getChksBefore();
   }
 
+  selector("ubicacion").addEventListener("change",()=>{
+    selector("update-test").disabled = false;
+  });
   function getChksBefore(){
     globals.contDes = contChks(".chk_designar", "data-iduser");
     globals.contResP = contChks(".chk_es_responsable", "data-iduser");
@@ -103,8 +116,14 @@ document.addEventListener("DOMContentLoaded", () => {
     chks.forEach(x=>{
       const es_resp = x.getAttribute("data-es");
       if(es_resp==="1"){x.checked=true;}
+      else{x.disabled=true;}
     });
+
+    selectChksRP();
+    selectChksCL();
   }
+
+
 
   selector("update-test").addEventListener("click",async(e)=>{
     e.preventDefault();
@@ -115,35 +134,88 @@ document.addEventListener("DOMContentLoaded", () => {
       const diferentCL = getDiferent(globals.contDes[1], chkDes[1]); //idusuario
   
       const chkIdRespDes = contChks(".chk_designar", "data-idresp");
-      const diferentRespCL = getDiferent(globals.contIdResDes[1], chkIdRespDes[1]); //idactivo_resp
+      const diferentIdRespCL = getDiferent(globals.contIdResDes[1], chkIdRespDes[1]); //idactivo_resp
   
       const verifyCL = isSameChks(globals.contDes, chkDes);
       const verifyRP = isSameChks(globals.contResP, chkEsResP);
-  
-      //console.log(verifyRP);
       
-      // console.log("diferente user", diferentCL);
-      // console.log("diferente resp_act", diferentRespCL);
-      
-      let updated=false;
-      if(!verifyCL){
-        const data = await cascadeUpdateAsignacion(diferentCL, diferentRespCL,"Designacion", "Te han designado de un activo");
-        console.log("designacion", data);
-        updated=true;
-      }
-      if(!verifyRP){
-        const data = await changeResponsableP();
-        console.log("change principal", data);
-        updated=true;
-      }
+    
+      const {idubicacion} = await getUbicacion();
+      if(parseInt(idubicacion)!==parseInt(selector("ubicacion").value)){
+        
+        
+        
+        const {usuario}= await getResPrincipal(4,3);
+        const id = await getIdUser(usuario);
+        //obtener aqui el id responsable 
+        console.log(id);
+        
+        // const isUpdated = await updateUbicacion(id);
 
-      if(updated){
-        alert("Las asignaciones se han actualizado");
-        updated=false;
+
+        // if(isUpdated.mensaje==="Historial guardado"){
+        //   console.log(usuario);
+          
+        //   //console.log(id);
+          
+        //   const addNotif = await addNotificacion(id, "Cambio de ubicacion", "Se ha cambiado de ubicacion un activo que te han asignado");
+
+        //   if(addNotif>0){
+        //     console.log("se ha actualizado la ubicacion");
+            
+        //   }
+        // }
+        
       }
+      
+      // let updated=false;
+      // if(!verifyCL){
+      //   const data = await cascadeUpdateAsignacion(diferentCL, diferentIdRespCL,"Designacion", "Te han designado de un activo");
+      //   console.log("designacion", data);
+      //   updated=true;
+      // }
+      // if(!verifyRP){
+      //   const data = await changeResponsableP();
+      //   console.log("change principal", data);
+      //   updated=true;
+      // }
+
+      // if(updated){
+      //   alert("Las asignaciones se han actualizado");
+      //   updated=false;
+      //   window.location.href = `http://localhost/CMMS/views/responsables/`;
+      // }
 
     }
   });
+
+  function selectChksRP(){
+    recorrer_QSA("chk_es_responsable", "data-idresp");
+  }
+
+  function selectChksCL(){
+    recorrer_QSA("chk_designar", "data-idresp");
+  }
+
+  function recorrer_QSA(name_selector, nameAttribute){
+    const chks = document.querySelectorAll(`.${name_selector}`);
+    chks.forEach(x=>{
+      x.addEventListener("click",()=>{
+        disabledChksRP(`${name_selector}`);
+        selector("update-test").disabled =false;
+      });
+    });
+  }
+
+  function disabledChksRP(name_selector){
+    const chks = document.querySelectorAll(`.${name_selector}`);
+    chks.forEach(x=>{
+      if(!x.checked){
+        x.disabled = true;
+      }
+    });
+    
+  }
 
   function isSameChks(before=[], after=[]){
     const data = before.some(b=>after.includes(b));
@@ -174,9 +246,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let isChange = false;
     console.log("iduser", diferentRP);
-    console.log("idact_resp", diferentRespRP);
+    console.log("idact_resp", diferentRespRP[0]);
     
-    const autorizacion = await getIdUser();
+    const autorizacion = await getIdUser(selector("nomuser").textContent);
     const params = new FormData();
     params.append("operation", "updateResponsableP");
     params.append("idactivo_resp", diferentRespRP[0]);
@@ -200,7 +272,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   async function updateAsignacion(iduser, idresp){
-    const autorizacion = await getIdUser();
+    const autorizacion = await getIdUser(selector("nomuser").textContent);
     const params = new FormData();
     params.append("operation", "updateAsignacion");
     params.append("idactivo_resp", idresp);
@@ -236,16 +308,21 @@ document.addEventListener("DOMContentLoaded", () => {
     return [cont, ids];
   }
 
-  
-  async function getResPrincipal(id) {
+  //------------------------ACTUALIZAR UBICACION---------------------
+
+  async function getResPrincipal(idresp, idactivo) {
     const params = new URLSearchParams();
     params.append("operation", "getResponasblePrin");
-    params.append("idactivo_resp", parseInt(id));
+    params.append("idactivo_resp", parseInt(idresp));
+    params.append("idactivo", parseInt(idactivo));
 
     const data = await getDatos(`${globals.host}respActivo.controller.php`, params);
     return data[0];
   }
 
+  /**
+   * obtiene la ubicacion actual y lo muestra en el select
+   */
   async function getUbicacion(){
     const params = new URLSearchParams();
     params.append("operation", "ubiByActivo");
@@ -253,7 +330,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const data = await getDatos(`${globals.host}historialactivo.controller.php`, params);
     
-    selector("ubicacion").value = data[0].idubicacion;
+    return data[0];
   }
 
   async function addNotificacion(iduser, tipoMsg, msg){
@@ -272,10 +349,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 
-  async function updateUbicacion() {
+  async function updateUbicacion(id) {
+    //Insercion al historial
     const params = new FormData();
     params.append("operation", "add");
-    params.append("idactivo_resp", parseInt(globals.id));
+    params.append("idactivo_resp", parseInt(id));
     params.append("idubicacion", parseInt(selector("ubicacion").value));
 
     const data = await fetch(`${globals.host}historialactivo.controller.php`, {
@@ -287,20 +365,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return addNewUbicacion;
   }
 
-  async function addNotificacionUbi(iduser){
-    const params = new URLSearchParams();
-    params.append("operation", "add");
-    params.append("idusuario", parseInt(iduser));
-    params.append("tipo","Nueva Ubicacion");
-    params.append("mensaje","Se ha actualizado una ubicacion de un activo asignado");
-
-    const data = await fetch(`${globals.host}notificacion.controller.php`,{
-      method:'POST',
-      body:params
-    });
-    const resp = await data.json();
-    return resp.respuesta;
-  }
 
   async function createNotificacion(data=[]){
     for (let i = 0; i < data.length; i++) {
@@ -314,10 +378,10 @@ document.addEventListener("DOMContentLoaded", () => {
     return isValidate;
   }
 
-  async function getIdUser(){
+  async function getIdUser(nom_user){
     const params = new URLSearchParams();
     params.append("operation", "searchUser");
-    params.append("usuario", selector("nomuser").textContent);
+    params.append("usuario", nom_user);
     const data = await getDatos(`${globals.host}usuarios.controller.php`, params);
     return data[0].id_usuario;
   }

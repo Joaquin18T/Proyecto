@@ -93,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
       selector("tb-colaboradores tbody").innerHTML=`<tr><td colspan=7 class="text-center">No hay resultados</td></tr>`;
     }
     
-    console.log(data.length);
+    //console.log(data.length);
   
     
     data.forEach((x, index)=>{
