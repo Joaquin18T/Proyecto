@@ -219,6 +219,19 @@ class Activo extends ExecQuery{
       die($e->getMessage());
     }
   }
+
+  
+  public function obtenerActivosPorTarea($params):array{
+    try{
+      $cmd = parent::execQ("CALL obtenerActivosPorTarea(?)");
+      $cmd->execute(
+        array($params['idtarea'])
+      );
+      return $cmd->fetchAll(PDO::FETCH_ASSOC);
+    }catch(Exception $e){
+      die($e->getMessage());
+    }
+  }
 }
 
 //$asc = new Activo();

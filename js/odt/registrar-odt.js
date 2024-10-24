@@ -87,7 +87,6 @@ $(document).ready(async () => {
         params.append("iddiagnostico", iddiagnostico)
         const evidencias = await getDatos(`${host}diagnostico.controller.php`, params)
         return evidencias
-        //previewContainer.innerHTML = '';
     }
     // ************************************ FIN DE FUNCIONES PARA OBTENER DATOS ******************************
 
@@ -417,7 +416,7 @@ $(document).ready(async () => {
         const diagnostico = await obtenerDiagnosticoEntrada()
         if (diagnostico.length == 1) {
             hayDiagnostico = true
-            alert("ya hay un diagnostico registrado")
+            alert("ya hay un diagnostico de salida registrado")
             txtDiagnosticoEntrada.value = diagnostico[0].diagnostico
             iddiagnosticoGenerado = diagnostico[0].iddiagnostico
             return
@@ -425,7 +424,7 @@ $(document).ready(async () => {
             const diagnostico = await registrarDiagnosticoEntrada()
             //alert("se creo un nuevo diagnostico")
             hayDiagnostico = true
-            console.log("id diagnostico generado: ", diagnostico.id)
+            console.log("id diagnostico salida generado: ", diagnostico.id)
             iddiagnosticoGenerado = diagnostico.id
             return
         }

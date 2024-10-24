@@ -79,11 +79,9 @@ BEGIN
     INNER JOIN plandetareas PT ON PT.idplantarea = TAR.idplantarea
     INNER JOIN estados EST ON EST.idestado = ODT.idestado
     LEFT JOIN detalle_odt DODT ON DODT.clasificacion = EST.idestado 
-    WHERE ODT.borrador = _borrador
+    WHERE ODT.eliminado = _borrador
     GROUP BY ODT.idorden_trabajo, TAR.descripcion, TAR.fecha_inicio, TAR.fecha_vencimiento, PERCRE.nombres, PERCRE.apellidos, TAR.idtarea, ACT.descripcion, EST.nom_estado;
 END //
-
-call obtenerTareasOdt(0);
 
 DROP PROCEDURE IF EXISTS `obtenerTareaDeOdtGenerada`
 DELIMITER //
@@ -107,7 +105,12 @@ BEGIN
         INNER JOIN estados EST ON EST.idestado = ODT.idestado
         WHERE ODT.idorden_trabajo = _idodt;
 END //
-
+select * from odt; -- paso 1
+select * from diagnosticos; -- paso 2
+select * from evidencias_diagnostico; -- paso 3
+select * from tareas;
+select * from activos_vinculados_tarea; -- paso 4
+select * from activos;
 call obtenerTareaDeOdtGenerada(1)
 
 DROP PROCEDURE IF EXISTS `obtenerEvidenciasDiagnostico`

@@ -244,7 +244,7 @@ CREATE TABLE `odt`
     CONSTRAINT			fk_creado_por				foreign key (creado_por) 				REFERENCES usuarios	(id_usuario),
     CONSTRAINT			fk_idestado4				FOREIGN KEY	(idestado)					REFERENCES estados	(idestado)
 )ENGINE=INNODB;	
-select * from odt;
+
 DROP TABLE IF EXISTS `tipo_diagnosticos`;
 CREATE TABLE `tipo_diagnosticos`
 (

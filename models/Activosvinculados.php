@@ -63,6 +63,7 @@ class Activosvinculados extends ExecQuery
       die($e->getMessage());
     }
   } // integrado
+  
 
   // METODO DE ELIMIMNAR
   public function eliminarActivosVinculadosTarea($params = []): bool

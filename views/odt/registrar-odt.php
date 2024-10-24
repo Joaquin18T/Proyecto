@@ -19,7 +19,7 @@
                         <hr>
                         <div class="contenedor-diagnostico-entrada">
                             <h2 class="fs-5 fw-normal text-dark mb-2">Dianostico de Entrada</h2>
-                            <textarea class="comment-textarea form-control" id="diagnostico-entrada" rows="5" placeholder="Escribe tu comentario aquí..."></textarea>
+                            <textarea class="comment-textarea form-control" id="diagnostico-entrada" rows="5" placeholder="Escribe tu diagnostico aquí..."></textarea>
                         </div>
                     </div>
                 </div>

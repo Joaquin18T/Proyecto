@@ -9,7 +9,7 @@ CREATE PROCEDURE `actualizarBorradorOdt`
 )
 BEGIN
 	UPDATE odt SET
-    borrador = _borrador
+    incompleto = _borrador
     WHERE idorden_trabajo = _idorden_trabajo;
 END //
 

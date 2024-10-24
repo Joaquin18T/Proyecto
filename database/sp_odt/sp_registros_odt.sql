@@ -96,6 +96,39 @@ CREATE PROCEDURE `registrarHistorial`
     IN _devuelto		BOOLEAN
 )
 BEGIN
-	INSERT INTO historial_estado_odt (_idorden_trabajo, _estado_anterior, _estado_nuevo, _comentario, _devuelto)	
+	INSERT INTO historial_estado_odt (idorden_trabajo, estado_anterior, estado_nuevo, comentario, devuelto)	
 		VALUES (_idorden_trabajo, _estado_anterior, _estado_nuevo, _comentario, NULLIF(_devuelto, ""));
 END //
+
+DROP PROCEDURE IF EXISTS `registrarDetalleOdt`
+DELIMITER //
+CREATE PROCEDURE `registrarDetalleOdt`
+(
+	OUT _iddetalleodt 		INT,
+	IN _idorden_trabajo 	INT,
+    IN _fecha_inicial 		DATETIME,
+    IN _fecha_final 		DATETIME,
+    IN _tiempo_ejecucion	TIME,
+    IN _clasificacion		INT
+)
+BEGIN
+	-- Declaracion de variables
+	DECLARE existe_error INT DEFAULT 0;
+    
+    -- Manejador de excepciones
+	DECLARE CONTINUE HANDLER FOR SQLEXCEPTION
+		BEGIN
+        SET existe_error = 1;
+        END;
+        
+	INSERT INTO detalle_odt (idorden_trabajo, fecha_inicial, fecha_final, tiempo_ejecucion, clasificacion)	
+		VALUES (_idorden_trabajo, _fecha_inicial, _fecha_final, _tiempo_ejecucion, _clasificacion);
+        
+	IF existe_error = 1 THEN
+		SET _iddetalleodt = -1;
+	ELSE
+        SET _iddetalleodt = LAST_INSERT_ID();
+    END IF;
+END //
+
+

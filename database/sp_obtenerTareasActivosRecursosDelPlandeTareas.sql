@@ -117,6 +117,9 @@ BEGIN
     WHERE ACTV.idtarea = _idtarea;
 END $$
 
+call obtenerActivosPorTarea(2)
+
+
 
 DROP PROCEDURE IF EXISTS `obtenerUnActivoVinculadoAtarea`
 DELIMITER $$
@@ -127,6 +130,9 @@ BEGIN
     INNER JOIN subcategorias SUB ON ACT.idsubcategoria = SUB.idsubcategoria
     where AVT.idactivo_vinculado = _idactivo_vinculado;
 END $$
+
+select * from activos_vinculados_tarea
+call obtenerUnActivoVinculadoAtarea(1);
 
 -- *******************************************************************************************************
 

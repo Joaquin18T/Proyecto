@@ -26,7 +26,8 @@ BEGIN
         SET _idresponsable_asignado = LAST_INSERT_ID();
     END IF;
 END
-
+select * from usuarios;
+select * from odt;
 select * from responsables_asignados_odt;
 
 DROP PROCEDURE IF EXISTS `obtenerUsuario`
@@ -55,6 +56,7 @@ BEGIN
 END //
 
 select * from responsables_asignados_odt;
+select * from usuarios;
 
 DROP PROCEDURE IF EXISTS `eliminarResponsableOdt`
 DELIMITER //
@@ -85,3 +87,4 @@ BEGIN
     INNER JOIN personas PER ON PER.id_persona = USU.idpersona
 	WHERE idorden_trabajo = _idodt;
 END //
+

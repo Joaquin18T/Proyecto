@@ -1,4 +1,4 @@
-<?php
+  <?php
 
 require_once '../models/Activo.php';
 
@@ -45,6 +45,9 @@ if (isset($_GET['operation'])) {
         'cod_identificacion' => $_GET['cod_identificacion']=="" ? null : $_GET['cod_identificacion']
       ];
       echo json_encode($activo->searchActivoResponsable($datosEnviar));
+      break;
+    case 'obtenerActivosPorTarea':
+      echo json_encode($activo->obtenerActivosPorTarea(['idtarea' => $_GET['idtarea']]));
       break;
   }
 }
