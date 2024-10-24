@@ -17,7 +17,7 @@ require_once '../header.php';
     <form action="" id="update-asignacion">
       <div class="card">
         <div class="card-header d-flex justify-content-between m-0">
-          <div class="mb-0 pt-1">Actualizar asignaciones</div>
+          <div class="mb-0 pt-1">Designaciones para el activo</div>
           <button class="btn btn-sm btn-success m-0" type="submit" id="update-test">Actualizar</button>
         </div>
         <div class="card-body">

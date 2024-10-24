@@ -160,10 +160,11 @@ class ResponsableAct extends ExecQuery{
 
   public function getResponsablePrin($params=[]):array{
     try{
-      $cmd = parent::execQ("CALL sp_getresp_principal(?)");
+      $cmd = parent::execQ("CALL sp_getresp_principal(?,?)");
       $cmd->execute(
         array(
-          $params['idactivo_resp']
+          $params['idactivo_resp'],
+          $params['idactivo']
         )
       );
       return $cmd->fetchAll(PDO::FETCH_ASSOC);
@@ -227,7 +228,7 @@ class ResponsableAct extends ExecQuery{
 //   'autorizacion'=>1,
 // ]));
 
-// echo json_encode($resp->getResponsablePrin(['idactivo_resp'=>6]));
+//echo json_encode($resp->getResponsablePrin(['idactivo_resp'=>4, 'idactivo'=>3]));
 
 // echo json_encode($resp->listResp_activo());
 
