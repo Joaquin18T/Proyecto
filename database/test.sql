@@ -6,7 +6,7 @@ ALTER TABLE historial_activos AUTO_INCREMENT = 1;
 
 
 select* from activos_responsables where idactivo=3;
-select*from historial_activos where idactivo_resp=1;
+select*from historial_activos where idactivo_resp=4;
 select*from notificaciones where idusuario = 15;
 select*from activos;
 select*from usuarios;
@@ -29,4 +29,6 @@ SELECT * from activos_responsables where idactivo = 1;
 insert into bajas_activo(idactivo, motivo, ruta_doc, aprobacion) VALUES
 	(3, 'problemas frecuentes en su funcionamiento', 'C:/xampp/htdocs/CMMS/uploads/CAM123-Plan mantenimiento.pdf', 1);
 
+insert into historial_activos(idactivo_resp, idubicacion) VALUES
+	(4, 5);
 

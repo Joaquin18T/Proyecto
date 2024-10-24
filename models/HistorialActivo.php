@@ -22,9 +22,12 @@ class HistorialActivo extends ExecQuery{
 
   public function ubicacionByActivo($params=[]):array{
     try{
-      $cmd = parent::execQ("CALL sp_ubicacion_activo(?)");
+      $cmd = parent::execQ("CALL sp_ubicacion_activo(?,?)");
       $cmd->execute(
-        array($params['idactivo'])
+        array(
+          $params['idactivo'],
+          $params['idactivo_resp']
+        )
       );
       return $cmd->fetchAll(PDO::FETCH_ASSOC);
     }catch(Exception $e){
@@ -35,7 +38,7 @@ class HistorialActivo extends ExecQuery{
 
 // $hist = new HistorialActivo();
 
-// echo json_encode($hist->ubicacionByActivo(['idactivo'=>7]));
+// echo json_encode($hist->ubicacionByActivo(['idactivo'=>3, 'idactivo_resp'=>14]));
 
 // echo json_encode($hist->add([
 //   'idactivo_resp'=>1,

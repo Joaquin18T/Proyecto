@@ -7,7 +7,10 @@ $historialAc = new HistorialActivo();
 if(isset($_GET['operation'])){
   switch($_GET['operation']){
     case 'ubiByActivo':
-      echo json_encode($historialAc->ubicacionByActivo(['idactivo'=>$_GET['idactivo']]));
+      echo json_encode($historialAc->ubicacionByActivo([
+        'idactivo'=>$_GET['idactivo'],
+        'idactivo_resp'=>$_GET['idactivo_resp']
+      ]));
       break;
   }
 }

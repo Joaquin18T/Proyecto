@@ -157,17 +157,18 @@ DROP PROCEDURE IF EXISTS sp_ubicacion_activo;
 DELIMITER $$
 CREATE PROCEDURE  sp_ubicacion_activo
 (
-	IN _idactivo INT
+	IN _idactivo INT,
+	IN _idactivo_resp INT
 )
 BEGIN
 	SELECT DISTINCT UBI.idubicacion, UBI.ubicacion FROM historial_activos HIS
     INNER JOIN ubicaciones UBI ON HIS.idubicacion = UBI.idubicacion
     INNER JOIN activos_responsables RES ON HIS.idactivo_resp = RES.idactivo_resp
-    WHERE RES.idactivo = _idactivo
-    ORDER BY HIS.fecha_movimiento DESC
+    WHERE RES.idactivo = _idactivo and res.idactivo_resp = _idactivo_resp
+    ORDER BY HIS.fecha_movimiento desc
     LIMIT 1;
 END $$
--- CALL sp_ubicacion_activo(3)
+-- CALL sp_ubicacion_activo(3,4)
 DROP PROCEDURE IF EXISTS sp_users_by_activo;
 DELIMITER $$
 CREATE PROCEDURE sp_users_by_activo
@@ -223,15 +224,16 @@ BEGIN
         WHERE H1.fecha_movimiento = (
 			SELECT MAX(H2.fecha_movimiento)
             FROM historial_activos H2
-            WHERE H2.idactivo_resp = H1.idactivo_resp
+            WHERE H2.idactivo_resp = H1.idactivo_resp 
         )
     )UBI ON UBI.idactivo_resp = RES.idactivo_resp
     WHERE 	(SUB.idsubcategoria = _idsubcategoria OR _idsubcategoria IS NULL) AND
 			(UBI.idubicacion = _idubicacion OR _idubicacion IS NULL) AND
 			(ACT.cod_identificacion LIKE CONCAT('%', _cod_identificacion, '%') OR _cod_identificacion IS NULL) AND 
-            ACT.idestado BETWEEN 1 AND 2
+            RES.fecha_designacion IS NULL
+            -- ACT.idestado BETWEEN 1 AND 2
     GROUP BY ACT.idactivo
-    ORDER BY RES.idactivo_resp desc;
+    ORDER BY RES.idactivo_resp asc;
 END $$
 -- CALL sp_search_activo_responsable(null, null, null);
 
@@ -284,7 +286,6 @@ BEGIN
         LIMIT 1;
 	END IF;
 END $$
-
 -- CALL sp_getresp_principal(4,3);
 -- designacion
 DROP PROCEDURE IF EXISTS sp_update_activo_responsable;

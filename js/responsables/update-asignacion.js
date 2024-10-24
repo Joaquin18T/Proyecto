@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
     contIdResDes:0,
     idRes:0
   };
-  //console.log(globals.id);
+  //console.log(globals.idRes);
   
   function selector(value) {
     return document.querySelector(`#${value}`);
@@ -57,6 +57,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const data = await getDatos(`${globals.host}respActivo.controller.php`, params);
     return data;
   }
+
+  (async()=>{
+    const {idactivo_resp} = await getResPrincipal(globals.id, globals.idactivo);
+    globals.idRes = idactivo_resp;
+  })();
 
   (async () => {
     const data = await getDatos("http://localhost/CMMS/controllers/ubicacion.controller.php", "operation=getAll");
@@ -124,7 +129,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 
-
   selector("update-test").addEventListener("click",async(e)=>{
     e.preventDefault();
     if(confirm("¿Estas seguro de actualizar la asignacion?")){
@@ -141,53 +145,72 @@ document.addEventListener("DOMContentLoaded", () => {
       
     
       const {idubicacion} = await getUbicacion();
+      let isUpUbi = false;
       if(parseInt(idubicacion)!==parseInt(selector("ubicacion").value)){
-        
-        
-        
-        const {usuario}= await getResPrincipal(4,3);
+                
+        const {usuario}= await getResPrincipal(globals.id, globals.idactivo);
+  
         const id = await getIdUser(usuario);
-        //obtener aqui el id responsable 
-        console.log(id);
+        console.log(usuario);
         
-        // const isUpdated = await updateUbicacion(id);
+        console.log(globals.idRes);
+        console.log("ubi enviar", selector("ubicacion").value);
+        
+        const isUpdated = await updateUbicacion(globals.idRes);
 
+        if(isUpdated.mensaje==="Historial guardado"){
+          console.log(usuario);
 
-        // if(isUpdated.mensaje==="Historial guardado"){
-        //   console.log(usuario);
-          
-        //   //console.log(id);
-          
-        //   const addNotif = await addNotificacion(id, "Cambio de ubicacion", "Se ha cambiado de ubicacion un activo que te han asignado");
+          const addNotif = await addNotificacion(id, "Cambio de ubicacion", "Se ha cambiado de ubicacion un activo que te han asignado");
 
-        //   if(addNotif>0){
-        //     console.log("se ha actualizado la ubicacion");
-            
-        //   }
-        // }
+          if(addNotif>0){
+            isUpUbi = true;
+          }
+        }
         
       }
       
-      // let updated=false;
-      // if(!verifyCL){
-      //   const data = await cascadeUpdateAsignacion(diferentCL, diferentIdRespCL,"Designacion", "Te han designado de un activo");
-      //   console.log("designacion", data);
-      //   updated=true;
-      // }
-      // if(!verifyRP){
-      //   const data = await changeResponsableP();
-      //   console.log("change principal", data);
-      //   updated=true;
-      // }
+      let updated=false;
+      if(!verifyCL){
+        const data = await cascadeUpdateAsignacion(diferentCL, diferentIdRespCL,"Designacion", "Te han designado de un activo");
+        console.log("designacion", data);
+        updated=true;
+      }
+      if(!verifyRP){
+        const data = await changeResponsableP();
+        console.log("change principal", data);
+        updated=true;
+      }
 
-      // if(updated){
-      //   alert("Las asignaciones se han actualizado");
-      //   updated=false;
-      //   window.location.href = `http://localhost/CMMS/views/responsables/`;
-      // }
+
+      if(isUpUbi){
+        alert("actualizacion de ubicacion correcta");
+        if(!updated){
+          isUpUbi=false;
+          resetGlobals();
+          window.location.href = `http://localhost/CMMS/views/responsables/`;
+        }
+      }
+      if(updated){
+        updated=false;
+        alert("Las asignaciones se han actualizado");
+        resetGlobals();
+        window.location.href = `http://localhost/CMMS/views/responsables/`;
+      }
 
     }
   });
+
+  function resetGlobals(){
+    globals.id=localStorage.getItem("idresp_act");
+    globals.idactivo = localStorage.getItem("idactivo");
+    globals.contNof = 0;
+    globals.contResP = 0;
+    globals.contDes = 0;
+    globals.contIdResP = 0;
+    globals.contIdResDes = 0;
+    globals.idRes = 0;
+  }
 
   function selectChksRP(){
     recorrer_QSA("chk_es_responsable", "data-idresp");
@@ -202,6 +225,8 @@ document.addEventListener("DOMContentLoaded", () => {
     chks.forEach(x=>{
       x.addEventListener("click",()=>{
         disabledChksRP(`${name_selector}`);
+        // const id = x.getAttribute(`${nameAttribute}`);
+        // globals.idRes = parseInt(id);
         selector("update-test").disabled =false;
       });
     });
@@ -313,8 +338,8 @@ document.addEventListener("DOMContentLoaded", () => {
   async function getResPrincipal(idresp, idactivo) {
     const params = new URLSearchParams();
     params.append("operation", "getResponasblePrin");
-    params.append("idactivo_resp", parseInt(idresp));
-    params.append("idactivo", parseInt(idactivo));
+    params.append("idactivo_resp", idresp);
+    params.append("idactivo", idactivo);
 
     const data = await getDatos(`${globals.host}respActivo.controller.php`, params);
     return data[0];
@@ -327,6 +352,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const params = new URLSearchParams();
     params.append("operation", "ubiByActivo");
     params.append("idactivo", globals.idactivo);
+    params.append("idactivo_resp", globals.idRes);
 
     const data = await getDatos(`${globals.host}historialactivo.controller.php`, params);
     
@@ -351,9 +377,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function updateUbicacion(id) {
     //Insercion al historial
+    console.log("ubi enviar", parseInt(selector("ubicacion").value));
+    
     const params = new FormData();
     params.append("operation", "add");
-    params.append("idactivo_resp", parseInt(id));
+    params.append("idactivo_resp", id);
     params.append("idubicacion", parseInt(selector("ubicacion").value));
 
     const data = await fetch(`${globals.host}historialactivo.controller.php`, {
