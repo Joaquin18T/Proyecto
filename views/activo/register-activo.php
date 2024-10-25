@@ -25,13 +25,13 @@ require_once '../header.php'
               <div class="row mb-3 mt-2">
                 <div class="col-md-6">
                   <label for="subcategoria">SubCategorias</label>
-                  <select name="subcategorias" id="subcategoria" class="form-control w-75" required>
+                  <select name="subcategorias" id="subcategoria" class="form-control w-75" required autofocus>
                     <option value="">Selecciona</option>
                   </select>
                 </div>
                 <div class="col-6">
-                  <label for="">Marca</label>
-                  <select name="marcas" id="marca" class="form-control w-75" style="max-height: 50px; overflow-y: auto;" autofocus required>
+                  <label for="marca">Marca</label>
+                  <select name="marcas" id="marca" class="form-control w-75" style="max-height: 50px; overflow-y: auto;" required>
                     <option value="">Selecciona</option>
                   </select>
                 </div>
@@ -42,23 +42,27 @@ require_once '../header.php'
                   <input type="text" class="form-control w-75" placeholder="Modelo" id="modelo" minlength="3" required>
                 </div>
                 <div class="col-6">
-                  <label for="codigo">Codigo Ident.</label>
-                  <input type="text" class="form-control w-75" placeholder="Codido Ident." id="codigo" minlength="6" required maxlength="20">
+                  <label for="descripcion">Descripcion</label>
+                  <input type="text" class="form-control w-100" id="descripcion">
                 </div>
               </div>
-              <div class="row mb-6 mt-4">
+              <div class="row mt-4">
                 <div class="col-6">
                   <label for="fecha">Fecha Adquisicion</label>
                   <input type="date" class="form-control w-75" id="fecha" required>
                 </div>
-                <div class="col-6">
-                  <label for="descripcion">Descripcion</label>
-                  <input type="text" class="form-control w-100" id="descripcion" required minlength="15">
+                <div class="col-5">
+                  <label for="cantidad">Cantidad</label>
+                  <input type="number" class="form-control w-50" id="cantidad" min="0">
                 </div>
               </div>
               <div class="row mb-6 mt-4">
-                <div class="col-6 mx-auto">
-                  <button class="btn btn-sm btn-success w-75" type="submit" id="saveDatos">Save</button>
+                <div class="col-6">
+                  <button class="btn btn-sm btn-success w-75" type="button" id="showSB">Agregar Cods. Identf.</button>
+                </div>
+                <div class="col-3">
+                  <button class="btn btn-sm btn-info w-75" type="button" data-bs-toggle="offcanvas" 
+                  data-bs-target="#sb-code" id="only-view" disabled>Ver lista</button>
                 </div>
               </div>
             </div>
@@ -77,11 +81,11 @@ require_once '../header.php'
                 <div id="list-es">
                   <div class="row">
                     <div class="col-6">
-                      <label for="">Especificacion 1</label>
+                      <label>Especificacion 1</label>
                       <input type="text" class="form-control w-75 dataEs" required>
                     </div>
                     <div class="col-6 mb-0">
-                      <label for="">Valor</label>
+                      <label>Valor</label>
                       <input type="text" class="form-control w-75 dataEs" required>
                     </div>
                     <div class="col-4 mt-2">
@@ -97,64 +101,19 @@ require_once '../header.php'
     </div>
   </div>
 </div>
-<!-- <form class="form-group mt-5" autocomplete="off" id="form-activo">
-    <div>
-      <div class="row mb-3">
-        <div class="col-4">
-          <label for="subcategoria">SubCategorias</label>
-          <select name="subcategorias" id="subcategoria" class="form-control w-50" required>
-            <option value="">Selecciona</option>
-          </select>
-        </div>
-        <div class="col-4">
-          <label for="">Marca</label>
-          <select name="marcas" id="marca" class="form-control w-50" style="max-height: 50px; overflow-y: auto;" autofocus required>
-            <option value="">Selecciona</option>
-          </select>
-        </div>
-        <div class="col-4">
-          <label for="modelo">Modelo</label>
-          <input type="text" class="form-control w-50" placeholder="Modelo" id="modelo" minlength="5" required>
-        </div>
-      </div>
-      <div class="row mb-3">
-        <div class="col-4">
-          <label for="codigo">Codigo Ident.</label>
-          <input type="text" class="form-control w-50" placeholder="Codido Ident." id="codigo" minlength="6" required maxlength="20">
-        </div>
-        <div class="col-4">
-          <label for="fecha">Fecha Adquisicion</label>
-          <input type="date" class="form-control w-50" id="fecha" required>
-        </div>
-        <div class="col-4">
-          <label for="descripcion">Descripcion</label>
-          <input type="text" class="form-control w-75" id="descripcion" required minlength="15">
-        </div>
-      </div>
-      <div class="row mb-5">
-        <div class="col-4">
-          <button class="btn btn-sm btn-primary" type="submit" id="saveDatos">Save</button>
-        </div>
-      </div>
-      <div id="list-es">
-        <p>Especificaciones</p>
-        <div class="row">
-          <div class="col-4">
-            <label for="">Especificacion 1</label>
-            <input type="text" class="form-control w-50 dataEs" required>
-          </div>
-          <div class="col-3 mb-0">
-            <label for="">Valor</label>
-            <input type="text" class="form-control w-50 dataEs" required>
-          </div>
-          <div class="col-4">
-            <label for=""></label>
-            <button class="btn btn-primary btnAdd" type="button">AGREGAR</button>
-          </div>
-        </div>
+<!-- SIDEBAR PARA EL REGISTRO MULTIPLE (cod_identificacion) -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="sb-code" aria-labelledby="offcanvasRightLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="offcanvasRightLabel">Offcanvas right</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <div class="list-code" id="container-code">
 
-      </div>
     </div>
-  </form> -->
+    <button class="btn btn-sm btn-success w-50 mt-2" type="button" id="save">Guardar</button>
+  </div>
+</div>
+<!-- ./SIDEBAR PARA EL REGISTRO MULTIPLE (cod_identificacion) -->
 <?php require_once '../footer.php' ?>
 <script src="../../js/activos/register-activo.js"></script>

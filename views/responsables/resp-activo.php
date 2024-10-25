@@ -159,7 +159,7 @@ require_once '../header.php'; ?>
 </div>
 
 <?php require_once '../footer.php' ?>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script src="../../js/responsables/resp-activo.js"></script>
 </body>
 </html>

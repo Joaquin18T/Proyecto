@@ -57,4 +57,6 @@
 <!-- SWEET ALERT -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- Libreria que simplifica sweet alert -->
- <script src="http://localhost/linofino/js/swalcustom.js"></script>
+ <script src="http://localhost/CMMS/js/swalcustom.js"></script>
+ <!-- JQUERY -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

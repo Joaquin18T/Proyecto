@@ -155,8 +155,6 @@ require_once '../header.php';
 <!-- ./SIDEBAR DE ACTUALIZAR LA UBICACION -->
 
 <?php require_once '../footer.php' ?>
-<!-- JQUERY -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- LIBRERIA -->
 <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
 <script src="http://localhost/CMMS/js/responsables/index.js"></script>

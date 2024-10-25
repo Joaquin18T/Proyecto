@@ -499,7 +499,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.log("cant res: ",cantResp);
     
     if(cantResp>= 3){
-      alert("El activo seleccionado ha superado el limite de colaboradores");
+      alert("El activo seleccionado ha superado el limite de colaboradores, es necesario asignar un responsable principal");
       
       maxResp = true;
     }else{

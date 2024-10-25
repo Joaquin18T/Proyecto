@@ -38,7 +38,7 @@ CREATE TABLE `activos` (
   CONSTRAINT `fk_actsubcategoria` FOREIGN KEY (`idsubcategoria`) REFERENCES `subcategorias` (`idsubcategoria`),
   CONSTRAINT `fk_idestado` FOREIGN KEY (`idestado`) REFERENCES `estados` (`idestado`),
   CONSTRAINT `fkidmarca` FOREIGN KEY (`idmarca`) REFERENCES `marcas` (`idmarca`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `activos` */
 
@@ -57,7 +57,20 @@ insert  into `activos`(`idactivo`,`idsubcategoria`,`idmarca`,`idestado`,`modelo`
 (12,6,1,1,'HP LaserJet','HP-006','2023-06-18','Impresora láser','{\"tipo\": \"monocromo\", \"velocidad\": \"30ppm\"}'),
 (13,7,1,1,'LG Gram','LG-007','2023-07-22','Laptop ultraligera','{\"peso\": \"999g\", \"pantalla\": \"14in\"}'),
 (14,8,4,1,'ABB Robot IRB','ABB-008','2023-08-15','Robot industrial','{\"carga_util\": \"10kg\", \"alcance\": \"1.5m\"}'),
-(15,9,7,1,'FenWick Forklift','FW-009','2023-09-10','Montacargas eléctrico','{\"capacidad_carga\": \"2000kg\", \"batería\": \"24V\"}');
+(15,9,7,1,'FenWick Forklift','FW-009','2023-09-10','Montacargas eléctrico','{\"capacidad_carga\": \"2000kg\", \"batería\": \"24V\"}'),
+(16,9,2,1,'FR 55','F34UWDAS','2024-10-18','Impresora 2021','{\"wifi\":\"si\"}'),
+(17,9,2,1,'FR 55','345WDAS','2024-10-18','Impresora 2021','{\"wifi\":\"si\"}'),
+(18,1,1,1,'F5S R V','54SDDSFS','2024-10-23','Computadora LG ','{\"ram\":\"64\",\"tarjeta de video\":\"Nvidia 3060\"}'),
+(19,1,1,1,'F5S R V','FFR45SGG','2024-10-23','Computadora LG ','{\"ram\":\"64\",\"tarjeta de video\":\"Nvidia 3060\"}'),
+(20,11,1,1,'RG F7','F546DSDFD','2024-10-21','Teclado LG RG F3','{\"esNumerico\":\"no\"}'),
+(21,11,1,1,'RG F7','H7DSDSGS','2024-10-21','Teclado LG RG F3','{\"esNumerico\":\"no\"}'),
+(22,5,6,1,'i20','5FHSDFDDF','2024-10-22','Hyundai i20','{\"color\":\"blanco\"}'),
+(23,5,6,1,'i20','DSFSD43543','2024-10-22','Hyundai i20','{\"color\":\"blanco\"}'),
+(24,4,7,1,'VR D','F45YDSDS','2024-10-24','Generador Fenwick VR D','{\"peso\":\"20\"}'),
+(25,6,3,1,'Sentra','G45FDDSD','2024-10-20','Camioneta Nissan Sentra','{\"color\":\"Negro\"}'),
+(26,3,8,1,'CD 5','D34TSDSA','2024-10-24','Maquinaria ABB CD 5','{\"peso\":\"90 kg\"}'),
+(27,2,1,1,'NR 5','F45YSFSDFS1','2024-10-24','Laptop LG NR 5','{\"ram\":\"64\"}'),
+(28,10,1,1,'HR 5','FE56DSDD','2024-10-24','Monitor LG HR 5','{\"hz\":\"120\"}');
 
 /*Table structure for table `activos_responsables` */
 
@@ -92,7 +105,7 @@ CREATE TABLE `activos_responsables` (
 insert  into `activos_responsables`(`idactivo_resp`,`idactivo`,`idusuario`,`es_responsable`,`fecha_asignacion`,`fecha_designacion`,`condicion_equipo`,`imagenes`,`descripcion`,`autorizacion`,`solicitud`) values 
 (1,1,2,'0','2024-10-23','2024-10-23','En perfectas condiciones','{\"imagen1\":\"http://nose/que/poner\"}','equipo de trabajo',1,1),
 (2,1,3,'0','2024-10-23','2024-10-23','Nuevo','{\"imagen1\":\"https://ejemplo.com/imagenes/lg_ultragear.jpg\"}','Asignación a usuario',1,1),
-(3,2,4,'0','2024-10-23',NULL,'Este activo esta sin problemas','{\"imagen1\":\"https://ejemplo.com/imagenes/hp_pavilion.jpg\"}','Uso diario',1,1),
+(3,2,4,'0','2024-10-23','2024-10-24','Este activo esta sin problemas','{\"imagen1\":\"https://ejemplo.com/imagenes/hp_pavilion.jpg\"}','Uso diario',1,1),
 (4,3,5,'0','2024-10-23',NULL,'En buenas condiciones','{\"imagen1\":\"https://ejemplo.com/imagenes/caterpillar_320.jpg\"}','Asignación a proyecto',1,1),
 (5,4,6,'0','2024-10-23',NULL,'Tienes fallos en el motor','{\"imagen1\":\"https://ejemplo.com/imagenes/nissan_frontier.jpg\"}','Camioneta de trabajo',14,1),
 (6,5,7,'0','2024-10-23',NULL,'Nuevo','{\"imagen1\":\"https://ejemplo.com/imagenes/hyundai_generator.jpg\"}','Generador de respaldo',1,1),
@@ -358,7 +371,7 @@ CREATE TABLE `notificaciones` (
   PRIMARY KEY (`idnotificacion`),
   KEY `fk_idusuario_notif` (`idusuario`),
   CONSTRAINT `fk_idusuario_notif` FOREIGN KEY (`idusuario`) REFERENCES `usuarios` (`id_usuario`)
-) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `notificaciones` */
 
@@ -388,7 +401,9 @@ insert  into `notificaciones`(`idnotificacion`,`idusuario`,`tipo`,`mensaje`,`est
 (24,7,'Cambio de ubicacion','Se ha cambiado de ubicacion un activo que te han asignado','no leido','2024-10-23 22:51:59'),
 (25,7,'Cambio de responsabl','Ya no eres responsable principal del activo','no leido','2024-10-23 22:51:59'),
 (26,11,'Cambio de ubicacion','Se ha cambiado de ubicacion un activo que te han asignado','no leido','2024-10-23 22:59:18'),
-(27,11,'Cambio de responsabl','Ya no eres responsable principal del activo','no leido','2024-10-23 22:59:18');
+(27,11,'Cambio de responsabl','Ya no eres responsable principal del activo','no leido','2024-10-23 22:59:18'),
+(28,4,'Cambio de responsabl','Ya no eres responsable principal del activo','no leido','2024-10-24 18:29:03'),
+(29,4,'Designacion','Te han designado de un activo','no leido','2024-10-24 18:36:25');
 
 /*Table structure for table `odt` */
 
@@ -2354,8 +2369,8 @@ BEGIN
     WHERE 	(SUB.idsubcategoria = _idsubcategoria OR _idsubcategoria IS NULL) AND
 			(UBI.idubicacion = _idubicacion OR _idubicacion IS NULL) AND
 			(ACT.cod_identificacion LIKE CONCAT('%', _cod_identificacion, '%') OR _cod_identificacion IS NULL) AND 
-            RES.fecha_designacion IS NULL
-            -- ACT.idestado BETWEEN 1 AND 2
+            -- RES.fecha_designacion IS NULL
+            ACT.idestado BETWEEN 1 AND 2
     GROUP BY ACT.idactivo
     ORDER BY RES.idactivo_resp asc;
 END */$$

@@ -58,12 +58,14 @@ document.addEventListener("DOMContentLoaded", () => {
     return data;
   }
 
-  (async()=>{
-    const {idactivo_resp} = await getResPrincipal(globals.id, globals.idactivo);
-    globals.idRes = idactivo_resp;
-  })();
+  // (async()=>{
+  //   const {idactivo_resp} = await getResPrincipal(globals.id, globals.idactivo);
+  //   globals.idRes = idactivo_resp;
+  // })();
 
   (async () => {
+    const {idactivo_resp} = await getResPrincipal(globals.id, globals.idactivo);
+    globals.idRes = idactivo_resp;
     const data = await getDatos("http://localhost/CMMS/controllers/ubicacion.controller.php", "operation=getAll");
     data.forEach(x => {
       //console.log(x);
@@ -86,7 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     
     data.forEach(x=>{
-      selector("tb-asignacion").innerHTML+=`
+      selector("body-tb-asignacion").innerHTML+=`
       <tr>
         <td>${x.id_usuario}</td>
         <td>${x.apellidos}</td>
@@ -99,6 +101,39 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     checkingChkEs_resp();
     getChksBefore();
+    createTable(data);
+  }
+
+  function createTable(data){
+    let rows = $("#body-tb-asignacion").find("tr");
+    //console.log(rows.length);
+    if(data.length>0){
+      if (globals.myTable) {
+        if (rows.length > 0) {
+          globals.myTable.clear().rows.add(rows).draw();
+        } else if(rows.length===1){
+          globals.myTable.clear().draw(); // Limpia la tabla si no hay filas.
+        }
+      } else {
+        // Inicializa DataTable si no ha sido inicializado antes
+        globals.myTable = $("#tb-asignacion").DataTable({
+          paging: true,
+          searching: false,
+          lengthMenu: [5, 10, 15, 20],
+          pageLength: 5,
+          language: {
+            lengthMenu: "Mostrar _MENU_ filas por página",
+            paginate: {
+              previous: "Anterior",
+              next: "Siguiente",
+            },
+            search: "Buscar:",
+            info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+            emptyTable: "No se encontraron registros"
+          },
+        });
+      }
+    }
   }
 
   selector("ubicacion").addEventListener("change",()=>{
@@ -197,7 +232,6 @@ document.addEventListener("DOMContentLoaded", () => {
         resetGlobals();
         window.location.href = `http://localhost/CMMS/views/responsables/`;
       }
-
     }
   });
 

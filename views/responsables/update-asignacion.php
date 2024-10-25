@@ -78,14 +78,20 @@ require_once '../header.php';
                             <col style="width:1%">
                             <col style="width:1%">
                           </colgroup>
-                          <tr>
-                            <th>ID</th>
-                            <th>Apellidos</th>
-                            <th>Nombres</th>
-                            <th>Usuario</th>
-                            <th>R. Princ.</th>
-                            <th>Designar</th>
-                          </tr>
+                          <thead>
+                            <tr>
+                              <th>ID</th>
+                              <th>Apellidos</th>
+                              <th>Nombres</th>
+                              <th>Usuario</th>
+                              <th>R. Princ.</th>
+                              <th>Designar</th>
+                            </tr>
+                          </thead>
+                          <tbody id="body-tb-asignacion">
+
+                          </tbody>
+
                         </table>
                       </div>
                     </div>
@@ -100,8 +106,6 @@ require_once '../header.php';
   </div>
 </div>
 <?php require_once '../footer.php' ?>
-<!-- JQUERY -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- LIBRERIA -->
 <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
 <script src="http://localhost/CMMS/js/responsables/update-asignacion.js"></script>
