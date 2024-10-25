@@ -1,8 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
-  let listchks = [];
+  let list_codes = [];
+  let contClick = 0;
+  let contCodeInputs=0;
+
   let valores = [];
   let contEspecificaciones = 2;
-  let isClicked = false;
   let isnoEmpty = false;
 
   let cap = "";
@@ -15,7 +17,6 @@ document.addEventListener("DOMContentLoaded", () => {
     txtEscec = {},
     contEspec = 1;
 
-  let contButtons = document.querySelectorAll(".btnAdd");
   let isvalidate = true;
   let validateEspec = true;
 
@@ -111,26 +112,87 @@ document.addEventListener("DOMContentLoaded", () => {
   function valideWhiteSpace() {
     txtIdmarca = selector("marca").value;
     txtModelo = selector("modelo").value;
-    txtCode = selector("codigo").value;
+    //txtCode = selector("codigo").value;
     let subcategoria = selector("subcategoria").value;
     txtdescrip = selector("descripcion").value;
 
-    let list = [subcategoria, txtIdmarca, txtModelo, txtCode, txtdescrip];
+    let list = [subcategoria, txtIdmarca, txtModelo, txtdescrip];
 
     const isValidate = list.every((x) => x.trim().length > 0);
-    console.log("alert activo");
+    //console.log("alert activo");
 
     return isValidate;
   }
 
-  async function saveData() {
-    let isUnique = await searchCode();
-    //console.log(isUnique);
+  async function cascadeAddActivo(data=[]){
+    let cont=0;
+    for (let i = 0; i < data.length; i++) {
+      const isAdd = await saveData(data[i]);
+      if (isAdd>0){
+        console.log("agregado");
+        cont++;
+      }
+    }
+    return (cont===data.length);
+  }
+  selector("showSB").addEventListener("click",()=>{
+    if(parseInt(selector("cantidad").value)>0){
+      selector("only-view").disabled=false;
+      
+      addInputsCode(parseInt(selector("cantidad").value));
 
-    if (isUnique.length === 0) {
+      const sidebar = selector("sb-code");
+      const offCanvas = new bootstrap.Offcanvas(sidebar);
+      offCanvas.show();
+    }else{
+      alert("Lo minimo es 1");
+    }
+  });
+
+  function addInputsCode(cantidad){
+    const countInputs = document.querySelectorAll(".element-cod").length;
+    console.log(countInputs);
+    
+    for (contCodeInputs; contCodeInputs < cantidad; contCodeInputs++) {
+      const container = selector("container-code");
+      const div = document.createElement("div");
+      div.classList.add("mb-2", "mt-4");
+
+      const label = document.createElement("label");
+      label.classList.add("form-label");
+      label.textContent = `Codigo del activo Nº. ${contCodeInputs+1}`;
+
+      const input = document.createElement("input");
+      input.classList.add("form-control", "w-75", "element-cod");
+
+      div.appendChild(label);
+      div.appendChild(input);
+
+      container.appendChild(div);
+    }
+    //cantidad=0;
+  }
+
+
+  function getAllCodesSB(){
+    const codesSB = document.querySelectorAll(".element-cod");
+
+    codesSB.forEach(x=>{
+      console.log(x.value);
+      list_codes.push(x.value);
+    });
+    console.log(list_codes);
+    
+  }
+
+  async function saveData(code) {
+    //let isUnique = await searchCode(); verificar esto
+
+    let dataBack=0;
+    if (true) {
       txtIdmarca = selector("marca").value;
       txtModelo = selector("modelo").value;
-      txtCode = selector("codigo").value;
+      txtCode = code;
       txtfecha = selector("fecha").value;
       txtdescrip = selector("descripcion").value;
       //let txtIdUbi = selector("ubicacion").value;
@@ -155,8 +217,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       isvalidate = list.every((x) => x.trim().length > 0);
 
-      //console.log(txtIdUbi);
-
+      
       if (isvalidate && Object.keys(txtEscec).length > 0 && validateEspec) {
         const params = new FormData();
         params.append("operation", "add");
@@ -169,37 +230,30 @@ document.addEventListener("DOMContentLoaded", () => {
         params.append("descripcion", txtdescrip);
         params.append("especificaciones", JSON.stringify(txtEscec));
 
-        const option = {
+        const data = await fetch("http://localhost/CMMS/controllers/activo.controller.php",{
           method: "POST",
-          body: params,
-        };
-        fetch(`http://localhost/CMMS/controllers/activo.controller.php`, option)
-          .then((response) => response.json())
-          .then((data) => {
-            //console.log(data);
+          body: params
+        });
+        
+        const respuesta = await data.json();
 
-            if (data.idactivo > 0) {
-              alert("Activo registrado");
-              resetUI();
-            } else {
-              alert("Activo no registrado");
-            }
-          });
+        dataBack = respuesta.idactivo;
       } else {
         alert("Completa los campos");
-
         validateEspec = true;
       }
     } else {
       alert("El codigo no es unico");
+      //return 0;
       //Crear un array de objetos con las alertas, esa funcion tendra que pasarle un parametro, ejm:
       //alertArray("unico") Esta funcion mostrara una alerta de que el codigo no es unico de acuerdo a que debe
       // ser igual que la clave del objeto con el mensaje
     }
+    return dataBack;
   }
 
-  selector("form-activo").addEventListener("submit", (e) => {
-    e.preventDefault();
+  selector("save").addEventListener("click", async(e) => {
+    //e.preventDefault();
     const dateToday = getDate();
     catchData();
 
@@ -212,7 +266,20 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log(valores);
 
       if (confirm("Deseas registrar el activo?")) {
-        saveData();
+        getAllCodesSB();
+        const allSave = await cascadeAddActivo(list_codes);
+        if(allSave){
+          alert("Los registros se han guardado correctamente");
+          list_codes=[];
+          const sidebar = bootstrap.Offcanvas.getOrCreateInstance(
+            selector("sb-code")
+          );
+          sidebar.hide();
+          selector("cantidad").value=0;
+          contCodeInputs=0;
+          selector("only-view").disabled = true;
+          resetUI();
+        }
       }
     } else {
       if (!valideWhiteSpace()) {
@@ -427,7 +494,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function resetUI() {
     selector("marca").value = "";
     selector("modelo").value = "";
-    selector("codigo").value = "";
+    //selector("codigo").value = "";
     selector("fecha").value = getDate();
     selector("descripcion").value = "";
     selector("subcategoria").value = "";
@@ -451,5 +518,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     contEspecificaciones = 2;
     valores = [];
+
+    selector("container-code").innerHTML="";
   }
 });

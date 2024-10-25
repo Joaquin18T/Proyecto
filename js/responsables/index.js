@@ -193,7 +193,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     const data = await getDataUsuarios(params);
     return data;
   }
-
+  
   function renderListUsers(data=[]){
     const list = selector("list-users");
     list.innerHTML="";
