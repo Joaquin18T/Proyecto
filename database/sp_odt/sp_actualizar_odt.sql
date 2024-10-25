@@ -26,4 +26,20 @@ BEGIN
     WHERE iddiagnostico = _iddiagnostico;
 END //
 
-select * from diagnosticos;
+DROP PROCEDURE IF EXISTS `actualizarDetalleOdt`
+DELIMITER //
+CREATE PROCEDURE `actualizarDetalleOdt`
+(
+	IN _iddetalleodt INT,
+    IN _fechafinal DATETIME,
+    IN _tiempoejecucion TIME,
+    IN _clasificacion INT
+)
+BEGIN
+	UPDATE detalle_odt SET
+    fecha_final = _fechafinal,
+    tiempo_ejecucion = _tiempoejecucion,
+    clasificacion = _clasificacion
+    WHERE iddetalleodt = _iddetalleodt;
+END //
+

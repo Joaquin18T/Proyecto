@@ -14,6 +14,7 @@ $(document).ready(async () => {
 
   //ESTADOS
   let hayDiagnostico = false
+  let hayDetalle = false
 
   //variables globales
   const host = "http://localhost/CMMS/controllers/";
@@ -21,19 +22,28 @@ $(document).ready(async () => {
   let idtarea = -1
   let iddiagnosticoEntrada = -1
   let iddiagnosticoSalidaGenerado = -1;
+  let iddetalleodtGenerado = -1
 
   //UI
   const txtDiagnosticoEntrada = $q("#txtDiagnosticoEntrada")
   const txtDiagnosticoSalida = $q("#diagnostico-salida")
+  const txtFechaInicial = $q("#txtFechaInicial")
+  const txtFechaFinal = $q("#txtFechaFinal")
+  const txtTiempoEjecucion = $q("#txtTiempoEjecucion")
   const contenedorDetallesOdtEntrada = $q(".contenedor-detallesOdtEntrada") // DIV
   const contenedorResponsablesOdt = $q(".contenedor-responsablesOdt")
-  const contenedorBtnAbrirSideModal = $q("#contenedor-btn-abrirSideModal")
-  const contenedorEvidenciaPrevia = $q("#contenedor-evidencia-previa")
+  const contenedorEvidenciaPreviaEntrada = $q("#preview-container-entrada")
+  const contenedorEvidenciaPreviaSalida = $q("#preview-container")
+
+  //BOTONES
+  const evidenciasInput = $q("#evidencias-img-input")
+  const btnIniciar = $q("#btn-iniciar")
+  const btnFinalizar = $q("#btn-finalizar")
 
   //Ejecutar funciones 
   await obtenerOdt() // paso 1 
   await obtenerDiagnostico(1)
-  await obtenerEvidencias() // paso 3
+  //await obtenerEvidencias() // paso 3
   await obtenerTareaPorId(idtarea) // paso 4
   await obtenerActivosPorTarea(idtarea)
   await obtenerResponsablesAsignados()
@@ -43,12 +53,10 @@ $(document).ready(async () => {
   await renderDetalles()
   await renderResponsables()
   await verificarCantidadEvidenciasEntrada()
+  //alert("holaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
   await verificarDiagnosticoSalidaRegistrado()
-
-  //BOTONES
-  const evidenciasInput = $q("#evidencias-img-input")
-  const btnIniciar = $q("#btn-iniciar")
-  const btnFinalizar = $q("#btn-finalizar")
+  await verificarEvidenciasRegistradas()
+  await verificarDetalleOdtRegistrado()
 
 
 
@@ -64,11 +72,11 @@ $(document).ready(async () => {
     return odt
   }
 
-  async function obtenerEvidencias() {
-    console.log("ID DIAGNOSTICO AAA: ", iddiagnosticoEntrada)
+  async function obtenerEvidencias(iddiagnostico) {
+    console.log("ID DIAGNOSTICO AAA: ", iddiagnostico)
     const params = new URLSearchParams()
     params.append("operation", "obtenerEvidenciasDiagnostico")
-    params.append("iddiagnostico", iddiagnosticoEntrada)
+    params.append("iddiagnostico", iddiagnostico)
     const evidencias = await getDatos(`${host}diagnostico.controller.php`, params)
     console.log("evidencias: ", evidencias)
     return evidencias
@@ -80,8 +88,7 @@ $(document).ready(async () => {
     paramsDiagnosticoBuscar.append("idordentrabajo", idordengenerada)
     paramsDiagnosticoBuscar.append("idtipodiagnostico", tipo)
     const diagnosticoObtenido = await getDatos(`${host}diagnostico.controller.php`, paramsDiagnosticoBuscar)
-    console.log("diagnostico de salida: ", diagnosticoObtenido)
-    iddiagnosticoEntrada = diagnosticoObtenido[0]?.iddiagnostico
+    console.log("diagnostico de entrada: ", diagnosticoObtenido)
     return diagnosticoObtenido
   }
 
@@ -111,6 +118,14 @@ $(document).ready(async () => {
     return responsables
   }
 
+  async function obtenerDetalleOdt() {
+    const params = new URLSearchParams()
+    params.append("operation", "obtenerDetalleOdt")
+    params.append("idordentrabajo", idordengenerada)
+    const detalleOdt = getDatos(`${host}ordentrabajo.controller.php`, params)
+    return detalleOdt
+  }
+
   //***************************** FIN DE SECCION DE OBTENER DATOS ******************************** */
 
   // ************************************SECCION DE REGISTROS *************************************
@@ -124,6 +139,16 @@ $(document).ready(async () => {
     const FidDiagnosticoRegistrado = await fetch(`${host}diagnostico.controller.php`, { method: "POST", body: formDiagnostico })
     const idDiagnosticoRegistrado = await FidDiagnosticoRegistrado.json()
     return idDiagnosticoRegistrado
+  }
+
+  async function registrarDetalleOdt() {
+    const formRegistroDetalleOdt = new FormData()
+    formRegistroDetalleOdt.append("operation", "registrarDetalleOdt")
+    formRegistroDetalleOdt.append("idodt", idordengenerada)
+    formRegistroDetalleOdt.append("clasificacion", 9)
+    const fDetalleOdt = await fetch(`${host}ordentrabajo.controller.php`, { method: 'POST', body: formRegistroDetalleOdt })
+    const id = await fDetalleOdt.json()
+    return id
   }
 
   //* ******************************* FIN DE SECCION DE REGISTRO *********************************
@@ -140,13 +165,38 @@ $(document).ready(async () => {
     return actualizado
   }
 
+  async function actualizarDetalleOdt(fechaFinal, tiempoEjecucion) {
+    const formActualizacion = new FormData()
+    formActualizacion.append("operation", "actualizarDetalleOdt");
+    formActualizacion.append("iddetalleodt", iddetalleodtGenerado); // El ID generado
+    formActualizacion.append("fechafinal", fechaFinal); // Fecha final actual
+    formActualizacion.append("tiempoejecucion", tiempoEjecucion); // Tiempo de ejecución calculado
+    formActualizacion.append("clasificacion", 11);
+    const fActualizado = await fetch(`${host}ordentrabajo.controller.php`, { method: 'POST', body: formActualizacion })
+    const actualizado = await fActualizado.json()
+    return actualizado
+  }
+
   //****************************** FIN DE SECCION DE ACTUALIZACIONES ********************************** */
+
+  //******************************** SECCION DE ELIMINACIONES ******************************************** */
+
+  async function eliminarEvidenciaOdt(idevidencia) {
+    const formEliminacion = new FormData()
+    formEliminacion.append("operation", "eliminarEvidencia")
+    const fEliminado = await fetch(`${host}diagnostico.controller.php/${idevidencia}`, { method: 'POST', body: formEliminacion })
+    const eliminado = await fEliminado.json()
+    return eliminado
+  }
+
+  // ******************************* FIN DE SECCION DE ELIMINACIONES ****************************************
 
   // **************************** SECCION DE RENDERIZAR INTERFAZ CON DATOS ****************************** */
 
   async function renderDiagnosticoEntrada() {
     const diagnosticoEntrada = await obtenerDiagnostico(1) // entrada
     console.log("diagnosticoEntrada: ", diagnosticoEntrada)
+    iddiagnosticoEntrada = diagnosticoEntrada[0]?.iddiagnostico
     txtDiagnosticoEntrada.innerHTML = diagnosticoEntrada[0].diagnostico
   }
 
@@ -181,22 +231,39 @@ $(document).ready(async () => {
 
   //**************************** SECCION DE MODALES ******************************************************* */
 
-  async function abrirModalSidebar() {
+  async function abrirModalSidebar(iddiagnostico) {
     const modalEvidenciasContainer = document.getElementById("modal-evidencias-container");
     modalEvidenciasContainer.innerHTML = ''; // Limpiar el contenedor
 
-    const evidenciasObtenidas = await obtenerEvidencias(iddiagnosticoEntrada);
+    const evidenciasObtenidas = await obtenerEvidencias(iddiagnostico);
     console.log("Evidencias obtenidas: ", evidenciasObtenidas);
 
     // Iterar sobre cada evidencia y crear elementos de imagen
     evidenciasObtenidas.forEach(evidenciaObj => {
       const imgSrc = evidenciaObj.evidencia;
       modalEvidenciasContainer.innerHTML += `
-        <div class="mb-3 text-center" data-id="${evidenciaObj.idevidencias_diagnostico}">
-            <img src="http://localhost/CMMS/dist/images/evidencias/${imgSrc}" width=450 alt="Evidencia ${imgSrc}">            
+        <div class="card mb-3 text-center" data-id="${evidenciaObj.idevidencias_diagnostico}">
+            <img src="http://localhost/CMMS/dist/images/evidencias/${imgSrc}" class="card-img-top modal-img" width=450 alt="Evidencia ${imgSrc}">            
+            <div class="card-footer">
+              <button class="btn btn-primary btn-evidencia-eliminar" data-id="${evidenciaObj.idevidencias_diagnostico}">Eliminar</button>
+            </div>
         </div>
       `
     });
+
+    const btnsEvidenciaEliminar = $all(".btn-evidencia-eliminar")
+    btnsEvidenciaEliminar.forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const idevidencia = btn.getAttribute("data-id")
+        console.log("id evidencia: ", idevidencia)
+        const eliminado = await eliminarEvidenciaOdt(idevidencia);
+        console.log("evidencia eliminado: ", eliminado)
+        const listItem = document.querySelector(`div[data-id="${idevidencia}"]`);
+        if (listItem) {
+          listItem.remove();
+        }
+      })
+    })
   }
 
   // ************************* FIN DE SECCION DE MODALES **************************************************
@@ -208,25 +275,28 @@ $(document).ready(async () => {
     console.log("cantidad de evidencias: ", evidenciasObtenidas);
     if (evidenciasObtenidas.length > 1) {
       console.log("hay mucha evidencias apartir de 1s")
-      //CREACION DE UN BOTON PARA MOSTRAR EL MODAL SIDEBAR
-      contenedorBtnAbrirSideModal.innerHTML = `
-        <button class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRightEvidencias" id="btnAbrirModalSidebar">
+      //CREACION DE UN BOTON PARA MOSTRAR EL MODAL SIDEBAR      
+      contenedorEvidenciaPreviaEntrada.innerHTML = ""
+      contenedorEvidenciaPreviaEntrada.innerHTML = `
+        <div class="card mb-3 text-center">
+            <img src="http://localhost/CMMS/dist/images/evidencias/${evidenciasObtenidas[0].evidencia}" class="img-fluid rounded-start card-img-top" alt="..." style="max-width: 500px;">
+            <div class="card-footer">
+                <button class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRightEvidencias" id="btnAbrirModalSidebarEntrada">
           Ver todas las evidencias
         </button> 
+            </div>
+        </div>   
+        
       `
-      contenedorEvidenciaPrevia.innerHTML = ""
-      contenedorEvidenciaPrevia.innerHTML = `
-        <img src="http://localhost/CMMS/dist/images/evidencias/${evidenciasObtenidas[0].evidencia}" class="img-fluid rounded-start" alt="...">
-      `
-      const btnAbrirModalSidebar = $q("#btnAbrirModalSidebar")
-      btnAbrirModalSidebar.addEventListener("click", () => {
+      const btnAbrirModalSidebarEntrada = $q("#btnAbrirModalSidebarEntrada")
+      btnAbrirModalSidebarEntrada.addEventListener("click", async () => {
         console.log("clickeando dxdxdxd")
-        abrirModalSidebar()
+        await abrirModalSidebar(iddiagnosticoEntrada)
       })
     } else {
       evidenciasObtenidas.forEach(evidencia => {
-        contenedorEvidenciaPrevia.innerHTML = ""
-        contenedorEvidenciaPrevia.innerHTML = `
+        contenedorEvidenciaPreviaEntrada.innerHTML = ""
+        contenedorEvidenciaPreviaEntrada.innerHTML = `
           <img src="http://localhost/CMMS/dist/images/evidencias/${evidenciasObtenidas[0].evidencia}" class="img-fluid rounded-start" alt="...">
         `
       })
@@ -239,6 +309,7 @@ $(document).ready(async () => {
       hayDiagnostico = true
       alert("ya hay un diagnostico registrado")
       txtDiagnosticoSalida.value = diagnostico[0].diagnostico
+      console.log("DIAGNOSTICO TRAIDO: ", diagnostico)
       iddiagnosticoSalidaGenerado = diagnostico[0].iddiagnostico
       return
     } else {
@@ -250,6 +321,57 @@ $(document).ready(async () => {
       iddiagnosticoSalidaGenerado = diagnostico.id
       console.log("iddiagnosticoSalidaGenerado: ", iddiagnosticoSalidaGenerado)
       return
+    }
+  }
+
+  async function verificarEvidenciasRegistradas() {
+    const evidenciasObtenidas = await obtenerEvidencias(iddiagnosticoSalidaGenerado);
+    console.log("Evidencias obtenidas: ", evidenciasObtenidas);
+    //previewContainer.innerHTML = ''
+    if (evidenciasObtenidas.length > 0) {
+      contenedorEvidenciaPreviaSalida.innerHTML = `
+        <div class="card mb-3 text-center">
+            <img src="http://localhost/CMMS/dist/images/evidencias/${evidenciasObtenidas[0].evidencia}" class="card-img-top modal-img" alt="Evidencia" style="max-width: 500px;">
+            <div class="card-footer">
+                <button class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRightEvidencias" id="btnAbrirModalSidebarSalida">
+                    Ver todas las evidencias
+                </button>
+            </div>
+        </div>        
+        `
+      const btnAbrirModalSidebarSalida = $q("#btnAbrirModalSidebarSalida")
+      btnAbrirModalSidebarSalida.addEventListener("click", async () => {
+        console.log("clickeando dxdxdxd")
+        await abrirModalSidebar(iddiagnosticoSalidaGenerado)
+      })
+    }
+  }
+
+  async function verificarDetalleOdtRegistrado() {
+    const detalleOdt = await obtenerDetalleOdt()
+    console.log("DETALLE ODT DESPUES DE VERIFICAR: ", detalleOdt)
+    if (detalleOdt.length == 1 || detalleOdt.length > 1) {
+      hayDetalle = true
+      alert("ya hay un detalle odt registrado")
+      //render *****************************************************************
+      txtFechaInicial.innerText = detalleOdt[0].fecha_inicial ? detalleOdt[0].fecha_inicial : ''
+      txtFechaFinal.innerText = detalleOdt[0].fecha_final ? detalleOdt[0].fecha_final : ''
+      txtTiempoEjecucion.innerText = detalleOdt[0].tiempo_ejecucion ? detalleOdt[0].tiempo_ejecucion : ''
+      //fin render *************************************************************
+      iddetalleodtGenerado = detalleOdt[0].iddetalleodt
+      btnIniciar.disabled = true
+      btnIniciar.removeAttribute("id")
+      btnFinalizar.disabled = true
+      btnFinalizar.removeAttribute("id")
+      //console.log("btnIniciar: ", btnIniciar)
+      return
+    } else {
+      btnIniciar.disabled = false
+      btnFinalizar.disabled = false
+      txtFechaInicial.innerText = ''
+      txtFechaFinal.innerText = ''
+      txtTiempoEjecucion.innerText = ''
+      iddetalleodtGenerado = -1
     }
   }
 
@@ -275,7 +397,7 @@ $(document).ready(async () => {
       // Crear el objeto FormData y añadir los datos
       const formEvidencia = new FormData();
       formEvidencia.append("operation", "registrarEvidenciaDiagnostico")
-      formEvidencia.append("iddiagnostico", iddiagnosticoGenerado);
+      formEvidencia.append("iddiagnostico", iddiagnosticoSalidaGenerado);
       formEvidencia.append("evidencia", evidenciaImagen); // Aquí se añade el archivo de evidencia (imagen)
 
       try {
@@ -288,21 +410,21 @@ $(document).ready(async () => {
           // Renderizar imagen y botón usando HTML directo
           const imgSrc = URL.createObjectURL(evidenciaImagen); // Crear URL temporal de la imagen
 
-          previewContainer.innerHTML = `
+          contenedorEvidenciaPreviaSalida.innerHTML = `
                     <div class="card mb-3 text-center">
                         <img src="${imgSrc}" class="card-img-top modal-img" alt="Evidencia" style="max-width: 500px;">
                         <div class="card-footer">
-                            <button class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRightEvidencias" id="btnAbrirModalSidebar">
+                            <button class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRightEvidencias" id="btnAbrirModalSidebarSalida">
                                 Ver todas las evidencias
                             </button>
                         </div>
                     </div>
                 `;
           //
-          const btnAbrirModalSidebar = $q("#btnAbrirModalSidebar")
-          btnAbrirModalSidebar.addEventListener("click", () => {
+          const btnAbrirModalSidebarSalida = $q("#btnAbrirModalSidebarSalida")
+          btnAbrirModalSidebarSalida.addEventListener("click", async () => {
             console.log("clickeando dxdxdxd")
-            abrirModalSidebar()
+            await abrirModalSidebar(iddiagnosticoSalidaGenerado)
           })
 
         } else {
@@ -315,9 +437,58 @@ $(document).ready(async () => {
     }
   })
 
-  btnIniciar.addEventListener("click", async ()=>{
+  btnIniciar.addEventListener("click", async () => {
     const actualizado = await actualizarDiagnosticoSalida()
+    const detalleRegistrado = await registrarDetalleOdt()
+    btnIniciar.disabled = true
+    btnIniciar.removeAttribute("id")
+    iddetalleodtGenerado = detalleRegistrado.id
+    const detalleOdt = await obtenerDetalleOdt() // detalleRegistrado => id
+    console.log("Detalle odt obtenido: ", detalleOdt)
+    txtFechaInicial.innerText = `${detalleOdt[0].fecha_inicial}`
+    console.log("detalle registrado: ", detalleRegistrado)
     console.log("actualizado diagnostico salida:? ", actualizado)
+  })
+
+  btnFinalizar.addEventListener("click", async () => {
+    // Obtener la fecha actual como fecha final
+    const fechaFinal = new Date().toLocaleString('en-CA', { hour12: false }).replace(',', '').replace('/', '-').replace('/', '-');
+    console.log("FECHA FINAL OBTENIDA: ", fechaFinal)
+    // Obtener el detalle ODT registrado (deberías tener la fecha inicial en la base de datos)
+    const detalleOdt = await obtenerDetalleOdt(); // Esto ya trae la fecha_inicial
+
+    if (detalleOdt.length > 0) {
+      // Calculamos la fecha inicial (en formato Date)
+      const fechaInicial = new Date(detalleOdt[0].fecha_inicial);
+      console.log("fechaInicial: ", fechaInicial)
+      // Calculamos la diferencia en milisegundos entre fecha_final y fecha_inicial
+      const tiempoEjecucionMs = new Date(fechaFinal) - fechaInicial;
+      // Convertir la diferencia a horas, minutos y segundos
+      const tiempoEjecucionHoras = Math.floor(tiempoEjecucionMs / (1000 * 60 * 60));
+      const tiempoEjecucionMinutos = Math.floor((tiempoEjecucionMs % (1000 * 60 * 60)) / (1000 * 60));
+      const tiempoEjecucionSegundos = Math.floor((tiempoEjecucionMs % (1000 * 60)) / 1000);
+
+      const tiempoEjecucion = `${tiempoEjecucionHoras.toString().padStart(2, '0')}:${tiempoEjecucionMinutos.toString().padStart(2, '0')}:${tiempoEjecucionSegundos.toString().padStart(2, '0')}`;
+      console.log("Tiempo ejecutado (formato HH:MM:SS): ", tiempoEjecucion)
+
+      // Llamamos a la función que actualiza el detalle ODT
+      const actualizado = await actualizarDetalleOdt(fechaFinal, tiempoEjecucion);
+      console.log("DETALLE ODT ACTUALIZADO??? => ", actualizado)
+      if (actualizado.actualizado) {
+        const detalleActualizadoData = await obtenerDetalleOdt()
+        console.log("detalleActualizadoData: ", detalleActualizadoData)
+        txtFechaFinal.innerText = detalleActualizadoData[0].fecha_final
+        txtTiempoEjecucion.innerText = detalleActualizadoData[0].tiempo_ejecucion
+        //desabilitar el boton finalizar
+        btnFinalizar.disabled = true
+        btnFinalizar.removeAttribute("id")
+      }
+      /* if (actualizado.guardado === 'success') {
+        alert("El detalle ODT se ha actualizado con éxito.");
+      } else {
+        alert("Hubo un error al actualizar el detalle ODT.");
+      } */
+    }
   })
 
   // ************************************ FIN DE EVENTOS ************************************************

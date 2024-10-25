@@ -5,14 +5,8 @@
     <div class="card mb-3" style="max-width: 100%;">
         <div class="row g-0">
 
-            <div class="contenedor-evidencias col-md-4 text-center">
-                <div id="preview-container col" class="preview-container">
-                    <div class="row" id="contenedor-evidencia-previa">
-
-                    </div>
-                    <div class="row" id="contenedor-btn-abrirSideModal">
-
-                    </div>
+            <div class="contenedor-evidencias p-3 col-md-4 text-center">
+                <div id="preview-container-entrada" class="preview-container">                    
                 </div>
             </div>
             <div class="col-md-8">
@@ -75,15 +69,15 @@
                                 <div class="card-body ">
                                     <div class="row">
                                         <p class="fw-bolder col">Fecha inicial: </p>
-                                        <p class="fw-normal d-flex align-items-center col"></p>
+                                        <p class="fw-normal d-flex align-items-center col" id="txtFechaInicial"></p>
                                     </div>
                                     <div class="row">
                                         <p class="fw-bolder col">Fecha acabado: </p>
-                                        <p class="fw-normal d-flex align-items-center col"></p>
+                                        <p class="fw-normal d-flex align-items-center col" id="txtFechaFinal"></p>
                                     </div>
                                     <div class="row">
                                         <p class="fw-bolder col">Tiempo de ejecucion: </p>
-                                        <p class="fw-normal d-flex align-items-center col"></p>
+                                        <p class="fw-normal d-flex align-items-center col" id="txtTiempoEjecucion"></p>
                                     </div>
                                 </div>
                             </div>
@@ -94,11 +88,11 @@
                                     <h5 class="fw-bold">Acciones</h5>
                                 </div>
                                 <div class="card-body">
-                                    <div class="card-body text-center" id="btn-iniciar">
-                                        <button class="btn btn-primary">Iniciar</button>
+                                    <div class="card-body text-center" >
+                                        <button class="btn btn-primary" id="btn-iniciar">Iniciar</button>
                                     </div>
-                                    <div class="card-body text-center" id="btn-finalizar">
-                                        <button class="btn btn-secondary">Finalizar</button>
+                                    <div class="card-body text-center" >
+                                        <button class="btn btn-secondary" id="btn-finalizar">Finalizar</button>
                                     </div>
                                 </div>
                             </div>

@@ -25,10 +25,8 @@ BEGIN
 	ELSE
         SET _idresponsable_asignado = LAST_INSERT_ID();
     END IF;
-END
-select * from usuarios;
-select * from odt;
-select * from responsables_asignados_odt;
+END //
+
 
 DROP PROCEDURE IF EXISTS `obtenerUsuario`
 DELIMITER //

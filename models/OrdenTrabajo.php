@@ -18,6 +18,20 @@ class OrdenTrabajo extends ExecQuery
         }
     } // INTEGRADO
 
+    public function obtenerDetalleOdt($params = []): array
+    {
+        try {
+            $cmd = parent::execQ("CALL obtenerDetalleOdt(?)");
+            $cmd->execute(array(
+                $params['idordentrabajo']
+            ));
+            return $cmd->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+    } // INTEGRADO
+
+
     public function add($params = []): int
     {
         try {
@@ -30,6 +44,24 @@ class OrdenTrabajo extends ExecQuery
             );
             $response = parent::execQuerySimple("SELECT @idordentrabajo as idordentrabajo")->fetch(PDO::FETCH_ASSOC);
             return (int) $response['idordentrabajo'];
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+    } // INTEGRADO
+
+
+    public function registrarDetalleOdt($params = []): int
+    {
+        try {
+            $cmd = parent::execQ("call registrarDetalleOdt(@iddetalleodt,?,?)");
+            $cmd->execute(
+                array(
+                    $params['idodt'],
+                    $params['clasificacion']
+                )
+            );
+            $response = parent::execQuerySimple("SELECT @iddetalleodt as iddetalleodt")->fetch(PDO::FETCH_ASSOC);
+            return (int) $response['iddetalleodt'];
         } catch (Exception $e) {
             die($e->getMessage());
         }
@@ -74,6 +106,23 @@ class OrdenTrabajo extends ExecQuery
         }
     } // INTEGRADO
     
+    public function actualizarDetalleOdt($params = []): bool
+    {
+        try {
+            $status = false;
+            $cmd = parent::execQ("CALL actualizarDetalleOdt(?,?,?,?)");
+            $status = $cmd->execute(array(
+                $params['iddetalleodt'],
+                $params['fechafinal'],
+                $params['tiempoejecucion'],
+                $params['clasificacion']
+            ));
+            return $status;
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+    } // INTEGRADO
+
     public function eliminarOdt($params = []): bool
     {
         try {
