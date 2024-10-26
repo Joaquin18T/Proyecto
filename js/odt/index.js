@@ -157,15 +157,15 @@ $(document).ready(async () => {
                         <p class="text-muted">Creada por ${todt.creador}</p>
                         <p><strong>Activo:</strong> ${todt.activo}</p>
                         <div class="progress mb-2">
-                            <div class="progress-bar ${todt.clasificacion === 'finalizado' ? 'bg-success' : todt.clasificacion === 'iniciado' ? 'bg-warning' : 'bg-danger'}" 
+                            <div class="progress-bar ${todt.clasificacion === 11 ? 'bg-success' : todt.clasificacion === 9 ? 'bg-warning' : 'bg-danger'}" 
                                 role="progressbar" 
-                                style="width: ${todt.clasificacion === 'finalizado' ? '100' : todt.clasificacion === 'iniciado' ? '50' : '0'}%" 
-                                aria-valuenow="${todt.clasificacion === 'finalizado' ? '100' : todt.clasificacion === 'iniciado' ? '50' : '0'}" 
+                                style="width: ${todt.clasificacion === 11 ? '100' : todt.clasificacion === 9 ? '50' : '0'}%" 
+                                aria-valuenow="${todt.clasificacion === 11 ? '100' : todt.clasificacion === 9 ? '50' : '0'}" 
                                 aria-valuemin="0" 
                                 aria-valuemax="100">
                             </div>
                         </div>
-                        <p class="text-center">${todt.clasificacion === 'finalizado' ? '100' : todt.clasificacion === 'iniciado' ? '50' : '0'}%</p>                       
+                        <p class="text-center">${todt.clasificacion === 11 ? '100' : todt.clasificacion === 9 ? '50' : '0'}%</p>                       
                     </div>                                        
                 </div>
             `

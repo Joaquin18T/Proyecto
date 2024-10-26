@@ -25,7 +25,10 @@ BEGIN
         WHERE PT.eliminado = 0 AND PT.incompleto = 0;
 END //
 
-
+-- call obtenerTareas()
+-- call registrar_odt(@idordentrabajo,7,2);
+-- SELECT @idordentrabajo as idordentrabajo;
+-- select * from od;
 DROP PROCEDURE IF EXISTS `obtenerTareasPorEstado`
 DELIMITER //
 CREATE PROCEDURE `obtenerTareasPorEstado`
@@ -49,10 +52,12 @@ BEGIN
         WHERE EST.idestado = _idestado;
 END //
 
-DROP PROCEDURE IF EXISTS `obtenerTareasOdt`
+select * from detalle_odt;
+select * from odt;
+DROP PROCEDURE IF EXISTS `obtenerTareasOdt`;
 DELIMITER //
 CREATE PROCEDURE `obtenerTareasOdt` (
-	IN _borrador boolean
+	IN _borrador BOOLEAN
 )
 BEGIN 
     SELECT 
@@ -78,10 +83,11 @@ BEGIN
     INNER JOIN activos ACT ON ACT.idactivo = AVT.idactivo
     INNER JOIN plandetareas PT ON PT.idplantarea = TAR.idplantarea
     INNER JOIN estados EST ON EST.idestado = ODT.idestado
-    LEFT JOIN detalle_odt DODT ON DODT.clasificacion = EST.idestado 
+    LEFT JOIN detalle_odt DODT ON DODT.idorden_trabajo = ODT.idorden_trabajo -- Unión corregida
     WHERE ODT.eliminado = _borrador
     GROUP BY ODT.idorden_trabajo, TAR.descripcion, TAR.fecha_inicio, TAR.fecha_vencimiento, PERCRE.nombres, PERCRE.apellidos, TAR.idtarea, ACT.descripcion, EST.nom_estado;
 END //
+
 
 DROP PROCEDURE IF EXISTS `obtenerTareaDeOdtGenerada`
 DELIMITER //
@@ -135,4 +141,16 @@ BEGIN
     WHERE idorden_trabajo = _idordentrabajo AND idtipo_diagnostico = _idtipodiagnostico;
 END //
 
-select * from diagnosticos;
+select * from detalle_odt;
+
+DROP PROCEDURE IF EXISTS `obtenerDetalleOdt`
+DELIMITER //
+CREATE PROCEDURE `obtenerDetalleOdt`
+( 
+    IN _idordentrabajo INT
+)
+BEGIN
+	SELECT * FROM detalle_odt
+    WHERE idorden_trabajo = _idordentrabajo;
+END //
+

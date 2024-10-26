@@ -54,6 +54,8 @@ INSERT INTO USUARIOS (idpersona, idrol, usuario, contrasena) VALUES
 (12, 1, 'torres.jorge', 'contrasena7'),
 (13, 2, 'hernandez.lucia', 'contrasena8');
 
+select * from usuarios;
+
 -- UPDATE usuarios SET contrasena = '$2y$10$0xJpbL03XkLI5Zz/lCfyVu6HTYSDKKUpEfLF6BywNTBDJofh9YNlO' WHERE id_usuario=4;
 -- SELECT * FROM activos;
 INSERT INTO permisos(idrol, permiso)

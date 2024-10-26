@@ -106,9 +106,6 @@ CREATE PROCEDURE `registrarDetalleOdt`
 (
 	OUT _iddetalleodt 		INT,
 	IN _idorden_trabajo 	INT,
-    IN _fecha_inicial 		DATETIME,
-    IN _fecha_final 		DATETIME,
-    IN _tiempo_ejecucion	TIME,
     IN _clasificacion		INT
 )
 BEGIN
@@ -121,8 +118,8 @@ BEGIN
         SET existe_error = 1;
         END;
         
-	INSERT INTO detalle_odt (idorden_trabajo, fecha_inicial, fecha_final, tiempo_ejecucion, clasificacion)	
-		VALUES (_idorden_trabajo, _fecha_inicial, _fecha_final, _tiempo_ejecucion, _clasificacion);
+	INSERT INTO detalle_odt (idorden_trabajo, clasificacion)	
+		VALUES (_idorden_trabajo, _clasificacion);
         
 	IF existe_error = 1 THEN
 		SET _iddetalleodt = -1;
