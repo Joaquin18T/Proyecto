@@ -38,7 +38,7 @@ CREATE TABLE `activos` (
   CONSTRAINT `fk_actsubcategoria` FOREIGN KEY (`idsubcategoria`) REFERENCES `subcategorias` (`idsubcategoria`),
   CONSTRAINT `fk_idestado` FOREIGN KEY (`idestado`) REFERENCES `estados` (`idestado`),
   CONSTRAINT `fkidmarca` FOREIGN KEY (`idmarca`) REFERENCES `marcas` (`idmarca`)
-) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `activos` */
 
@@ -70,7 +70,15 @@ insert  into `activos`(`idactivo`,`idsubcategoria`,`idmarca`,`idestado`,`modelo`
 (25,6,3,1,'Sentra','G45FDDSD','2024-10-20','Camioneta Nissan Sentra','{\"color\":\"Negro\"}'),
 (26,3,8,1,'CD 5','D34TSDSA','2024-10-24','Maquinaria ABB CD 5','{\"peso\":\"90 kg\"}'),
 (27,2,1,1,'NR 5','F45YSFSDFS1','2024-10-24','Laptop LG NR 5','{\"ram\":\"64\"}'),
-(28,10,1,1,'HR 5','FE56DSDD','2024-10-24','Monitor LG HR 5','{\"hz\":\"120\"}');
+(28,10,1,1,'HR 5','FE56DSDD','2024-10-24','Monitor LG HR 5','{\"hz\":\"120\"}'),
+(31,5,3,1,'X-Trail','FR456','2024-10-25','Nissan X-trail','{\"color\":\"negro\"}'),
+(32,5,3,1,'X-Trail','FR458','2024-10-25','Nissan X-trail','{\"color\":\"negro\"}'),
+(33,8,8,1,'BG 5T','C34T5SDFSEFDSDVS','2024-10-25','Robot industrial ABB BG 5T','{\"peso\":\"100 kg\"}'),
+(34,8,8,1,'BG 5T','SDFE4TSFSDFSDSAS','2024-10-25','Robot industrial ABB BG 5T','{\"peso\":\"100 kg\"}'),
+(35,9,1,1,'MR 5','V456IJDKJSDASDA','2024-10-25','Impresora LG MR 5','{\"wifi\":\"si\"}'),
+(36,10,2,1,'CR 4','645654YFRET5464FE','2024-10-26','Monitor HP CR4','{\"hz\":\"360\"}'),
+(37,2,1,1,'RV 2','D345SDFDSFDSCSDF','2024-10-26','Laptop LG RV 2','{\"ram\":\"64\",\"Color \":\"negro\",\"SO\":\"Windows\"}'),
+(38,2,1,1,'RV 2','SADASD34543FEWDS','2024-10-26','Laptop LG RV 2','{\"ram\":\"64\",\"Color \":\"negro\",\"SO\":\"Windows\"}');
 
 /*Table structure for table `activos_responsables` */
 
@@ -203,6 +211,40 @@ CREATE TABLE `detalle_odt` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `detalle_odt` */
+
+/*Table structure for table `detalles_marca_subcategoria` */
+
+DROP TABLE IF EXISTS `detalles_marca_subcategoria`;
+
+CREATE TABLE `detalles_marca_subcategoria` (
+  `iddetalle_marca_sub` int(11) NOT NULL AUTO_INCREMENT,
+  `idmarca` int(11) NOT NULL,
+  `idsubcategoria` int(11) NOT NULL,
+  PRIMARY KEY (`iddetalle_marca_sub`),
+  KEY `fk_idmarca_detalle` (`idmarca`),
+  KEY `fk_idsubcategoria` (`idsubcategoria`),
+  CONSTRAINT `fk_idmarca_detalle` FOREIGN KEY (`idmarca`) REFERENCES `marcas` (`idmarca`),
+  CONSTRAINT `fk_idsubcategoria` FOREIGN KEY (`idsubcategoria`) REFERENCES `subcategorias` (`idsubcategoria`)
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+/*Data for the table `detalles_marca_subcategoria` */
+
+insert  into `detalles_marca_subcategoria`(`iddetalle_marca_sub`,`idmarca`,`idsubcategoria`) values 
+(1,1,1),
+(2,1,2),
+(3,2,2),
+(4,4,3),
+(5,7,3),
+(6,5,4),
+(7,6,5),
+(8,3,5),
+(9,6,6),
+(10,3,6),
+(11,4,7),
+(12,8,8),
+(13,2,9),
+(14,1,10),
+(15,1,11);
 
 /*Table structure for table `diagnosticos` */
 
@@ -1804,6 +1846,23 @@ BEGIN
 	FROM marcas MAR
 	INNER JOIN activos ACT ON MAR.idmarca = ACT.idmarca
 	WHERE ACT.idsubcategoria = _idsubcategoria;
+END */$$
+DELIMITER ;
+
+/* Procedure structure for procedure `sp_filter_marcas_by_subcategoria` */
+
+/*!50003 DROP PROCEDURE IF EXISTS  `sp_filter_marcas_by_subcategoria` */;
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_filter_marcas_by_subcategoria`(
+	IN _idsubcategoria INT
+)
+BEGIN
+	SELECT M.idmarca, M.marca
+    FROM marcas M
+    INNER JOIN detalles_marca_subcategoria MS ON M.idmarca = MS.idmarca
+    WHERE MS.idsubcategoria = _idsubcategoria;
 END */$$
 DELIMITER ;
 

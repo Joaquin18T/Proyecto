@@ -13,12 +13,16 @@ select*from usuarios;
 select*from personas;
 select*from estados;
 select*from bajas_activo;
+select*from marcas;
+select*from subcategorias;
+
 
 DELETE FROM bajas_activo where idbaja_activo>=2;
 DELETE FROM notificaciones where idnotificacion =15;
 DELETE FROM historial_activos where idhistorial_activo =14;
+DELETE FROM activos where idactivo =29;
 UPDATE activos SET idestado = 3 WHERE idactivo = 5;    
-ALTER TABLE bajas_activo AUTO_INCREMENT = 1;
+ALTER TABLE detalles_marca_subcategoria AUTO_INCREMENT = 1;
 UPDATE activos SET idestado = 2 WHERE idactivo = 5;
 UPDATE usuarios SET contrasena = '$2y$10$/w29oS1sTWIU7fJphQkoIeox2MbOlR8YLEOOG199o0Am5HZ9wADfa' WHERE id_usuario = 14;
 
