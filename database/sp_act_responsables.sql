@@ -153,6 +153,21 @@ BEGIN
     WHERE idactivo=_idactivo AND idusuario = _idusuario AND fecha_designacion IS NULL;
 END $$
 
+DROP PROCEDURE IF EXISTS sp_ubicacion_only_activo;
+DELIMITER $$
+CREATE PROCEDURE sp_ubicacion_only_activo
+(
+	IN _idactivo INT
+)
+BEGIN
+	SELECT DISTINCT UBI.idubicacion, UBI.ubicacion FROM historial_activos HIS
+    INNER JOIN ubicaciones UBI ON HIS.idubicacion = UBI.idubicacion
+    INNER JOIN activos_responsables RES ON HIS.idactivo_resp = RES.idactivo_resp
+    WHERE RES.idactivo = _idactivo
+    ORDER BY HIS.fecha_movimiento desc;
+END $$
+CALL sp_ubicacion_only_activo(12);
+
 DROP PROCEDURE IF EXISTS sp_ubicacion_activo;
 DELIMITER $$
 CREATE PROCEDURE  sp_ubicacion_activo
@@ -168,7 +183,7 @@ BEGIN
     ORDER BY HIS.fecha_movimiento desc
     LIMIT 1;
 END $$
--- CALL sp_ubicacion_activo(3,4)
+-- CALL sp_ubicacion_activo(12,4)
 DROP PROCEDURE IF EXISTS sp_users_by_activo;
 DELIMITER $$
 CREATE PROCEDURE sp_users_by_activo

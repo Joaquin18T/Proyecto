@@ -34,6 +34,20 @@ class HistorialActivo extends ExecQuery{
       die($e->getMessage());
     }
   }
+
+  public function getUbicacionByOnlyActivo($params=[]):array{
+    try{
+      $cmd = parent::execQ("CALL sp_ubicacion_only_activo(?)");
+      $cmd->execute(
+        array(
+          $params['idactivo']
+        )
+      );
+      return $cmd->fetchAll(PDO::FETCH_ASSOC);
+    }catch(Exception $e){
+      die($e->getMessage());
+    }
+  }
 }
 
 // $hist = new HistorialActivo();

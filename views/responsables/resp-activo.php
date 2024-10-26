@@ -1,7 +1,7 @@
 <?php
 require_once '../header.php'; ?>
 <script src="../../node_modules/tinymce/tinymce.min.js" referrerpolicy="origin"></script>
-<link rel="stylesheet" href="http://localhost/CMMS/css/responsables/asignar-resp.css">
+<!-- <link rel="stylesheet" href="http://localhost/CMMS/css/responsables/asignar-resp.css"> -->
 
 <h2>RESPONSABLES</h2>
 <div class="row">
@@ -60,7 +60,7 @@ require_once '../header.php'; ?>
             <div class="col-md-7">
               <div class="form-floating">
                 <input id="descripcion" class="form-control" name="descripcion" placeholder="Descripcion de la Asignacion" required>
-                <label for="descripcion">DESCRIPCION</label>
+                <label for="descripcion">Descripcion del activo</label>
               </div>
             </div>
           </div>
@@ -74,16 +74,12 @@ require_once '../header.php'; ?>
               <!-- La propiedad *multiple* permite seleccionar varios archivos al mismo tiempo -->
             </div>
             <div class="col-md-4">
-              <div class="form-floating">
-                <!-- Contenedor de previsualización de imágenes -->
-                <div class="row " id="imagePreview" class="contain-images">
-                  <!-- Aquí se agregarán las imágenes previsualizadas -->
-                </div>
-              </div>
+              <button class="btn btn-sm btn-info w-50" id="show-sb-images" type="button" disabled>Ver lista de imgenes</button>
             </div>
           </div>
           <div class="row g-1 mb-3 mt-4">
             <div class="col-md-12">
+              <h4>Condicion del Activo</h4>
               <textarea name="condicion" id="condicion" class="w-100 form-control" style="text-decoration: none; resize:none" autocomplete="off" cols="15" rows="5" required>
               </textarea>
             </div>
@@ -157,9 +153,22 @@ require_once '../header.php'; ?>
   <!-- FIN MODAL IMAGENES -->
   <!-- <img src="" alt="" id="imgtest"> -->
 </div>
-
+<div class="offcanvas offcanvas-end" tabindex="-1" id="sb-imagenes" aria-labelledby="offcanvasRightLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="offcanvasRightLabel">Offcanvas right</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <div class="form-floating">
+      <div class="row" id="imagePreview" class="contain-images">
+        <!-- Aquí se agregarán las imágenes previsualizadas -->
+      </div>
+    </div>
+  </div>
+</div>
 <?php require_once '../footer.php' ?>
 
 <script src="../../js/responsables/resp-activo.js"></script>
 </body>
+
 </html>

@@ -12,6 +12,9 @@ if(isset($_GET['operation'])){
         'idactivo_resp'=>$_GET['idactivo_resp']
       ]));
       break;
+    case 'getUbiOnlyActivo':
+      echo json_encode($historialAc->getUbicacionByOnlyActivo(['idactivo'=>$_GET['idactivo']]));
+      break;
   }
 }
 
