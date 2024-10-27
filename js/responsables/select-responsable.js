@@ -38,11 +38,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if(data.length>0){
       data.forEach(x=>{
         const element = document.createElement("li");
-        element.textContent = `${x.descripcion} - ${x.subcategoria}`;
+        element.textContent = `${x.cod_identificacion} - ${x.descripcion}`;
         element.value = x.idactivo;
       
         element.addEventListener("click",async (e)=>{
-          selector("activo").value = `${x.descripcion} - ${x.subcategoria}`;
+          selector("activo").value = `${x.cod_identificacion} - ${x.descripcion}`;
           lista.innerHTML="";
           lista.style.display = "none";
           //list.classList.remove('visible');
@@ -54,7 +54,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
           const data = await filterUsuarios(idactivo);
           await showDataTable(data);
-          
+          await showDataActivo(idactivo);
+          await showUbicacion(idactivo);
           //idactivo=0;
           //console.log(data);
         });
@@ -85,7 +86,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const data = await getDatos(`${host}/activo.controller.php`, params);
     return data;
   }
-
+  
+  chargerEventsButtons();
   async function showDataTable(data=[]){
     //console.log(data);
     selector("tb-colaboradores tbody").innerHTML="";
@@ -95,7 +97,6 @@ document.addEventListener("DOMContentLoaded", () => {
     
     //console.log(data.length);
   
-    
     data.forEach((x, index)=>{
       selector("tb-colaboradores tbody").innerHTML+=`
         <tr>
@@ -103,13 +104,11 @@ document.addEventListener("DOMContentLoaded", () => {
           <td class="text-left">${x.nombres}</td>
           <td class="text-center">${x.rol}</td>
           <td class="text-center">${x.cantidad}</td>
-          <td class="text-center">${x.estado}</td>
           <td class="text-center">${x.es_responsable==="0"?"Colaborador":"Responsable"}</td>
           <td class="text-center"><button type="button" class="btn btn-sm btn-success btn-add" data-idresp=${x.idactivo_resp}>Asignar</button></td>
         </tr>
       `;
     });
-    chargerEventsButtons();
     createTable(data);
   }
   
@@ -192,6 +191,53 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const data = await getDatos(`${host}/respActivo.controller.php`, params);
     return data;
+  }
+
+  async function showDataActivo(id){
+    const params = new URLSearchParams();
+    params.append("operation", "searchByUpdate");
+    params.append("idactivo", parseInt(id));
+
+    const data = await getDatos(`${host}/activo.controller.php`, params);
+    selector("subcategoria").value = data[0].subcategoria;
+    selector("marca").value = data[0].marca;
+    selector("modelo").value = data[0].modelo;
+    selector("fecha").value = data[0].fecha_adquisicion;
+    selector("estado").value = data[0].nom_estado;
+
+    showEspecificaciones(data[0].especificaciones);
+    
+  }
+
+  async function showUbicacion(id){
+    const params = new URLSearchParams();
+    params.append("operation", "getUbiOnlyActivo");
+    params.append("idactivo", parseInt(id));
+
+    const data = await getDatos(`${host}/historialactivo.controller.php`, params);
+
+    if(data.length===0){
+      selector("ubicacion").value="No ha sido asignado";
+    }else{
+      selector("ubicacion").value = data[0].ubicacion;
+    }
+    //console.log("ubi data",data);
+    
+  }
+
+  function showEspecificaciones(data){
+    const convertData = JSON.parse(data);
+    console.log(convertData);
+
+    selector("lista-espec").innerHTML="";
+    selector("title").innerHTML = "Especificaciones";
+
+    for (const key in convertData) {
+      const li = document.createElement("li");
+      li.innerHTML=`<strong>${key}: </strong>${convertData[key]}`;
+      selector("lista-espec").appendChild(li);
+    }
+
   }
 
 })

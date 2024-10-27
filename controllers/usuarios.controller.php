@@ -127,5 +127,18 @@ if (isset($_POST['operation'])) {
       }
       echo json_encode($isUpdate);
       break;
+    case 'darBajaUser':
+      $enviar = ['respuesta'=>-1];
+      $cleanData = [
+        'estado'=>$user->limpiarCadena($_POST['estado']),
+        'idusuario'=>$user->limpiarCadena($_POST['idusuario'])
+      ];
+      $resp = $user->darBajaUsuario($cleanData);
+
+      if($resp){
+        $enviar['respuesta']=1;
+      }
+      echo json_encode($enviar);
+      break;
   }
 }

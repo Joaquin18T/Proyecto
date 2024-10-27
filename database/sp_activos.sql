@@ -69,16 +69,16 @@ DROP PROCEDURE IF EXISTS sp_search_activo_resp;
 DELIMITER $$
 CREATE PROCEDURE sp_search_activo_resp
 (
-	IN _descripcion VARCHAR(40)
+	IN _cod_identificacion VARCHAR(40)
 )
 BEGIN
-	SELECT DISTINCT ACT.idactivo, ACT.descripcion, SUB.subcategoria
+	SELECT DISTINCT ACT.idactivo, ACT.cod_identificacion, ACT.descripcion
 	FROM activos ACT
     -- INNER JOIN activos_responsables RES ON ACT.idactivo = RES.idactivo
-	INNER JOIN subcategorias SUB ON ACT.idsubcategoria = SUB.idsubcategoria
-    INNER JOIN marcas MAR ON ACT.idmarca = MAR.idmarca
-	WHERE ACT.descripcion LIKE CONCAT('%', _descripcion,'%') AND ACT.idestado!=4 AND ACT.idestado!=5
-	ORDER BY SUB.subcategoria ASC;
+	-- INNER JOIN subcategorias SUB ON ACT.idsubcategoria = SUB.idsubcategoria
+    -- INNER JOIN marcas MAR ON ACT.idmarca = MAR.idmarca
+	WHERE ACT.cod_identificacion LIKE CONCAT('%', _cod_identificacion,'%') AND ACT.idestado!=4 AND ACT.idestado!=5
+	ORDER BY ACT.idactivo ASC;
 END $$
 CALL sp_search_activo_resp('');
 
@@ -216,6 +216,7 @@ CREATE PROCEDURE sp_search_update_activo
 BEGIN
 		SELECT
 		ACT.idactivo, ACT.idsubcategoria, ACT.idmarca, MAR.marca,
+        SUB.subcategoria,
         CAT.categoria,
         EST.nom_estado,
         ACT.modelo,

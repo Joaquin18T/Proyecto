@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
   (async () => {
     await showData();
   })();
-
+  chargerEventsButtons();
   async function showData() {
     const params = new URLSearchParams();
     params.append("operation", "sinServicio");
@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if(isSelect===0){
       createTable(data);
     }
-    chargerEventsButtons();
+    
     //console.log(isSelect);
   }
 

@@ -77,6 +77,7 @@
       </div>
     </div>
   </div>
+  <!-- Modal actualizar usuario -->
   <div class="modal fade" id="modal-update-user" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -93,6 +94,24 @@
       </div>
     </div>
   </div>
+  <!-- ./Modal actualizar usuario -->
+
+  <div class="modal fade" id="modal-baja" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Dar de baja</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <h2>¿Estas seguro de dar de baja al usuario?</h2>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" id="aceptar-baja">Aceptar</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <?php require_once '../footer.php' ?>
@@ -101,4 +120,5 @@
 <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
 <script src="http://localhost/CMMS/js/users/index.js"></script>
 </body>
+
 </html>

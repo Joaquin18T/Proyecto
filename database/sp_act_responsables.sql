@@ -166,7 +166,7 @@ BEGIN
     WHERE RES.idactivo = _idactivo
     ORDER BY HIS.fecha_movimiento desc;
 END $$
-CALL sp_ubicacion_only_activo(12);
+-- CALL sp_ubicacion_only_activo(12);
 
 DROP PROCEDURE IF EXISTS sp_ubicacion_activo;
 DELIMITER $$

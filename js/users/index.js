@@ -1,6 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
   let myTable = null;
-
+  const globals = {
+    iduserBaja:""
+  }
   const host = "http://localhost/CMMS/controllers/";
 
   function selector(value) {
@@ -43,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
     await showUsuarios();
   })();
 
-
+  chargerEventButtons();
   async function showUsuarios() {
     const params = new URLSearchParams();
     params.append("operation", "listOfFilters");
@@ -76,15 +78,15 @@ document.addEventListener("DOMContentLoaded", () => {
           <td>${x.estado==="1"?"Activo":"Baja"}</td>
           <td>
               ${parseInt(x.estado)===0?'Ninguna Accion':
-                `<button type="button" class="btn btn-sm btn-outline-secondary update-user" data-iduser=${x.id_usuario}>Update</button>`
+                `<button type="button" class="btn btn-sm btn-warning update-user" data-iduser=${x.id_usuario}>Update</button>
+                <button type="button" class="btn btn-sm btn-danger dar-baja" data-iduser=${x.id_usuario}>Dar baja</button>
+                `
               }
           </td>
         </tr>
       `;
     });
     createTable(data);
-
-    chargerEventButtons();
   }
 
   function createTable(data){
@@ -137,11 +139,16 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector(".table-responsive").addEventListener("click",(e)=>{
       if(e.target){
         if(e.target.classList.contains("update-user")){
+
           loadUpdate(e);
+        }if(e.target.classList.contains("dar-baja")){
+          globals.iduserBaja = e;
+          showModalBaja();
         }
       }
     });
   }
+  
   /**
    * Obtiene la id y abre el modal para confirmar la actualizacion
    */
@@ -157,5 +164,39 @@ document.addEventListener("DOMContentLoaded", () => {
   selector("aceppt-update").addEventListener("click",()=>{
     window.location.href = "http://localhost/CMMS/views/usuarios/update";
   });
+  
   filtersData();
+  async function showModalBaja(){
+    const modalImg = new bootstrap.Modal(selector("modal-baja"));
+    modalImg.show();
+  }
+  
+
+  selector("aceptar-baja").addEventListener("click",async()=>{
+    await DarBajaUsuario();
+  });
+
+  async function DarBajaUsuario(){
+    const iduser = globals.iduserBaja.target.getAttribute("data-iduser");
+  
+    const params = new FormData();
+    params.append("operation","darBajaUser");
+    params.append("estado","0");
+    params.append("idusuario",parseInt(iduser));
+
+    const data = await fetch(`${host}usuarios.controller.php`, {
+      method:'POST',
+      body:params
+    });
+
+    const {respuesta} = await data.json();
+    if(respuesta>0){
+      console.log("actualizado");
+      
+      await showUsuarios();
+    }
+  }
+
+  
+
 });
