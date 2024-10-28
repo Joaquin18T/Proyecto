@@ -13,7 +13,7 @@ if (isset($_GET['operation'])) {
       break;
 
     case 'obtenerTareasOdt':
-      echo json_encode($ordentrabajo->obtenerTareasOdt(["borrador" => $_GET['borrador']]));
+      echo json_encode($ordentrabajo->obtenerTareasOdt());
       break;
 
     case 'obtenerDetalleOdt':
@@ -46,6 +46,17 @@ if (isset($_POST['operation'])) {
       echo json_encode(["id" => $id]);
       break;
 
+    case 'registrarComentarioOdt':
+      $datosEnviar = [
+        "idodt"             => $_POST["idodt"],
+        "comentario"        => $_POST["comentario"],
+        "revisadopor"       => $_POST["revisadopor"]
+      ];
+
+      $registrado = $ordentrabajo->registrarComentarioOdt($datosEnviar);
+      echo json_encode(["registrado" => $registrado]);
+      break;
+
     case 'actualizarBorradorOdt':
       $datosEnviar = [
         "idordentrabajo"   => $_POST["idordentrabajo"],
@@ -53,6 +64,16 @@ if (isset($_POST['operation'])) {
       ];
 
       $actualizado = $ordentrabajo->actualizarBorradorOdt($datosEnviar);
+      echo json_encode(["actualizado" => $actualizado]);
+      break;
+
+    case 'actualizarEstadoOdt':
+      $datosEnviar = [
+        "idodt"   => $_POST["idodt"],
+        "idestado"     => $_POST["idestado"]
+      ];
+
+      $actualizado = $ordentrabajo->actualizarEstadoOdt($datosEnviar);
       echo json_encode(["actualizado" => $actualizado]);
       break;
 

@@ -171,6 +171,20 @@ BEGIN
     WHERE id_usuario = _idusuario;
 END $$
 
+DROP PROCEDURE IF EXISTS sp_update_asignacion_usuario;
+DELIMITER $$
+CREATE PROCEDURE sp_update_asignacion_usuario
+(
+	IN _idusuario INT,
+    IN _asignacion INT
+)
+BEGIN
+	UPDATE usuarios SET
+    asignacion = _asignacion
+    WHERE id_usuario = _idusuario;
+END $$
+
+
 DROP PROCEDURE IF EXISTS sp_update_claveacceso;
 DELIMITER $$
 CREATE PROCEDURE sp_update_claveacceso

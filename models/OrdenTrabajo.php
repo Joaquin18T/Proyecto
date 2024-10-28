@@ -67,6 +67,24 @@ class OrdenTrabajo extends ExecQuery
         }
     } // INTEGRADO
 
+    public function registrarComentarioOdt($params = []): bool
+    {
+        try {
+            $status = false;
+            $cmd = parent::execQ("call registrar_comentario_odt(?,?,?)");
+            $status = $cmd->execute(
+                array(
+                    $params['idodt'],
+                    $params['comentario'],
+                    $params['revisadopor']
+                )
+            );
+            return $status;
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+    } // INTEGRADO
+
     public function verificarTareaInconclusa($params = []): array
     {
         try {
@@ -81,10 +99,8 @@ class OrdenTrabajo extends ExecQuery
     public function obtenerTareasOdt($params = []): array
     {
         try {
-            $cmd = parent::execQ("CALL obtenerTareasOdt(?)");
-            $cmd->execute(array(
-                $params['borrador']
-            ));
+            $cmd = parent::execQ("CALL obtenerTareasOdt");
+            $cmd->execute();
             return $cmd->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
             die($e->getMessage());
@@ -105,7 +121,22 @@ class OrdenTrabajo extends ExecQuery
             die($e->getMessage());
         }
     } // INTEGRADO
-    
+
+    public function actualizarEstadoOdt($params = []): bool
+    {
+        try {
+            $status = false;
+            $cmd = parent::execQ("CALL actualizarEstadoOdt(?,?)");
+            $status = $cmd->execute(array(
+                $params['idodt'],
+                $params['idestado']
+            ));
+            return $status;
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+    } // INTEGRADO
+
     public function actualizarDetalleOdt($params = []): bool
     {
         try {
@@ -136,4 +167,6 @@ class OrdenTrabajo extends ExecQuery
             die($e->getMessage());
         }
     } //  INTEGRADO
+
+
 }

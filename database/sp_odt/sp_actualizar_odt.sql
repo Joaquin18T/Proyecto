@@ -13,6 +13,19 @@ BEGIN
     WHERE idorden_trabajo = _idorden_trabajo;
 END //
 
+DROP PROCEDURE IF EXISTS `actualizarEstadoOdt`
+DELIMITER //
+CREATE PROCEDURE `actualizarEstadoOdt`
+(
+	IN _idorden_trabajo INT,
+	IN _idestado INT
+)
+BEGIN
+	UPDATE odt SET
+    idestado = _idestado
+    WHERE idorden_trabajo = _idorden_trabajo;
+END //
+
 DROP PROCEDURE IF EXISTS `actualizarDiagnosticoOdt`
 DELIMITER //
 CREATE PROCEDURE `actualizarDiagnosticoOdt`

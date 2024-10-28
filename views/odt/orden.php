@@ -1,6 +1,6 @@
 <?php require_once '../header.php' ?>
 
-<div class="div row container-fluid">
+<div class="row container-fluid">
     <h1>Orden de trabajo</h1>
     <div class="card mb-3" style="max-width: 100%;">
         <div class="row g-0">
@@ -51,13 +51,13 @@
                 </div>
                 <div id="preview-container" class="preview-container">
                     <p id="no-images-text" class="no-images-text">No hay imágenes seleccionadas aún</p>
-                    <img src="https://i.etsystatic.com/36262552/r/il/b32f2f/4239329917/il_570xN.4239329917_gcxb.jpg" class="img-fluid rounded-start" alt="...">
                 </div>
             </div>
             <div class="col-md-8">
                 <div class="card-body ">
                     <h5 class="card-title">Diagnsotico salida</h5>
-                    <textarea class="comment-textarea form-control" id="diagnostico-salida" rows="5" placeholder="Escribe tu diagnostico aquí..."></textarea>
+                    <textarea class="comment-textarea form-control mb-3" id="diagnostico-salida" rows="5" placeholder="Escribe tu diagnostico aquí..."></textarea>
+                    <button class="btn btn-primary" id="btn-guardar-diagnostico">Guardar</button>
                 </div>
                 <div class="card-footer">
                     <div class="row">
