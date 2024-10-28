@@ -128,4 +128,15 @@ BEGIN
     END IF;
 END //
 
-
+DROP PROCEDURE IF EXISTS `registrar_comentario_odt`
+DELIMITER //
+CREATE PROCEDURE `registrar_comentario_odt`
+(
+	IN _idorden_trabajo 	INT,
+    IN _comentario			VARCHAR(300),
+    IN _revisadoPor			INT
+)
+BEGIN	
+	INSERT INTO comentarios_odt (idorden_trabajo, comentario, revisadoPor)	
+		VALUES (_idorden_trabajo, NULLIF(_comentario,""), _revisadoPor);	
+END //

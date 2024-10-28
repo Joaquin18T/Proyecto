@@ -249,7 +249,7 @@ $(document).ready(async () => {
         for (let k = 0; k < tareas.length; k++) {
             ulTareasAgregadas.innerHTML += `
                     <li class="list-group-item d-flex justify-content-between align-items-center mb-3">
-                        <p class="tarea-agregada" data-tarea-id="${tareas[k]?.idtarea}">${tareas[k]?.descripcion} - Tarea: ${tareas[k]?.idtarea}</p>
+                        <p class="tarea-agregada" data-tarea-id="${tareas[k]?.idtarea}">${tareas[k]?.descripcion} - Tarea: ${tareas[k]?.idtarea} - estado: ${tareas[k].nom_estado}</p>
                         <span class="badge bg-primary rounded-pill btn-eliminar-tarea" data-tarea-id="${tareas[k]?.idtarea}">
                             <i class="fa-solid fa-trash"></i>
                         </span>
@@ -262,6 +262,7 @@ $(document).ready(async () => {
         await renderTareasSelect()
         await renderSubCategorias()
         await renderUbicacion()
+        const tareasObtenidasAntesDeEliminar = await obtenerTareas()
         //registrarTareasOk = true
 
         //confirmarEliminacionTarea()
@@ -269,40 +270,55 @@ $(document).ready(async () => {
         const btnsEliminarTarea = $all(".btn-eliminar-tarea")
         btnsEliminarTarea.forEach(btn => {
             btn.addEventListener("click", async () => {
+                console.log("PUTAAAAAAAAAAAAAAAAAAAAAA: ", tareasObtenidasAntesDeEliminar)
                 console.log("eliminado")
                 console.log("data-tarea-id: ", btn.getAttribute("data-tarea-id"))
                 const idTarea = parseInt(btn.getAttribute("data-tarea-id"));
+                let procesoEncontrado = false;
                 console.log("ID tarea CLICKEADO: ", idTarea)
-                const li = btn.closest("li");
-                li.remove();
-
-                const activosVinculados = document.querySelectorAll(`li[data-idtarea="${idTarea}"]`);
-                activosVinculados.forEach(activo => activo.remove());
-
-                //ELIMINAMOS LA TAREA
-                const formEliminacionTarea = new FormData();
-                formEliminacionTarea.append("operation", "eliminarTarea")
-                const eliminado = await fetch(`${host}tarea.controller.php/${idTarea}`, { method: 'POST', body: formEliminacionTarea })
-                const elim = await eliminado.json()
-                console.log("eliminado?: ", elim.eliminado)
-
-                //CONSULTAMOS LAS TAREAS REGISTRADAS HASTA EL MOMENTO
-                const tareasRegistradasObtenidas = await obtenerTareas()
-                const avtObtenidas = await obtenerActivosVinculados()
-                console.log("tareasRegistradasObtenidas: ", await tareasRegistradasObtenidas) // me quede aca
-                console.log("avt data hasta el momento: ", avtObtenidas)
-                //ELIMINAR CONTENIDO DE LAS CAJAS DE TEXTO
-                formtarea.reset()
-
-                if (elim.eliminado) {
-                    if (tareasRegistradasObtenidas.length == 0 || avtObtenidas.length == 0) {
-                        console.log("ya no hay tareas");
-                        habilitarCamposActivo(true)
+                for (let w = 0; w < tareasObtenidasAntesDeEliminar.length; w++) {
+                    if (tareasObtenidasAntesDeEliminar[w].idtarea == idTarea && tareasObtenidasAntesDeEliminar[w].nom_estado == "proceso") {
+                        alert("ESTA TAREA NO SE PUEDE ELIMINAR POR QUE YA ESTA EN PROCESO")
+                        procesoEncontrado = true;
+                        break;
                     }
                 }
-                await renderTareasSelect()
-                sintareas = true
-                return
+
+                if (!procesoEncontrado) {
+                    //console.log("tarea data en else: ", tareasObtenidasAntesDeEliminar[w])
+                    console.log("dataidtara: ", idTarea)
+                    console.log("ELIMINADO JAAAJJASASJJAJASJASD")
+                    const li = btn.closest("li");
+                    li.remove();
+
+                    const activosVinculados = document.querySelectorAll(`li[data-idtarea="${idTarea}"]`);
+                    activosVinculados.forEach(activo => activo.remove());
+
+                    //ELIMINAMOS LA TAREA
+                    const formEliminacionTarea = new FormData();
+                    formEliminacionTarea.append("operation", "eliminarTarea")
+                    const eliminado = await fetch(`${host}tarea.controller.php/${idTarea}`, { method: 'POST', body: formEliminacionTarea })
+                    const elim = await eliminado.json()
+                    console.log("eliminado?: ", elim.eliminado)
+
+                    //CONSULTAMOS LAS TAREAS REGISTRADAS HASTA EL MOMENTO
+                    const tareasRegistradasObtenidas = await obtenerTareas()
+                    const avtObtenidas = await obtenerActivosVinculados()
+                    console.log("tareasRegistradasObtenidas: ", await tareasRegistradasObtenidas) // me quede aca
+                    console.log("avt data hasta el momento: ", avtObtenidas)
+                    //ELIMINAR CONTENIDO DE LAS CAJAS DE TEXTO
+                    formtarea.reset()
+
+                    if (elim.eliminado) {
+                        if (tareasRegistradasObtenidas.length == 0 || avtObtenidas.length == 0) {
+                            console.log("ya no hay tareas");
+                            habilitarCamposActivo(true)
+                        }
+                    }
+                    await renderTareasSelect()
+                    sintareas = true
+                    return
+                }
             })
         })
         console.log("sintareas? :", sintareas)
@@ -656,21 +672,37 @@ $(document).ready(async () => {
         const avtdata = await getDatos(`${host}activosvinculados.controller.php`, paramsAVTsearch)
         console.log("avtdata: ", avtdata)
 
+
         if (parseInt(selectElegirTareaParaActivo.value) === -1) { // si es que manipulan el console de google
             console.log("eliga una tarea valida")
             return
         }
+
+        // Obtener todas las tareas para verificar estados
+        const tareas = await obtenerTareas();
+        console.log("TAREAS OBTENIDAS AL MOMENTO DE SER AGREGADA UN ACTIVO: ", tareas);
+
         for (let e = 0; e < activosElegidos.length; e++) {
             for (let f = 0; f < avtdata.length; f++) {
-                if (avtdata[f].idactivo == activosElegidos[e].idactivo && avtdata[f].idtarea == activosElegidos[e].idtarea) {
-                    alert("este activo ya esta registrado a esa tarea .....")
+                const idTarea = activosElegidos[e].idtarea;
+                const tarea = tareas.find(t => t.idtarea === idTarea);
+
+                // Verificar si la tarea está en proceso antes de agregar activos
+                if (tarea && tarea.nom_estado === "proceso") {
+                    alert("Esta tarea ya no puede guardar más activos porque está en proceso");
                     estado = true;
-                    break;
+                    return;
+                }
+
+                // Verificar si el activo ya está vinculado a la tarea
+                const activoYaVinculado = avtdata.some(avt => avt.idactivo === activosElegidos[e].idactivo && avt.idtarea === idTarea);
+                if (activoYaVinculado) {
+                    alert("Este activo ya está registrado en esa tarea.");
+                    estado = true;
+                    return;
                 }
             }
-            if (estado) {
-                return
-            }
+
 
             const formAVT = new FormData()
             formAVT.append("operation", "insertarActivoPorTarea")

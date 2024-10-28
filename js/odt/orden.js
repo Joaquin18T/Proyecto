@@ -39,6 +39,7 @@ $(document).ready(async () => {
   const evidenciasInput = $q("#evidencias-img-input")
   const btnIniciar = $q("#btn-iniciar")
   const btnFinalizar = $q("#btn-finalizar")
+  const btnGuardarDianogstico = $q("#btn-guardar-diagnostico")
 
   //Ejecutar funciones 
   await obtenerOdt() // paso 1 
@@ -433,12 +434,10 @@ $(document).ready(async () => {
       } catch (error) {
         console.error('Error en la petición:', error);
       }
-
     }
   })
 
   btnIniciar.addEventListener("click", async () => {
-    const actualizado = await actualizarDiagnosticoSalida()
     const detalleRegistrado = await registrarDetalleOdt()
     btnIniciar.disabled = true
     btnIniciar.removeAttribute("id")
@@ -447,6 +446,10 @@ $(document).ready(async () => {
     console.log("Detalle odt obtenido: ", detalleOdt)
     txtFechaInicial.innerText = `${detalleOdt[0].fecha_inicial}`
     console.log("detalle registrado: ", detalleRegistrado)
+  })
+
+  btnGuardarDianogstico.addEventListener("click", async () => {
+    const actualizado = await actualizarDiagnosticoSalida()
     console.log("actualizado diagnostico salida:? ", actualizado)
   })
 

@@ -110,7 +110,7 @@ DROP PROCEDURE IF EXISTS `obtenerActivosPorTarea`
 DELIMITER $$
 CREATE PROCEDURE `obtenerActivosPorTarea`(IN _idtarea INT)
 BEGIN
-	SELECT ACTV.idactivo_vinculado, SCAT.subcategoria, MAR.marca, ACT.modelo FROM activos_vinculados_tarea ACTV
+	SELECT ACTV.idactivo_vinculado, ACT.idactivo,SCAT.subcategoria, MAR.marca, ACT.modelo FROM activos_vinculados_tarea ACTV
     INNER JOIN activos ACT ON ACTV.idactivo = ACT.idactivo
     INNER JOIN subcategorias SCAT ON ACT.idsubcategoria = SCAT.idsubcategoria
     INNER JOIN marcas MAR ON ACT.idmarca = MAR.idmarca

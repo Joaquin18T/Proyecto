@@ -15,6 +15,7 @@ $(document).ready(async () => {
 
     // VARIABLES
     const idodtgenerada = window.localStorage.getItem("idodt")
+    const idtareagenerada = window.localStorage.getItem("idtarea")
     const host = "http://localhost/CMMS/controllers/";
     let tbResponsables = null
     let iddiagnosticoGenerado = -1
@@ -42,6 +43,7 @@ $(document).ready(async () => {
     await filtrarUsuariosList()
     await renderResponsablesOdt()
     await verificarEvidenciasRegistradas()
+    await obtenerActivosPorTarea()
     //sestadoBotonConfirmarAsignacion()
 
     // ************************************ FUNCIONES PARA OBTENER DATOS ************************************
@@ -87,6 +89,15 @@ $(document).ready(async () => {
         params.append("iddiagnostico", iddiagnostico)
         const evidencias = await getDatos(`${host}diagnostico.controller.php`, params)
         return evidencias
+    }
+
+    async function obtenerActivosPorTarea() {
+        const params = new URLSearchParams()
+        params.append("operation", "obtenerActivosPorTarea")
+        params.append("idtarea", idtareagenerada)
+        const activo = await getDatos(`${host}activo.controller.php`, params)
+        console.log("activos: ", activo)
+        return activo
     }
     // ************************************ FIN DE FUNCIONES PARA OBTENER DATOS ******************************
 
@@ -449,7 +460,7 @@ $(document).ready(async () => {
     }
 
     async function verificarIdsGenerados() {
-        if(iddiagnosticoGenerado == -1 && !window.localStorage.getItem("idodt")){ // SI NO HAY ID GENERADO Y NO EXISTE ESE ITEM EN LOCALSTORAGE
+        if (iddiagnosticoGenerado == -1 && !window.localStorage.getItem("idodt")) { // SI NO HAY ID GENERADO Y NO EXISTE ESE ITEM EN LOCALSTORAGE
             contenedorRegistrarOdt.innerHTML = ''
             contenedorRegistrarOdt.innerHTML = `
             <div class="container-fluid">
@@ -459,7 +470,7 @@ $(document).ready(async () => {
             </div>
             `
             console.log("BODY BORRADO")
-            return 
+            return
         }
     }
 
@@ -534,12 +545,52 @@ $(document).ready(async () => {
         const responsablesAsignados = await obtenerResponsablesAsignados()
         const diagnosticoEntrada = await obtenerDiagnosticoEntrada()
         const evidencias = await obtenerEvidencias(iddiagnosticoGenerado)
+        //
+        const activos = await obtenerActivosPorTarea()
+        if (responsablesAsignados.length > 0 && diagnosticoEntrada.length == 1 && evidencias.length > 0) {
+            // SI POR LO MENOS HAY RESPONSABLES ASIGNADOS Y HAY DIAGNOSTICO (YA DEBERIA TENER AUTOMATICO) Y SI HAY EVIDENNCIAS
+            for (let o = 0; o < activos.length; o++) {
+                await actualizarEstadoActivo(activos[o].idactivo, 2)
+            }
+            for (let i = 0; i < responsablesAsignados.length; i++) {
+                await actualizarAsignacionUsuario(responsablesAsignados[i].idresponsable, 6)
+            }
+
+        } else {
+            for (let o = 0; o < activos.length; o++) {
+                await actualizarEstadoActivo(activos[o].idactivo, 1)
+            }
+            for (let i = 0; i < responsablesAsignados.length; i++) {
+                await actualizarAsignacionUsuario(responsablesAsignados[i].idresponsable, 7)
+            }
+        }
+
 
         const formActualizacion = new FormData()
         formActualizacion.append("operation", "actualizarBorradorOdt")
         formActualizacion.append("idordentrabajo", window.localStorage.getItem("idodt"))
         formActualizacion.append("borrador", (responsablesAsignados.length > 0 && diagnosticoEntrada.length == 1 && evidencias.length > 0) ? 0 : 1)
         const Factualizado = await fetch(`${host}ordentrabajo.controller.php`, { method: 'POST', body: formActualizacion })
+        const actualizado = await Factualizado.json()
+        return actualizado
+    }
+
+    async function actualizarEstadoActivo(idactivo, idestado) {
+        const formActualizacion = new FormData()
+        formActualizacion.append("operation", "updateEstado")
+        formActualizacion.append("idactivo", idactivo)
+        formActualizacion.append("idestado", idestado)
+        const Factualizado = await fetch(`${host}activo.controller.php`, { method: 'POST', body: formActualizacion })
+        const actualizado = await Factualizado.json()
+        return actualizado
+    }
+
+    async function actualizarAsignacionUsuario(idusuario, asignacion) {
+        const formActualizacion = new FormData()
+        formActualizacion.append("operation", "updateAsignacion")
+        formActualizacion.append("idusuario", idusuario)
+        formActualizacion.append("asignacion", asignacion)
+        const Factualizado = await fetch(`${host}usuarios.controller.php`, { method: 'POST', body: formActualizacion })
         const actualizado = await Factualizado.json()
         return actualizado
     }

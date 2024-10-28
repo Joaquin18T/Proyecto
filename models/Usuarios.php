@@ -2,31 +2,34 @@
 
 require_once 'ExecQuery.php';
 
-class Usuario extends ExecQuery{
+class Usuario extends ExecQuery
+{
 
-  public function login($params=[]):array{
-    try{
+  public function login($params = []): array
+  {
+    try {
       $sp = parent::execQ("CALL sp_user_login(?)");
       $sp->execute(array($params['usuario']));
       return $sp->fetchAll(PDO::FETCH_ASSOC);
-    }catch(Exception $e){
+    } catch (Exception $e) {
       die($e->getMessage());
     }
-
   }
 
-  public function getDataUsuario():array{
-    try{
-      $cmd=parent::execQ("CALL sp_list_users()");
+  public function getDataUsuario(): array
+  {
+    try {
+      $cmd = parent::execQ("CALL sp_list_users()");
       $cmd->execute();
       return $cmd->fetchAll(PDO::FETCH_ASSOC);
-    }catch(Exception $e){
+    } catch (Exception $e) {
       die($e->getMessage());
     }
   }
 
-  public function add($params=[]):bool{
-    try{
+  public function add($params = []): bool
+  {
+    try {
       $status = false;
       $cmd = parent::execQ("CALL sp_register_user(?,?,?,?)");
       $status = $cmd->execute(
@@ -38,42 +41,45 @@ class Usuario extends ExecQuery{
         )
       );
       return $status;
-    }catch(Exception $e){
+    } catch (Exception $e) {
       die($e->getMessage());
     }
   }
 
-  public function searchUser($params=[]):array{
-    try{
+  public function searchUser($params = []): array
+  {
+    try {
       $cmd = parent::execQ("CALL sp_search_user(?)");
       $cmd->execute(
         array($params['usuario'])
       );
       return $cmd->fetchAll(PDO::FETCH_ASSOC);
-    }catch(Exception $e){
+    } catch (Exception $e) {
       die($e->getMessage());
     }
   }
 
-  public function getUserById($params=[]):array{
-    try{
+  public function getUserById($params = []): array
+  {
+    try {
       $cmd = parent::execQ("CALL sp_getUser_by_id(?)");
       $cmd->execute(
         array($params['idusuario'])
       );
       return $cmd->fetchAll(PDO::FETCH_ASSOC);
-    }catch(Exception $e){
+    } catch (Exception $e) {
       die($e->getMessage());
     }
   }
 
-  public function listFilters($params=[]):array{
-    try{
-      $defaultParams=[
-        'idrol'=>null,
-        'idtipodoc'=>null,
-        'estado'=>null,
-        'dato'=>null
+  public function listFilters($params = []): array
+  {
+    try {
+      $defaultParams = [
+        'idrol' => null,
+        'idtipodoc' => null,
+        'estado' => null,
+        'dato' => null
       ];
 
       $realParams = array_merge($defaultParams, $params);
@@ -87,16 +93,17 @@ class Usuario extends ExecQuery{
         )
       );
       return $cmd->fetchAll(PDO::FETCH_ASSOC);
-    }catch(Exception $e){
+    } catch (Exception $e) {
       die($e->getMessage());
     }
   }
-  
-  public function filtrarUsuarios($params=[]):array{
-    try{
-      $defaultParams=[
-        'numdoc'=>null,
-        'dato'=>null
+
+  public function filtrarUsuarios($params = []): array
+  {
+    try {
+      $defaultParams = [
+        'numdoc' => null,
+        'dato' => null
       ];
 
       $realParams = array_merge($defaultParams, $params);
@@ -108,13 +115,14 @@ class Usuario extends ExecQuery{
         )
       );
       return $cmd->fetchAll(PDO::FETCH_ASSOC);
-    }catch(Exception $e){
+    } catch (Exception $e) {
       die($e->getMessage());
     }
   }
 
-  public function updateUser($params=[]):int{
-    try{
+  public function updateUser($params = []): int
+  {
+    try {
       $pdo = parent::getConexion();
       $cmd = $pdo->prepare("CALL sp_update_usuario(@idpersona, ?, ?, ?)");
       $cmd->execute(
@@ -127,53 +135,73 @@ class Usuario extends ExecQuery{
 
       $respuesta = $pdo->query("SELECT @idpersona AS idpersona")->fetch(PDO::FETCH_ASSOC);
       return $respuesta['idpersona'];
-    }catch(Exception $e){
-      error_log("Error: ".$e->getMessage());
+    } catch (Exception $e) {
+      error_log("Error: " . $e->getMessage());
       return -1;
     }
   }
 
-  public function updateEstado($params=[]):bool{
-    try{
+  public function updateEstado($params = []): bool
+  {
+    try {
       $state = false;
       $cmd = parent::execQ("CALL sp_update_estado_usuario(?,?)");
-      $state=$cmd->execute(
+      $state = $cmd->execute(
         array(
           $params['idusuario'],
           $params['estado']
         )
       );
       return $state;
-    }catch(Exception $e){
-      error_log("Error: ".$e->getMessage());
+    } catch (Exception $e) {
+      error_log("Error: " . $e->getMessage());
     }
   }
 
-  public function updateClaveAcceso($params=[]):bool{
-    try{
-      $status=false;
+  public function updateAsignacion($params = []): bool
+  {
+    try {
+      $state = false;
+      $cmd = parent::execQ("CALL sp_update_asignacion_usuario(?,?)");
+      $state = $cmd->execute(
+        array(
+          $params['idusuario'],
+          $params['asignacion']
+        )
+      );
+      return $state;
+    } catch (Exception $e) {
+      error_log("Error: " . $e->getMessage());
+    }
+  }
+
+  public function updateClaveAcceso($params = []): bool
+  {
+    try {
+      $status = false;
       $cmd = parent::execQ("CALL sp_update_claveacceso(?,?)");
       $status = $cmd->execute(
         array(
           $params['idusuario'],
-          $params['contrasena']          
+          $params['contrasena']
         )
       );
       return $status;
-    }catch(Exception $e){
-      error_log("Error: ".$e->getMessage());
+    } catch (Exception $e) {
+      error_log("Error: " . $e->getMessage());
     }
   }
 
-  public function getDataUserPersona($params = []):array{
-    try{
+  public function getDataUserPersona($params = []): array
+  {
+    try {
       $cmd = parent::execQ("CALL sp_get_user_persona(?)");
       $cmd->execute(
         array($params['idusuario'])
       );
       return $cmd->fetchAll(PDO::FETCH_ASSOC);
-    }catch(Exception $e){
-      error_log("Error: ".$e->getMessage());
+    } catch (Exception $e) {
+      error_log("Error: " . $e->getMessage());
     }
   }
 }

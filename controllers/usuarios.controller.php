@@ -114,6 +114,16 @@ if (isset($_POST['operation'])) {
       }
       echo json_encode($isUpdate);
       break;
+
+    case 'updateAsignacion':
+      $datosEnviar = [
+        'idusuario' => $user->limpiarCadena($_POST['idusuario']),
+        'asignacion' => $user->limpiarCadena($_POST['asignacion'])
+      ];
+      $resp = $user->updateAsignacion($datosEnviar);  
+      echo json_encode(["actualizado" => $resp]);
+      break;
+
     case 'updateClaveAcceso':
       $isUpdate = ['respuesta' => -1];
 
