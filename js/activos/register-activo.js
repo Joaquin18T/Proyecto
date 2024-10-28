@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   let list_codes = [];
-  let contClick = 0;
+  let onlyOneCall = false;
+
   let contCodeInputs=0;
 
   let valores = [];
@@ -19,6 +20,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let isvalidate = true;
   let validateEspec = true;
+
+  function getInputCodes(){
+    const data = document.querySelectorAll(".element-cod");
+    return [...data];
+  }
+
+  function createElementHTML(name_element){
+    return document.createElement(name_element);
+  }
 
   async function getDatos(link, params) {
     let data = await fetch(`${link}?${params}`);
@@ -47,9 +57,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   })();
 
-  // selector("subcategoria").addEventListener("change", async () => {
-  //   await showMarca(selector("subcategoria").value);
-  // });
+  selector("subcategoria").addEventListener("change", async () => {
+    await getMarcas(selector("subcategoria").value);
+  });
 
   function getDate() {
     const today = new Date();
@@ -65,27 +75,13 @@ document.addEventListener("DOMContentLoaded", () => {
     selector("fecha").value = getDate();
   })();
 
-  // async function showMarca() {
-  //   const params = new URLSearchParams();
-  //   params.append("operation", "getAll");
-  //   //params.append("idsubcategoria", id);
-  //   const data = await getDatos("http://localhost/CMMS/controllers/marca.controller.php", params);
 
-  //   for (let i = selector("marca").options.length - 1; i > 0; i--) {
-  //     selector("marca").remove(i);
-  //   }
-  //   data.forEach(x => {
-  //     const element = createOption(x.idmarca, x.marca);
-  //     selector("marca").appendChild(element);
-  //   })
-  // }
-
-  (async () => {
+  async function getMarcas(id){
     const params = new URLSearchParams();
-    params.append("operation", "getAll");
-    //params.append("idsubcategoria", id);
+    params.append("operation", "getMarcasBySubcategoria");
+    params.append("idsubcategoria", parseInt(id));
     const data = await getDatos(
-      "http://localhost/CMMS/controllers/marca.controller.php",
+      "http://localhost/CMMS/controllers/subcategoria.controller.php",
       params
     );
 
@@ -96,17 +92,34 @@ document.addEventListener("DOMContentLoaded", () => {
       const element = createOption(x.idmarca, x.marca);
       selector("marca").appendChild(element);
     });
-  })();
+  }
 
-  async function searchCode() {
+  async function searchCode(code) {
     const params = new URLSearchParams();
     params.append("operation", "repeatCode");
-    params.append("cod_identificacion", selector("codigo").value);
+    params.append("cod_identificacion", code);
     const data = await getDatos(
       "http://localhost/CMMS/controllers/activo.controller.php",
       params
     );
     return data;
+  }
+
+  async function validateAllCodes(){
+    let cont =0;
+    let cap ="";
+    const inputsCode = getInputCodes();
+    for (let i = 0; i < inputsCode.length; i++) {
+      const data = await searchCode(inputsCode[i].value);
+
+      if(data.length===0 && (cap!==inputsCode[i].value)){
+        cont++;
+        cap = inputsCode[i].value;
+      }
+    }
+    cap="";
+
+    return (cont ===inputsCode.length);
   }
 
   function valideWhiteSpace() {
@@ -119,9 +132,13 @@ document.addEventListener("DOMContentLoaded", () => {
     let list = [subcategoria, txtIdmarca, txtModelo, txtdescrip];
 
     const isValidate = list.every((x) => x.trim().length > 0);
-    //console.log("alert activo");
-
-    return isValidate;
+    
+    //Validamos que no se puedan registrar campos vacios en el sidebar
+    const inputsC = getInputCodes();
+    const validateCods = inputsC.every(x=>x.value.trim().length>0);
+    console.log("code blank",validateCods);
+    
+    return isValidate===validateCods;
   }
 
   async function cascadeAddActivo(data=[]){
@@ -137,6 +154,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   selector("showSB").addEventListener("click",()=>{
     if(parseInt(selector("cantidad").value)>0){
+
       selector("only-view").disabled=false;
       
       addInputsCode(parseInt(selector("cantidad").value));
@@ -150,104 +168,132 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   function addInputsCode(cantidad){
-    const countInputs = document.querySelectorAll(".element-cod").length;
-    console.log(countInputs);
+    // const countInputs = document.querySelectorAll(".element-cod").length;
+    // console.log(countInputs);
     
     for (contCodeInputs; contCodeInputs < cantidad; contCodeInputs++) {
       const container = selector("container-code");
-      const div = document.createElement("div");
-      div.classList.add("mb-2", "mt-4");
+      const div = createElementHTML("div");
+      div.classList.add("mb-2", "mt-4", "contain-input-code");
 
-      const label = document.createElement("label");
-      label.classList.add("form-label");
+      const label = createElementHTML("label");
+      label.classList.add("form-label", "text-cont");
       label.textContent = `Codigo del activo Nº. ${contCodeInputs+1}`;
 
-      const input = document.createElement("input");
-      input.classList.add("form-control", "w-75", "element-cod");
+      const input = createElementHTML("input");
+      input.classList.add("form-control", "w-50", "element-cod");
+      
+      const button = createElementHTML("button");
+      button.classList.add("btn", "btn-sm", "btn-danger", "delete-input","w-25");
+      button.textContent="Delete";
+
+      const divGroup = createElementHTML("div");
+      divGroup.classList.add("input-group", 'input-code');
+
+      divGroup.appendChild(input);
+      divGroup.appendChild(button);
 
       div.appendChild(label);
-      div.appendChild(input);
+      div.appendChild(divGroup);
+
+      deleteInputCode(div);
 
       container.appendChild(div);
     }
-    //cantidad=0;
+    cantidad=0;
   }
 
+  function deleteInputCode(div){
+    div.querySelector(".delete-input").addEventListener("click",(e)=>{
+      getAllCodesSB();
+      const parent = e.target.parentNode;
+
+      //Obtiene el valor del input
+      const input = e.target.closest('.input-group').querySelector('input');
+
+      list_codes = [];
+
+      const grandParent = parent.parentNode;
+
+      const container = selector("container-code");
+      container.removeChild(grandParent);
+      selector("cantidad").value-=1;
+      contCodeInputs-=1;
+
+      const textLabels = document.querySelectorAll(".text-cont");
+      for (let i = 0; i < getInputCodes().length; i++) {
+        textLabels[i].textContent = `Codigo del activo Nº. ${i+1}`;
+      }
+
+      if(getInputCodes().length===0){
+        const sidebar = bootstrap.Offcanvas.getOrCreateInstance(selector("sb-code"));
+        sidebar.hide();
+        selector("cantidad").value=0;
+        selector("only-view").disabled = true;
+      }
+    });
+  }
 
   function getAllCodesSB(){
-    const codesSB = document.querySelectorAll(".element-cod");
-
-    codesSB.forEach(x=>{
-      console.log(x.value);
+    const inputsCode = getInputCodes();
+    inputsCode.forEach(x=>{
+      //console.log(x.value);
       list_codes.push(x.value);
     });
     console.log(list_codes);
-    
   }
 
   async function saveData(code) {
-    //let isUnique = await searchCode(); verificar esto
-
     let dataBack=0;
-    if (true) {
-      txtIdmarca = selector("marca").value;
-      txtModelo = selector("modelo").value;
-      txtCode = code;
-      txtfecha = selector("fecha").value;
-      txtdescrip = selector("descripcion").value;
-      //let txtIdUbi = selector("ubicacion").value;
+    txtIdmarca = selector("marca").value;
+    txtModelo = selector("modelo").value;
+    txtCode = code;
+    txtfecha = selector("fecha").value;
+    txtdescrip = selector("descripcion").value;
 
-      let subcategoria = selector("subcategoria").value;
+    let subcategoria = selector("subcategoria").value;
 
-      selector("descripcion").addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
-        }
-      });
-
-      //catchData();
-      txtEscec = valores.reduce((acum, objeto) => {
-        const clave = String(Object.keys(objeto)[0]);
-        acum[clave] = objeto[clave];
-        return acum;
-      }, {});
-      //console.log(txtEscec);
-
-      let list = [subcategoria, txtIdmarca, txtModelo, txtCode, txtdescrip];
-
-      isvalidate = list.every((x) => x.trim().length > 0);
-
-      
-      if (isvalidate && Object.keys(txtEscec).length > 0 && validateEspec) {
-        const params = new FormData();
-        params.append("operation", "add");
-        params.append("idsubcategoria", selector("subcategoria").value);
-        params.append("idmarca", txtIdmarca);
-        //params.append("idubicacion", txtIdUbi);
-        params.append("modelo", txtModelo);
-        params.append("cod_identificacion", txtCode);
-        params.append("fecha_adquisicion", txtfecha);
-        params.append("descripcion", txtdescrip);
-        params.append("especificaciones", JSON.stringify(txtEscec));
-
-        const data = await fetch("http://localhost/CMMS/controllers/activo.controller.php",{
-          method: "POST",
-          body: params
-        });
-        
-        const respuesta = await data.json();
-
-        dataBack = respuesta.idactivo;
-      } else {
-        alert("Completa los campos");
-        validateEspec = true;
+    selector("descripcion").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
       }
+    });
+
+    //catchData();
+    txtEscec = valores.reduce((acum, objeto) => {
+      const clave = String(Object.keys(objeto)[0]);
+      acum[clave] = objeto[clave];
+      return acum;
+    }, {});
+    //console.log(txtEscec);
+
+    let list = [subcategoria, txtIdmarca, txtModelo, txtCode, txtdescrip];
+
+    isvalidate = list.every((x) => x.trim().length > 0);
+
+    if (isvalidate && Object.keys(txtEscec).length > 0 && validateEspec) {
+      const params = new FormData();
+      params.append("operation", "add");
+      params.append("idsubcategoria", selector("subcategoria").value);
+      params.append("idmarca", txtIdmarca);
+      //params.append("idubicacion", txtIdUbi);
+      params.append("modelo", txtModelo);
+      params.append("cod_identificacion", txtCode);
+      params.append("fecha_adquisicion", txtfecha);
+      params.append("descripcion", txtdescrip);
+      params.append("especificaciones", JSON.stringify(txtEscec));
+
+      const data = await fetch("http://localhost/CMMS/controllers/activo.controller.php",{
+        method: "POST",
+        body: params
+      });
+      
+      const respuesta = await data.json();
+
+      dataBack = respuesta.idactivo;
     } else {
-      alert("El codigo no es unico");
-      //return 0;
-      //Crear un array de objetos con las alertas, esa funcion tendra que pasarle un parametro, ejm:
-      //alertArray("unico") Esta funcion mostrara una alerta de que el codigo no es unico de acuerdo a que debe
-      // ser igual que la clave del objeto con el mensaje
+      alert("Completa los campos");
+      validateEspec = true;
     }
     return dataBack;
   }
@@ -263,22 +309,35 @@ document.addEventListener("DOMContentLoaded", () => {
       validateJson &&
       valideWhiteSpace()
     ) {
-      console.log(valores);
-
-      if (confirm("Deseas registrar el activo?")) {
-        getAllCodesSB();
-        const allSave = await cascadeAddActivo(list_codes);
-        if(allSave){
-          alert("Los registros se han guardado correctamente");
-          list_codes=[];
-          const sidebar = bootstrap.Offcanvas.getOrCreateInstance(
-            selector("sb-code")
-          );
-          sidebar.hide();
-          selector("cantidad").value=0;
-          contCodeInputs=0;
-          selector("only-view").disabled = true;
-          resetUI();
+      //console.log(valores);
+      let isUnique = await validateAllCodes(); 
+      const inputsSB = getInputCodes();
+      const minCharacteres = inputsSB.every(x=>x.value.length>=15); //el codigo de ident. tiene un minimo de 15
+      
+      //console.log(list_codes);
+      
+      if(isUnique && minCharacteres){
+        if (confirm("Deseas registrar el activo?")) {
+          getAllCodesSB();
+          const allSave = await cascadeAddActivo(list_codes);
+          if(allSave){
+            alert("Los registros se han guardado correctamente");
+            list_codes=[];
+            const sidebar = bootstrap.Offcanvas.getOrCreateInstance(
+              selector("sb-code")
+            );
+            sidebar.hide();
+            selector("cantidad").value=0;
+            contCodeInputs=0;
+            selector("only-view").disabled = true;
+            resetUI();
+          }
+        }
+      }else{
+        if(!isUnique){
+          alert("El codigo de identificacion debe ser unico");
+        }else if(!minCharacteres){
+          alert("El minimo de carateres para el codigo de identif. es de 15 caracteres");
         }
       }
     } else {

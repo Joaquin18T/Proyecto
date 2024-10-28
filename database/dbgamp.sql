@@ -86,6 +86,15 @@ CREATE TABLE marcas
     CONSTRAINT uk_marca UNIQUE(marca)
 )ENGINE=INNODB;
 
+CREATE TABLE detalles_marca_subcategoria
+(
+	iddetalle_marca_sub INT AUTO_INCREMENT PRIMARY KEY,
+    idmarca		INT NOT NULL,
+    idsubcategoria INT NOT NULL,
+    CONSTRAINT fk_idmarca_detalle FOREIGN KEY (idmarca) REFERENCES marcas (idmarca),
+    CONSTRAINT fk_idsubcategoria FOREIGN KEY (idsubcategoria) REFERENCES subcategorias (idsubcategoria)
+)ENGINE = INNODB;
+
 CREATE TABLE ubicaciones
 (
 	idubicacion	INT AUTO_INCREMENT PRIMARY KEY,

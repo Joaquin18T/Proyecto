@@ -266,7 +266,7 @@ class Activo extends ExecQuery{
 
 //echo json_encode($asc->getAll());
 
-//echo json_encode($asc->searchCode(['code'=>'D']));
+//echo json_encode($asc->repeatByCode(['cod_identificacion'=>'123ABC']));
 
 // $params=[
 //   'idsubcategoria'=>1,

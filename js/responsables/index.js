@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     await showData();
     
   })();
-  
+  chargerEventsButtons();
   async function showData(){
     selector("tb-activo-resp tbody").innerHTML="";
     const params = new URLSearchParams();
@@ -73,8 +73,6 @@ document.addEventListener("DOMContentLoaded",()=>{
     });
 
     createTable(data);
-    chargerEventsButtons();
-    
   }
 
   function chargerEventsButtons(){

@@ -46,26 +46,34 @@ document.addEventListener("DOMContentLoaded", async () => {
       file.onload = function() {
         const colDiv = document.createElement("div");
         colDiv.id=`image${contImages}`;
-        colDiv.classList.add('col-6', 'col-md-1', 'col-lg-3', 'mb-1');
+        colDiv.classList.add('col-md-12', 'mb-1');
   
         let img = document.createElement("img");
         img.src = file.result;
         img.height=200;
-        img.width=200;
+        img.width=400;
   
         listImages[`image${contImages}`] ={
           url:img.src,
           name: image.name
         }
 
-        img.classList.add('img-fluid', 'rounded', 'img-select','images-select');
-        img.setAttribute("data-filename", image.name);
+        img.classList.add('rounded');
+        
         console.log(listImages);
+
+        const button = document.createElement("button");
+        button.classList.add("btn", "btn-sm", "btn-danger", "w-25", "mt-2", "mb-3", "btn-delete-image");
+        button.textContent = "Eliminar";
+        button.setAttribute("data-filename", image.name);
         
         colDiv.appendChild(img);
+        colDiv.appendChild(button)
         contentImages.appendChild(colDiv);
   
         contImages++;
+        selector("show-sb-images").disabled = false;
+        deleteImage();
       }
       file.onerror = function() {
         console.error(file.error);
@@ -75,11 +83,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  imagesModal();
+  selector("show-sb-images").addEventListener("click",()=>{
+    const sidebar = selector("sb-imagenes");
+    const offCanvas = new bootstrap.Offcanvas(sidebar);
+    offCanvas.show();
+  });
 
-  function imagesModal() {
-    selector("imagePreview").addEventListener("click", (e) => {
-      selector("btn-eliminar").addEventListener("click",()=>{
+  function deleteImage(){
+    const buttons = document.querySelectorAll(".btn-delete-image");
+    buttons.forEach(x=>{
+      x.addEventListener("click",(e)=>{
         let dataImage = e.target.dataset.filename;
         let isSame = "";
         for(let i in listImages){
@@ -92,30 +105,25 @@ document.addEventListener("DOMContentLoaded", async () => {
         if(isSame!=""){
           console.log("Imagen eliminada ", dataImage);
           delete listImages[isSame]; //elimina una propiedad del objeto
-          const parent = selector("imagePreview");
-          const child = selector(isSame);
-          parent.removeChild(child); //elimina la imagen de la lista previa
-
-          const myModal = bootstrap.Modal.getOrCreateInstance('#imageModal');
-          myModal.hide();
+          console.log("parent", e.target.parentNode);
           
+          const parent = selector("imagePreview");
+          parent.removeChild(e.target.parentNode);   
         }
+
+        if(Object.keys(listImages).length===0){
+          selector("show-sb-images").disabled = true;
+          const sidebar = bootstrap.Offcanvas.getOrCreateInstance(selector("sb-imagenes"));
+          sidebar.hide();
+        }
+
         console.log(listImages);
         
         dataImage="";
       });
-      // if (e.target.classList.contains("img-select")) {
-      //   const imgSrc = e.target.src;
-      //   const imgModal = selector("modalImg");
-
-      //   imgModal.src = imgSrc;
-      //   imgModal.height=300;
-      //   imgModal.width=150;
-      // }
-      const modalImg = new bootstrap.Modal(selector("imageModal"));
-      modalImg.show();
     });
   }
+
 
   function startText(select) {
     select.setSelectionRange(0, 0); //Ubicar el cursor al principio
@@ -477,7 +485,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   async function getUbiByActivo(){
     const params = new URLSearchParams();
-    params.append("operation", 'ubiByActivo');
+    params.append("operation", 'getUbiOnlyActivo');
     params.append("idactivo", idactivo);
     const data = await getDatos(`${host}/historialactivo.controller.php`, params);
     if(data.length>0){

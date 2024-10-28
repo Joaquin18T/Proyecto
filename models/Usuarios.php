@@ -204,10 +204,27 @@ class Usuario extends ExecQuery
       error_log("Error: " . $e->getMessage());
     }
   }
+
+  public function darBajaUsuario($params=[]):bool{
+    try{
+      $status = false;
+      $cmd = parent::execQ("UPDATE usuarios SET estado=? WHERE id_usuario=?");
+      $status = $cmd->execute(array(
+        $params['estado'],
+        $params['idusuario']
+      ));
+      return $status;
+    }catch(Exception $e){
+      error_log("Error: ".$e->getMessage());
+      return false;
+    }
+  }
 }
 
 //echo (password_hash('contrasena7', PASSWORD_BCRYPT));
-//$user = new Usuario();
+// $user = new Usuario();
+
+// echo json_encode($user->darBajaUsuario(['estado'=>1, 'idusuario'=>15]));
 
 // echo json_encode($user->getDataUserPersona(['idusuario'=>1]));
 

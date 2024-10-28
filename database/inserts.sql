@@ -97,8 +97,23 @@ INSERT INTO marcas(marca)
 		('Hyundai'),
 		('FenWick'),
 		('ABB');
-        
-
+select* from detalles_marca_subcategoria;
+INSERT INTO detalles_marca_subcategoria (idsubcategoria, idmarca) VALUES
+	(1,1),
+	(2,1),
+	(2,2),
+	(3,4),
+	(3,7),
+	(4,5),
+	(5,6),
+	(5,3),
+	(6,6),
+	(6,3),
+	(7,4),
+	(8,8),
+	(9,2),
+	(10,1),
+	(11,1);
 
 INSERT INTO activos(idsubcategoria, idmarca, modelo, cod_identificacion, fecha_adquisicion, descripcion, especificaciones)
 	VALUES
