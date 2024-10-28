@@ -6,8 +6,8 @@ ALTER TABLE historial_activos AUTO_INCREMENT = 1;
 
 
 select* from activos_responsables where idactivo=3;
-select*from historial_activos where idactivo_resp=4;
-select*from notificaciones where idusuario = 15;
+select*from historial_activos where idactivo_resp=1;
+select*from notificaciones where idusuario = 2;
 select*from activos;
 select*from usuarios;
 select*from personas;
@@ -17,7 +17,7 @@ select*from marcas;
 select*from subcategorias;
 
 DELETE FROM bajas_activo where idbaja_activo>=2;
-DELETE FROM notificaciones where idnotificacion =15;
+DELETE FROM notificaciones where idusuario =2;
 DELETE FROM historial_activos where idhistorial_activo =14;
 DELETE FROM activos where idactivo =29;
 UPDATE activos SET idestado = 3 WHERE idactivo = 5;    
@@ -35,4 +35,16 @@ insert into bajas_activo(idactivo, motivo, ruta_doc, aprobacion) VALUES
 
 insert into historial_activos(idactivo_resp, idubicacion) VALUES
 	(4, 5);
+
+SELECT
+    NOF.idusuario,
+    NOF.idnotificacion,
+    NOF.tipo,
+    NOF.estado,
+    NOF.mensaje,
+    NOF.fecha_creacion
+FROM notificaciones NOF
+WHERE NOF.idusuario = 2
+ORDER BY NOF.fecha_creacion DESC
+
 

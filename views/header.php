@@ -273,7 +273,7 @@ $host = "http://localhost/CMMS/";
                   <div class="" id="list-notificaciones">
 
                   </div>
-                  <a href="#" class="dropdown-item text-center fw-bold rounded-bottom py-3">
+                  <a href="#" class="dropdown-item text-center fw-bold rounded-bottom py-3" id="show-all-notificaciones">
                     <svg
                       class="icon icon-xxs text-gray-400 me-1"
                       fill="currentColor"

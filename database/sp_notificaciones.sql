@@ -63,11 +63,12 @@ BEGIN
     RES.idusuario,
 	ACT.descripcion,
     RES.descripcion desresp,
-    RES.idactivo_resp
+    RES.idactivo_resp,
+    RES.fecha_asignacion
 	FROM activos_responsables RES
     INNER JOIN activos ACT ON RES.idactivo = ACT.idactivo
     WHERE RES.idusuario = _idusuario
-    ORDER BY RES.fecha_asignacion DESC;
+    ORDER BY RES.idactivo_resp DESC;
 END $$
 
 CALL sp_responsable_notificacion(2);
@@ -81,6 +82,7 @@ CREATE PROCEDURE sp_detalle_notificacion_resp (
 BEGIN
     SELECT
         ACT.idactivo,
+        RES.idactivo_resp,
         ACT.cod_identificacion,
         ACT.descripcion,
         MAR.marca,
@@ -94,10 +96,9 @@ BEGIN
     INNER JOIN historial_activos HIS ON RES.idactivo_resp = HIS.idactivo_resp
     INNER JOIN ubicaciones UBI ON HIS.idubicacion = UBI.idubicacion
     WHERE RES.idusuario = _idusuario AND RES.idactivo_resp = _idactivo_resp
-    ORDER BY HIS.fecha_movimiento DESC
-    LIMIT 1; -- acabar esto
+    ORDER BY HIS.fecha_movimiento DESC;
 END $$
-CALL sp_detalle_notificacion_resp(2, 1);
+CALL sp_detalle_notificacion_resp(2, 18);
 
 -- no se usa
 DROP PROCEDURE IF EXISTS sp_detalle_sol_estado
@@ -125,3 +126,12 @@ END $$
 
 -- CALL sp_detalle_sol_estado(7);
 
+DROP PROCEDURE IF EXISTS sp_notificacion_designacion;
+DELIMITER $$
+CREATE PROCEDURE sp_notificacion_designacion
+(
+
+)
+BEGIN
+
+END $$

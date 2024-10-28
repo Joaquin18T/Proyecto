@@ -46,6 +46,20 @@
   </div>
 </div>
 <!-- FIN MODAL -->
+
+<!-- SIDEBAR DE NOTIFICACIONES -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="sb-notificacion" aria-labelledby="offcanvasRightLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="offcanvasRightLabel">Offcanvas right</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <div class="mt-1" id="sb-list-notificacion">
+
+    </div>
+  </div>
+</div>
+<!-- ./SIDEBAR DE NOTIFICACIONES -->
 <!-- Core -->
 <script
   src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"

@@ -191,7 +191,7 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log(globals.idRes);
         console.log("ubi enviar", selector("ubicacion").value);
         
-        const isUpdated = await updateUbicacion(globals.idRes);
+        const isUpdated = await addHistorial(globals.idRes);
 
         if(isUpdated.mensaje==="Historial guardado"){
           console.log(usuario);
@@ -286,9 +286,10 @@ document.addEventListener("DOMContentLoaded", () => {
     for (let i = 0; i < data_user.length; i++) {
       const isAdd = await addNotificacion(data_user[i], tipo, msg);
       const updateAsg = await updateAsignacion(data_user[i], data_resp[i]);
-      console.log(updateAsg);
+      const {mensaje} = await addHistorial(data_resp[i]);
+      console.log(mensaje);
       
-      if(isAdd>0 && updateAsg>0){
+      if(isAdd>0 && updateAsg>0 && mensaje==="Historial guardado"){
         cont++;
       }
     }
@@ -322,8 +323,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     const resp = await data.json();
     const isAdd = await addNotificacion(diferentRP[0], "Cambio de responsable Principal", "Ya no eres responsable principal del activo");
-
-    if(isAdd>0 && resp.respuesta>0){
+    const {mensaje} = await addHistorial(diferentRespRP[0]);
+    if(isAdd>0 && resp.respuesta>0 && mensaje==="Historial guardado"){
       isChange = true;
     }
     return isChange;
@@ -367,6 +368,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return [cont, ids];
   }
 
+
   //------------------------ACTUALIZAR UBICACION---------------------
 
   async function getResPrincipal(idresp, idactivo) {
@@ -408,8 +410,12 @@ document.addEventListener("DOMContentLoaded", () => {
     return resp.respuesta;
   }
 
-
-  async function updateUbicacion(id) {
+  /**
+   * Crea un registro en el historial
+   * @param {*} id idActivo_resp
+   * @returns Retorna un booleano
+   */
+  async function addHistorial(id) {
     //Insercion al historial
     console.log("ubi enviar", parseInt(selector("ubicacion").value));
     

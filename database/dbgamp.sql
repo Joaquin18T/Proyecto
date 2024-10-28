@@ -198,6 +198,18 @@ CREATE TABLE bajas_activo
 )
 ENGINE=INNODB;
 
+CREATE TABLE notificaciones_activos
+(
+	idnotificacion_activo	INT AUTO_INCREMENT PRIMARY KEY,
+    idactivo_resp			INT NOT NULL,
+    tipo					VARCHAR(30) NOT NULL,
+    mensaje					VARCHAR(250) NOT NULL,
+    fecha_creacion			DATETIME NOT NULL DEFAULT NOW(),
+    visto					CHAR(1) NOT NULL,
+    CONSTRAINT fk_idactivo_resp_nof FOREIGN KEY(idactivo_resp) REFERENCES activos_responsables (idactivo_resp),
+    CONSTRAINT chk_visto CHECK (visto IN('1','0'))
+)ENGINE = INNODB;
+
 -- ********************************* TABLAS ROYER *************************************
 -- 12/10/2024
 
