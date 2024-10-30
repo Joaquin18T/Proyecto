@@ -139,16 +139,6 @@ CREATE TABLE solicitudes_activos
 )
 ENGINE=INNODB;
 
-CREATE TABLE notificaciones
-(
-	idnotificacion	INT AUTO_INCREMENT PRIMARY KEY,
-	idusuario		INT NOT NULL,
-    tipo			VARCHAR(20) NOT NULL, --  ASIGNACION, DESIGNACION, cuando la ubicacion del activo cambia
-	mensaje			VARCHAR(400) NOT NULL,
-	estado			ENUM('no leido', 'leido') NOT NULL DEFAULT('no leido'),
-	fecha_creacion	DATETIME NOT NULL DEFAULT NOW(),
-	CONSTRAINT fk_idusuario_notif FOREIGN KEY(idusuario) REFERENCES usuarios(id_usuario)
-)ENGINE=INNODB;
 
 -- TABLA CONTROLADA POR LOS ADMINISTRADORES
 CREATE TABLE activos_responsables
@@ -175,11 +165,14 @@ CREATE TABLE activos_responsables
 CREATE TABLE historial_activos
 (
 	idhistorial_activo 	INT AUTO_INCREMENT PRIMARY KEY,
-    idactivo_resp		INT NOT NULL,
+    idactivo_resp		INT NULL,
 	idubicacion			INT	NOT NULL,
+    accion 				VARCHAR(30) NULL,
+    responsable_accion 	INT NULL,
     fecha_movimiento 	DATETIME NOT NULL DEFAULT NOW(),
     CONSTRAINT fk_idactivo_resp FOREIGN KEY (idactivo_resp)REFERENCES activos_responsables(idactivo_resp),
-	CONSTRAINT fk_idubicacion	FOREIGN KEY(idubicacion) REFERENCES ubicaciones(idubicacion)
+	CONSTRAINT fk_idubicacion	FOREIGN KEY(idubicacion) REFERENCES ubicaciones(idubicacion),
+    CONSTRAINT fk_usuario_his FOREIGN KEY(responsable_accion) REFERENCES usuarios (id_usuario)
 )ENGINE=INNODB;
 
 
@@ -198,6 +191,33 @@ CREATE TABLE bajas_activo
 )
 ENGINE=INNODB;
 
+CREATE TABLE notificaciones_activos
+(
+	idnotificacion_activo	INT AUTO_INCREMENT PRIMARY KEY,
+    idactivo_resp			INT NULL, 
+    tipo					VARCHAR(30) NOT NULL,
+    mensaje					VARCHAR(250) NOT NULL,
+    fecha_creacion			DATETIME NOT NULL DEFAULT NOW(),
+    visto					CHAR(1) NOT NULL DEFAULT('0'),
+    idactivo 				INT  NULL,
+    CONSTRAINT fk_idactivo_resp_nof FOREIGN KEY(idactivo_resp) REFERENCES activos_responsables (idactivo_resp),
+    CONSTRAINT chk_visto CHECK (visto IN('1','0')),
+    CONSTRAINT fk_idactivo_noti_activo FOREIGN KEY(idactivo) REFERENCES activos(idactivo)
+)ENGINE = INNODB;
+
+CREATE TABLE notificaciones_mantenimiento
+(
+	idnotificacion_mantenimiento	INT AUTO_INCREMENT PRIMARY KEY,
+    idactivo						INT NOT NULL,
+    tipo							VARCHAR(30) NOT NULL,
+    mensaje							VARCHAR(250) NOT NULL,
+    fecha_programada				DATE NOT NULL,
+    fecha_creacion					DATETIME NOT NULL DEFAULT NOW(),
+    estado							VARCHAR(20) NOT NULL,
+    visto							CHAR(1) NOT NULL,
+    CONSTRAINT fk_idactivo_noti_mantenimiento FOREIGN KEY(idactivo) REFERENCES activos(idactivo)
+    -- validar que la fecha programada sea mayor que la fecha actual
+)ENGINE = INNODB;
 -- ********************************* TABLAS ROYER *************************************
 -- 12/10/2024
 

@@ -209,9 +209,73 @@ class ResponsableAct extends ExecQuery{
       error_log("Error: ".$e->getMessage());
     }
   }
+
+  public function verificarColaboradores($params=[]):array{
+    try{
+      $cmd = parent::execQ("CALL sp_verificar_colaboradores(?)");
+      $cmd->execute(
+        array(
+          $params['idactivo']
+        )
+      );
+      return $cmd->fetchAll(PDO::FETCH_ASSOC);
+    }catch(Exception $e){
+      error_log("Error: ".$e->getMessage());
+    }
+  }
+
+  public function getIdResp($params=[]):array{
+    try{
+      $cmd = parent::execQ("CALL get_idresp_activo(?,?)");
+      $cmd->execute(
+        array(
+          $params['idactivo'],
+          $params['idusuario']
+        )
+      );
+      return $cmd->fetchAll(PDO::FETCH_ASSOC);
+    }catch(Exception $e){
+      error_log("Error: ".$e->getMessage());
+    }
+  }
+
+  public function getAnyIdResp($params=[]):array{
+    try{
+      $cmd = parent::execQ("CALL sp_get_any_idresp(?)");
+      $cmd->execute(
+        array(
+          $params['idactivo']
+        )
+      );
+      return $cmd->fetchAll(PDO::FETCH_ASSOC);
+    }catch(Exception $e){
+      error_log("Error: ".$e->getMessage());
+    }
+  }
+
+  public function getAnyIdUbicacion($params=[]):array{
+    try{
+      $cmd = parent::execQ("CALL sp_get_any_ubicacion_activo(?)");
+      $cmd->execute(
+        array(
+          $params['idactivo_resp']
+        )
+      );
+      return $cmd->fetchAll(PDO::FETCH_ASSOC);
+    }catch(Exception $e){
+      error_log("Error: ".$e->getMessage());
+    }
+  }
 }
 
-//$resp = new ResponsableAct();
+// $resp = new ResponsableAct();
+// echo json_encode($resp->getAnyIdResp(['idactivo'=>10]));
+// $id=$resp->getAnyIdResp(['idactivo'=>8]);
+
+// echo json_encode($resp->getAnyIdUbicacion(['idactivo_resp'=>$id[0]['idactivo_resp']]));
+// echo json_encode($resp->getIdResp(['idactivo'=>3, 'idusuario'=>5]));
+
+//echo json_encode($resp->verificarColaboradores(['idactivo'=>8]));
 
 // echo json_encode($resp->updateAsignacion([
 //   'idactivo_resp'=>2,
@@ -228,7 +292,7 @@ class ResponsableAct extends ExecQuery{
 //   'autorizacion'=>1,
 // ]));
 
-//echo json_encode($resp->getResponsablePrin(['idactivo_resp'=>4, 'idactivo'=>3]));
+//echo json_encode($resp->getResponsablePrin(['idactivo_resp'=>5, 'idactivo'=>4]));
 
 // echo json_encode($resp->listResp_activo());
 

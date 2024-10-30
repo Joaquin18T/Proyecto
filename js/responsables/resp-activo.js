@@ -190,9 +190,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       let x = await data.json();
 
       if (x.idresp > 0) {
-        const valor = await createNotification(iduser);
+        const valor = await createNotification(x.idresp, idactivo);
         if (valor > 0) {
-          const msg = addHistorialActivo(x);
+          const msg = await addHistorialActivo(x);
           if (msg.mensaje != "") {
             isSaved = true;
             console.log(cont);
@@ -270,13 +270,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     return data;
   }
 
-  async function createNotification(id) {
+  async function createNotification(id, idactivo=0) {
 
     const params = new FormData();
     params.append("operation", "add");
-    params.append("idusuario", id);
+    params.append("idactivo_resp", id);
     params.append("tipo", "Asignacion");
     params.append("mensaje", "Te han asignado un activo!");
+    params.append("idactivo", idactivo===0?"":idactivo);
 
     const options = {
       method: "post",
@@ -291,11 +292,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
   async function addHistorialActivo(id) {
+    const iduser = await getIdUser(selector("nomuser").textContent);
 
     const params = new FormData();
     params.append("operation", "add");
     params.append("idactivo_resp", id.idresp);
     params.append("idubicacion", selector("ubicacion").value);
+    params.append("accion", "Nueva Asignacion");
+    params.append("responsable_accion", iduser);
 
     const option = {
       method: "POST",
@@ -303,6 +307,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
     const data = await fetch(`http://localhost/CMMS/controllers/historialactivo.controller.php`, option);
     return await data.json();
+  }
+
+    /**
+   * Obtiene el idusuario segun el nombre del usuario
+   * @param {*} user nombre del usuario
+   * @returns El id del usuario
+   */
+  async function getIdUser(user) {
+    const params = new URLSearchParams();
+    params.append("operation", "searchUser");
+    params.append("usuario", user);
+
+    const data = await getDatos(
+      `${host}/usuarios.controller.php`,
+      params
+    );
+    return data[0].id_usuario;
   }
 
   selector("form-responsables").addEventListener("submit", async (e) => {

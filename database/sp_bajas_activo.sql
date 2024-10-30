@@ -1,6 +1,5 @@
 use gamp;
 
--- 10/10
 DROP PROCEDURE IF EXISTS sp_add_baja_activo;
 DELIMITER $$
 CREATE PROCEDURE sp_add_baja_activo
@@ -30,8 +29,8 @@ BEGIN
      END IF;
 END $$
 
-CALL sp_add_baja_activo(@idbaja, 1, 'Sobre calentamiento frecuente', null, 'localhost/CMMS/uploads/archiv1.pdf', 1);
-SELECT @idbaja;
+-- CALL sp_add_baja_activo(@idbaja, 1, 'Sobre calentamiento frecuente', null, 'localhost/CMMS/uploads/archiv1.pdf', 1);
+-- SELECT @idbaja;
 
 DROP VIEW IF EXISTS v_activos_list;
 CREATE VIEW v_activos_list
@@ -60,6 +59,7 @@ BEGIN
         ACT.cod_identificacion,
         EST.nom_estado,
         ACT.descripcion,
+        RES.idactivo_resp,
         (SELECT CONCAT(U.usuario,'|', P.apellidos, ' ', P.nombres) FROM usuarios U
         INNER JOIN personas P ON u.idpersona = P.id_persona WHERE
         U.id_usuario = RES.idusuario AND RES.es_responsable='1') as dato,
@@ -76,14 +76,16 @@ BEGIN
             WHERE H2.idactivo_resp = H1.idactivo_resp
         )
     )UBI ON UBI.idactivo_resp = RES.idactivo_resp
-    INNER JOIN activos ACT ON RES.idactivo = ACT.idactivo
+    RIGHT JOIN activos ACT ON RES.idactivo = ACT.idactivo
     INNER JOIN estados EST ON ACT.idestado = EST.idestado
     WHERE  (ACT.fecha_adquisicion = _fecha_adquisicion OR _fecha_adquisicion IS NULL)
     AND (EST.idestado = _idestado OR _idestado IS NULL) AND
     (ACT.cod_identificacion LIKE CONCAT('%',_cod_identificacion,'%') OR _cod_identificacion IS NULL) AND
 	EST.idestado >1 AND EST.idestado<5;
 END $$
--- CALL sp_activos_sin_servicio(null, null, 'C');
+
+-- CALL sp_activos_sin_servicio(null, null, 'NIS');
+
 DROP PROCEDURE IF EXISTS sp_data_baja_activo;
 DELIMITER $$
 CREATE PROCEDURE sp_data_baja_activo

@@ -139,7 +139,8 @@ INSERT INTO ubicaciones(ubicacion)
 		('lugar 2'),
 		('lugar 3'),
 		('lugar 4'),
-		('lugar 5');
+		('lugar 5'),
+        ('No Definida');
 
 INSERT INTO solicitudes_activos(idusuario, idactivo, fecha_solicitud, motivo_solicitud, idautorizador) 
 	VALUES

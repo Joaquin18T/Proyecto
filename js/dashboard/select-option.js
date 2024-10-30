@@ -62,14 +62,26 @@ document.addEventListener("DOMContentLoaded", () => {
       const newArray = avoidRepeats(data);
       //const dataCombined = matchList(data, dataResp);
       //console.log("combined", dataCombined);
+      //console.log(newArray);
       
-      newArray.forEach((x) => {
+      data.forEach((x, i) => {
+        if(i<5){
+          createNotificacion(
+            x.idactivo_resp,
+            x.mensaje,
+            x.descripcion,
+            x.fecha_creacion,
+            x.desresp,
+            1
+          );
+        }
         createNotificacion(
           x.idactivo_resp,
           x.mensaje,
           x.descripcion,
           x.fecha_creacion,
-          x.desresp
+          x.desresp,
+          2
         );
       });
     }
@@ -111,6 +123,7 @@ document.addEventListener("DOMContentLoaded", () => {
     notfs.forEach(x=>{
       x.addEventListener("click", async (e) => {
         console.log("id",e.target.dataset.idresp);
+        console.log("iduser", idusuario);
         
         const detail = await showDetail(e.target.dataset.idresp);
         console.log("detalle nof",detail);
@@ -140,7 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const params = new URLSearchParams();
     params.append("operation", "detalleNotf");
     params.append("idusuario", idusuario);
-    params.append("idactivo_resp", id);
+    params.append("idactivo_resp", parseInt(id));
     //console.log(id);
 
     const data = await getDatos(`${host}notificacion.controller.php`, params);
@@ -196,28 +209,55 @@ document.addEventListener("DOMContentLoaded", () => {
     return newWord;
   }
 
-  function createNotificacion(id,mensaje, descripcion, fecha, descrip_asig) {
-    let element = `
-    <a href="#" class="list-group-item list-group-item-action border-bottom item-notifi" data-idresp=${id}>
-        <div class="row align-items-center " style="pointer-events:none;">
-          <div class="col ps-0 ms-2">
-            <div class="d-flex justify-content-between align-items-center">
-              <div>
-                <h4 class="h6 mb-0 text-small">${mensaje}</h4>
+  function createNotificacion(id,mensaje, descripcion, fecha, descrip_asig, type) {
+    let element = "";
+    if(type===1){
+      element = `
+      <a href="#" class="list-group-item list-group-item-action border-bottom item-notifi" data-idresp=${id}>
+          <div class="row align-items-center " style="pointer-events:none;">
+            <div class="col ps-0 ms-2">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h4 class="h6 mb-0 text-small">${mensaje}</h4>
+                </div>
+                <div class="text-end">
+                  <small class="text-danger">${fecha}</small>
+                </div>
               </div>
-              <div class="text-end">
-                <small class="text-danger">${fecha}</small>
-              </div>
+              <p class="font-small mt-1 mb-0">
+                ${descripcion}
+              </p>
             </div>
-            <p class="font-small mt-1 mb-0">
-              ${descripcion}
-            </p>
+          </div>
+          </a>
+        `;
+      selector("list-notificaciones").innerHTML+=element;
+    }else if(type===2){
+      element = `
+      <div class="card">
+        <div class="card-body">
+          <div class="row align-items-center">
+            <div class="col ps-0 ms-2">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h4 class="h6 mb-0 text-small">${mensaje}</h4>
+                </div>
+                <div class="text-end">
+                  <small class="text-danger">${fecha}</small>
+                </div>
+              </div>
+              <p class="font-small mt-1 mb-0">
+                ${descripcion}
+              </p>
+            </div>
           </div>
         </div>
-        </a>
+      </div>
       `;
 
-    selector("list-notificaciones").innerHTML+=element;
+      selector("sb-list-notificacion").innerHTML+=element;
+    }
+
   }
 
   function removeExtraBackdrops() {
@@ -241,4 +281,16 @@ document.addEventListener("DOMContentLoaded", () => {
       removeExtraBackdrops();
     }
   );
+
+  //MOSTRAR NOTIFICACIONES EN EL SIDEBAR
+
+  selector("show-all-notificaciones").addEventListener("click",()=>{
+
+
+    const sidebar = selector("sb-notificacion");
+    const offCanvas = new bootstrap.Offcanvas(sidebar);
+    offCanvas.show();
+  });
+
+  
 });
