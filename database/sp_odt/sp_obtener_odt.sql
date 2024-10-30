@@ -119,13 +119,7 @@ BEGIN
         INNER JOIN estados EST ON EST.idestado = ODT.idestado
         WHERE ODT.idorden_trabajo = _idodt;
 END //
-select * from odt; -- paso 1
-select * from diagnosticos; -- paso 2
-select * from evidencias_diagnostico; -- paso 3
-select * from tareas;
-select * from activos_vinculados_tarea; -- paso 4
-select * from activos;
-call obtenerTareaDeOdtGenerada(1)
+
 
 DROP PROCEDURE IF EXISTS `obtenerEvidenciasDiagnostico`
 DELIMITER //
@@ -225,5 +219,4 @@ BEGIN
     GROUP BY ODT.idorden_trabajo, TAR.descripcion, ODT.fecha_inicio, ODT.fecha_vencimiento, 
              PERCRE.nombres, PERCRE.apellidos, TAR.idtarea, EST.nom_estado;
 END //
-use gamp;
-call obtenerOdtporId(2)
+
