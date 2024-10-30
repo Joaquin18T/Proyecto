@@ -60,7 +60,7 @@ require_once '../header.php'; ?>
             <div class="col-md-7">
               <div class="form-floating">
                 <input id="descripcion" class="form-control" name="descripcion" placeholder="Descripcion de la Asignacion" required>
-                <label for="descripcion">Descripcion del activo</label>
+                <label for="descripcion">Descripcion de la asignacion</label>
               </div>
             </div>
           </div>

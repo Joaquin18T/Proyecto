@@ -7,7 +7,7 @@ $activo = new Activo();
 if (isset($_GET['operation'])) {
   switch ($_GET['operation']) {
     case 'searchDescripcion':
-      echo json_encode($activo->searchbyDecripcion(['descripcion' => $_GET['descripcion']]));
+      echo json_encode($activo->searchbyDecripcion(['cod_identificacion' => $_GET['cod_identificacion']]));
       break;
     case 'searchByActivo':
       echo json_encode($activo->searchByActivo(['idactivo' => $_GET['idactivo']]));

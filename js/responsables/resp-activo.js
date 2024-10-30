@@ -362,7 +362,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const params = new URLSearchParams();
     params.append("operation", "searchDescripcion");
-    params.append("descripcion", valor);
+    params.append("cod_identificacion", valor);
 
     fetch(`http://localhost/CMMS/controllers/activo.controller.php?${params}`)
       .then(response => response.json())
@@ -376,7 +376,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (data.length > 0) {
           data.forEach(x => {
             const option = document.createElement("li");
-            option.textContent = `${x.descripcion}`;
+            option.textContent = `${x.cod_identificacion} - ${x.descripcion}`;
             //option.setAttribute("data-id", `${x.idsolicitud}`);
 
             option.addEventListener("click", async() => {

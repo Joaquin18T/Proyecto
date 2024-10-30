@@ -425,12 +425,13 @@ document.addEventListener("DOMContentLoaded", () => {
   async function addHistorial(id, accion="") {
     //Insercion al historial
     console.log("ubi enviar", parseInt(selector("ubicacion").value));
-    
+    const iduser = await getIdUser(selector("nomuser").textContent);
     const params = new FormData();
     params.append("operation", "add");
     params.append("idactivo_resp", id);
     params.append("idubicacion", parseInt(selector("ubicacion").value));
     params.append("accion", accion);
+    params.append("responsable_accion", iduser);
 
     const data = await fetch(`${globals.host}historialactivo.controller.php`, {
       method: "POST",

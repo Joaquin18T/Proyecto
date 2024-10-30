@@ -53,17 +53,17 @@ DROP PROCEDURE IF EXISTS sp_search_activo;
 DELIMITER $$
 CREATE PROCEDURE sp_search_activo
 (
-	IN _descripcion VARCHAR(40)
+	IN _cod_identificacion VARCHAR(40)
 )
 BEGIN
-	SELECT ACT.idactivo, ACT.descripcion, SUB.subcategoria
+	SELECT ACT.idactivo, ACT.cod_identificacion, ACT.descripcion, SUB.subcategoria
 	FROM activos ACT
 	INNER JOIN subcategorias SUB ON ACT.idsubcategoria = SUB.idsubcategoria
     INNER JOIN marcas MAR ON ACT.idmarca = MAR.idmarca
-	WHERE ACT.descripcion LIKE CONCAT('%', _descripcion,'%') AND ACT.idestado!=4 
+	WHERE ACT.cod_identificacion LIKE CONCAT('%', _cod_identificacion,'%') AND ACT.idestado!=4 
 	ORDER BY SUB.subcategoria ASC;
 END $$
--- CALL sp_search_activo('D');
+-- CALL sp_search_activo('DS');
 
 DROP PROCEDURE IF EXISTS sp_search_activo_resp;
 DELIMITER $$

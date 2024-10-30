@@ -30,7 +30,7 @@ class Activo extends ExecQuery{
     try{
       $cmd = parent::execQ("CALL sp_search_activo(?)");
       $cmd->execute(
-        array($params['descripcion'])
+        array($params['cod_identificacion'])
       );
       return $cmd->fetchAll(PDO::FETCH_ASSOC);
     }catch(Exception $e){
