@@ -1,5 +1,6 @@
 $(document).ready(async () => {
     //alert("idusuarioxdd: " + idusuario)
+    window.localStorage.clear()
     function $q(object = null) {
         return document.querySelector(object);
     }
@@ -14,8 +15,11 @@ $(document).ready(async () => {
     }
 
     //variables
+    
     let redirigir = false
     const host = "http://localhost/CMMS/controllers/";
+    await verificarTerminadoOdt()
+    await obtenerHistorialOdt()
     // **************************** SECCION DE OBTENER DATOS ****************************************************
     async function obtenerTareas() {
         const paramsTareasSearch = new URLSearchParams()
@@ -31,6 +35,14 @@ $(document).ready(async () => {
         const tareasOdt = await getDatos(`${host}ordentrabajo.controller.php`, paramsTareasOdtListar)
         console.log("TAREAS ODT: ", tareasOdt)
         return tareasOdt;
+    }
+
+    async function obtenerHistorialOdt() {
+        const paramsHistorialOdt = new URLSearchParams()
+        paramsHistorialOdt.append("operation", "obtenerHistorialOdt")
+        const historialOodt = await getDatos(`${host}ordentrabajo.controller.php`, paramsHistorialOdt)
+        console.log("Historial odt: ", historialOodt)
+        return historialOodt;
     }
 
     var kanban = new jKanban({
@@ -92,8 +104,14 @@ $(document).ready(async () => {
                         alert("Esta tarea ya está en proceso, no se puede redirigir");
                         break;
                     } else if (tareaSeleccionada && tareaSeleccionada.nom_estado === "pendiente") {
+                        const now = new Date();
+                        const fechaInicioTarea = now.toISOString().split("T")[0]; // Fecha en formato YYYY-MM-DD
+                        const horaInicioTarea = now.toTimeString().split(" ")[0].substring(0, 5); // Hora en formato HH:MM
+                        let fechaHoraInicio = new Date(`${fechaInicioTarea}T${horaInicioTarea}:00-05:00`);
+
+
                         // SI LA TAREA ESTÁ EN PENDIENTE, REDIRIGIR
-                        const idOdt = await registrarOdt(cardId);
+                        const idOdt = await registrarOdt(cardId, fechaInicioTarea, horaInicioTarea);
                         console.log(idOdt);
                         window.localStorage.clear()
                         window.localStorage.setItem("idtarea", cardId);
@@ -153,10 +171,10 @@ $(document).ready(async () => {
     async function renderTareasPendiente() {
         const tareas = await obtenerTareas() //PENDIENTES
         const tareasOdt = await obtenerTareasOdt() //EN PROCESO
+        const historialOdt = await obtenerHistorialOdt() //FINALIZADAS
         tareas.forEach(tarea => {
             const tareaHTML = `
                 <h3 class="card-title">${tarea.descripcion}</h3>
-                <p class=" mb-2 text-muted">Inicia: ${tarea.fecha_inicio} - Vence: ${tarea.fecha_vencimiento}</p>                 
                 <p class="card-text">Plan de tarea: ${tarea.plantarea}</p>
                 <p class="card-text">Activos: ${tarea.activos}</p>
                 <p class="card-text"><small class="text-muted">Prioridad: ${tarea.prioridad}</small></p>
@@ -174,25 +192,47 @@ $(document).ready(async () => {
         });
 
         tareasOdt.forEach(todt => {
-            const tareaOdtHTML = `             
+            const verificarEstadoClasificacion =
+                (todt.nom_estado === "proceso" && (todt.clasificacion === 9 || todt.clasificacion === 11 || todt.clasificacion == null));
+            const badgeClasificacion =
+                (todt.clasificacion === 11 && todt.nom_estado === "finalizado")
+                    ? `<span class="badge bg-primary">Terminado</span>`
+                    : (todt.nom_estado === "finalizado" && (todt.clasificacion === 9 || todt.clasificacion === null))
+                        ? `<span class="badge bg-warning">No terminado/Vencido</span>`
+                        : '';
+            const tareaOdtHTML = `         
+
                 <div class="mb-3" >                    
                     <div class="d-flex justify-content-between align-items-center">
                         <h3 class="card-title">${todt.tarea}</h3>
-                        <div class="btn-group dropstart">
-                            <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" data-id="dropdown">
-                                ⋮
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li class="dropdown-item li-editar" data-id="${todt.idorden_trabajo}" data-tarea-id="${todt.idtarea}">Editar</li>
-                                <li class="dropdown-item li-revision" data-id="${todt.idorden_trabajo}">Enviar a revision</li>                                
-                            </ul>
-                        </div>
+                        ${badgeClasificacion}
+                        ${verificarEstadoClasificacion ? `
+                            <div class="btn-group dropstart">
+                                <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" data-id="dropdown">
+                                    ⋮
+                                </button>
+                                <ul class="dropdown-menu">
+                                    ${(todt.nom_estado !== "finalizado" && todt.nom_estado !== "revision" && (todt.clasificacion === 9 || todt.clasificacion == null)) ? `<li class="dropdown-item li-editar" data-id="${todt.idorden_trabajo}" data-tarea-id="${todt.idtarea}">Editar</li>` : ''}
+                                    ${(todt.nom_estado === "proceso" && todt.clasificacion === 11) ? `<li class="dropdown-item li-revision" data-id="${todt.idorden_trabajo}">Enviar a revision</li>` : ''}                                                                
+                                </ul>
+                            </div>
+                        ` : ''}
+                        
                     </div>
                     <div class="tarea-odt" data-id="${todt.idorden_trabajo}" >
                         <div class="d-flex align-items-center mb-3">
                             <img src="https://www.iconpacks.net/icons/1/free-user-group-icon-296-thumb.png" class="rounded-circle me-2" alt="Responsables" width="40" height="40"/>
                             <p class="mb-0">${todt.responsables}</p>
                         </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="text-muted"> F.I: ${todt.fecha_inicio}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="text-muted"> F.V: ${todt.fecha_vencimiento}</p>
+                            </div>
+                        </div>
+                        ${todt.revisado_por ? `<p class="text-muted">Revisado por ${todt.revisado_por}</p>` : ''}
                         <p class="text-muted">Creada por ${todt.creador}</p>
                         <p><strong>Activos:</strong> ${todt.activos}</p>
                         <div class="progress mb-2">
@@ -208,6 +248,7 @@ $(document).ready(async () => {
                     </div>                                        
                 </div>
             `
+
             switch (todt.nom_estado) {
                 case 'proceso':
                     kanban.addElement('b-proceso', {
@@ -223,12 +264,72 @@ $(document).ready(async () => {
                     })
                     break;
 
-                case 'finalizado':
-                    kanban.addElement('b-finalizado', {
-                        id: todt.idtarea,
-                        title: tareaOdtHTML
-                    })
-                    break;
+                // QUITADO FINALIZADO
+            }
+        })
+
+        historialOdt.forEach(historial => {
+            const verificarEstadoClasificacion =
+                (historial.nom_estado === "proceso" && (historial.clasificacion === 9 || historial.clasificacion === 11 || historial.clasificacion == null));
+            const badgeClasificacion =
+                (historial.clasificacion === 11 && historial.nom_estado === "finalizado")
+                    ? `<span class="badge bg-primary">Terminado</span>`
+                    : (historial.nom_estado === "finalizado" && (historial.clasificacion === 9 || historial.clasificacion === null))
+                        ? `<span class="badge bg-warning">No terminado/Vencido</span>`
+                        : '';
+            const historialOdtFinalizadas = `
+                <div class="mb-3" >                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="card-title">${historial.tarea}</h3>
+                        ${badgeClasificacion}
+                        ${verificarEstadoClasificacion ? `
+                            <div class="btn-group dropstart">
+                                <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" data-id="dropdown">
+                                    ⋮
+                                </button>
+                                <ul class="dropdown-menu">
+                                    ${(historial.nom_estado !== "finalizado" && historial.nom_estado !== "revision" && (historial.clasificacion === 9 || historial.clasificacion == null)) ? `<li class="dropdown-item li-editar" data-id="${historial.idorden_trabajo}" data-tarea-id="${historial.idtarea}">Editar</li>` : ''}
+                                    ${(historial.nom_estado === "proceso" && historial.clasificacion === 11) ? `<li class="dropdown-item li-revision" data-id="${historial.idorden_trabajo}">Enviar a revision</li>` : ''}                                                                
+                                </ul>
+                            </div>
+                        ` : ''}
+                        
+                    </div>
+                    <div class="tarea-odt" data-id="${historial.idorden_trabajo}" >
+                        <div class="d-flex align-items-center mb-3">
+                            <img src="https://www.iconpacks.net/icons/1/free-user-group-icon-296-thumb.png" class="rounded-circle me-2" alt="Responsables" width="40" height="40"/>
+                            <p class="mb-0">${historial.responsables}</p>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="text-muted"> F.I: ${historial.fecha_inicio}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="text-muted"> F.V: ${historial.fecha_vencimiento}</p>
+                            </div>
+                        </div>
+                        ${historial.revisado_por ? `<p class="text-muted">Revisado por ${historial.revisado_por}</p>` : ''}
+                        <p class="text-muted">Creada por ${historial.creador}</p>
+                        <p><strong>Activos:</strong> ${historial.activos}</p>
+                        <div class="progress mb-2">
+                            <div class="progress-bar ${historial.clasificacion === 11 ? 'bg-success' : historial.clasificacion === 9 ? 'bg-warning' : 'bg-danger'}" 
+                                role="progressbar" 
+                                style="width: ${historial.clasificacion === 11 ? '100' : historial.clasificacion === 9 ? '50' : '0'}%" 
+                                aria-valuenow="${historial.clasificacion === 11 ? '100' : historial.clasificacion === 9 ? '50' : '0'}" 
+                                aria-valuemin="0" 
+                                aria-valuemax="100">
+                            </div>
+                        </div>
+                        <p class="text-center">${historial.clasificacion === 11 ? '100' : historial.clasificacion === 9 ? '50' : '0'}%</p>                       
+                    </div>                                        
+                </div>
+            `
+
+            if (historial.nom_estado == "finalizado") {
+                kanban.addElement('b-finalizado', {
+                    id: historial.idorden_trabajo,
+                    title: historialOdtFinalizadas
+                })
             }
         })
 
@@ -317,11 +418,15 @@ $(document).ready(async () => {
     //**************************** FIN DE SECCION DE RENDERIZADO DE DATOS *********************** */
 
     // ***************************** SECCION DE REGISTROS ************************************
-    async function registrarOdt(idtarea) {
+    async function registrarOdt(idtarea, fechainicio, horainicio) {
         const formOdt = new FormData()
         formOdt.append("operation", "add")
         formOdt.append("idtarea", idtarea)
         formOdt.append("creado_por", idusuario)
+        formOdt.append("fecha_inicio", fechainicio)
+        formOdt.append("hora_inicio", horainicio)
+        formOdt.append("fecha_vencimiento", null)
+        formOdt.append("hora_vencimiento", null)
         const dataOdt = await fetch(`${host}ordentrabajo.controller.php`, { method: 'POST', body: formOdt })
         const idodt = await dataOdt.json()
         return idodt
@@ -352,8 +457,34 @@ $(document).ready(async () => {
 
     //************************ FIN DE SECCION DE ACTUALIZAR ******************************** */
 
-    // ********************************* SECCION DE MODALES ********************************************
+    // ********************************* SECCION DE VERIFICACIONES ********************************************
+    async function verificarTerminadoOdt() {
+        const odt = await obtenerTareasOdt();
+        console.log("VERIFICANDO ODT: ", odt);
 
+        // Obtener la fecha y hora actual en horario de Lima
+        let ahora = new Date().toLocaleString("en-US", { timeZone: "America/Lima" });
+        let fechaHoraHoy = new Date(ahora);
 
-    // ******************************* FIN SECCION DE MODALES ******************************************
+        for (let i = 0; i < odt.length; i++) {
+            // Si la fecha y hora de vencimiento existen
+            if (odt[i].fecha_vencimiento && odt[i].hora_vencimiento) {
+                // Crear un objeto Date combinando la fecha y la hora de vencimiento
+                let fechaHoraVencimiento = new Date(`${odt[i].fecha_vencimiento}T${odt[i].hora_vencimiento}-05:00`);
+
+                // Comparar la fecha y hora de vencimiento con la fecha y hora actuales
+                if (fechaHoraVencimiento < fechaHoraHoy) {
+                    console.log(`La ODT con id ${odt[i].idorden_trabajo} ha sido vencida.`);
+                    const odtActualizado = await actualizarEstadoOdt(11, odt[i].idorden_trabajo)
+                    console.log("odtactualizado?: ", odtActualizado)
+                } else {
+                    console.log(`La ODT con id ${odt[i].idorden_trabajo} aún está vigente.`);
+                }
+            } else {
+                console.log(`La ODT con id ${odt[i].idorden_trabajo} no tiene fecha o hora de vencimiento completa.`);
+            }
+        }
+    }
+
+    // ******************************* FIN SECCION DE VERIFICACIONES ******************************************
 })

@@ -6,7 +6,11 @@ CREATE PROCEDURE `registrar_odt`
 (
 	OUT _idorden_trabajo INT,
 	IN _idtarea INT,
-    IN _creado_por INT
+    IN _creado_por INT,
+    IN _fecha_inicio DATE,
+    IN _hora_inicio	TIME,
+    IN _fecha_vencimiento DATE,
+    IN _hora_vencimiento	TIME
 )
 BEGIN
 	-- Declaracion de variables
@@ -18,8 +22,8 @@ BEGIN
         SET existe_error = 1;
         END;
         
-	INSERT INTO odt (idtarea, creado_por)
-		VALUES (_idtarea, _creado_por);
+	INSERT INTO odt (idtarea, creado_por, fecha_inicio, hora_inicio, fecha_vencimiento, hora_vencimiento)
+		VALUES (_idtarea, _creado_por, _fecha_inicio, _hora_inicio, _fecha_vencimiento, _hora_vencimiento);
         
 	IF existe_error = 1 THEN
 		SET _idorden_trabajo = -1;
@@ -140,3 +144,31 @@ BEGIN
 	INSERT INTO comentarios_odt (idorden_trabajo, comentario, revisadoPor)	
 		VALUES (_idorden_trabajo, NULLIF(_comentario,""), _revisadoPor);	
 END //
+
+DROP PROCEDURE IF EXISTS `registrarHistorialOdt`
+DELIMITER //
+CREATE PROCEDURE `registrarHistorialOdt`
+(
+	OUT _idhistorial 		INT,
+	IN _idorden_trabajo 	INT
+)
+BEGIN	
+	-- Declaracion de variables
+	DECLARE existe_error INT DEFAULT 0;
+    
+    -- Manejador de excepciones
+	DECLARE CONTINUE HANDLER FOR SQLEXCEPTION
+		BEGIN
+        SET existe_error = 1;
+        END;
+        
+	INSERT INTO historial_odt (idorden_trabajo)	
+		VALUES (_idorden_trabajo);	
+        
+	IF existe_error = 1 THEN
+		SET _idhistorial = -1;
+	ELSE
+        SET _idhistorial = LAST_INSERT_ID();
+    END IF;
+END //
+

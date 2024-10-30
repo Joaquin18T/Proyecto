@@ -29,11 +29,7 @@ if (isset($_POST['operation'])) {
             $datosEnviar = [
                 "idplantarea"               => $_POST["idplantarea"],
                 "idtipo_prioridad"          => $_POST["idtipo_prioridad"],
-                "descripcion"               => $_POST["descripcion"],
-                "fecha_inicio"              => $_POST["fecha_inicio"],
-                "fecha_vencimiento"         => $_POST["fecha_vencimiento"],
-                "cant_intervalo"            => $_POST["cant_intervalo"],
-                "frecuencia"                => $_POST["frecuencia"],
+                "descripcion"               => $_POST["descripcion"],                                
                 "idestado"                  => $_POST["idestado"],
             ];
 
@@ -54,11 +50,7 @@ if (isset($_POST['operation'])) {
             $datosEnviar = [
                 "idtarea"           => $_POST["idtarea"],
                 "idtipo_prioridad"  => $_POST["idtipo_prioridad"],
-                "descripcion"       => $_POST["descripcion"],
-                "fecha_inicio"      => $_POST["fecha_inicio"],
-                "fecha_vencimiento" => $_POST["fecha_vencimiento"],
-                "cant_intervalo"    => $_POST["cant_intervalo"],
-                "frecuencia"        => $_POST["frecuencia"],
+                "descripcion"       => $_POST["descripcion"],                               
                 "idestado"          => $_POST["idestado"],
             ];
             $actualizado = $tarea->actualizarTarea($datosEnviar);

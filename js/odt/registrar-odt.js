@@ -38,6 +38,8 @@ $(document).ready(async () => {
     const btnAgregarResponsable = $q("#btnAgregarResponsable");
     const btnCrearOdt = $q("#btnCrearOdt")
     //renderTablaUsuarios()
+    await verificarOdtEstado()
+    await verificarFvencimiento()
     await verificarDiagnosticoRegistrado()
     await verificarIdsGenerados() // SI ESTO SUCEDE LO DEMAS EN GENERAL NO DEBERIA DE EJECUTAR
     await filtrarUsuariosList()
@@ -98,6 +100,14 @@ $(document).ready(async () => {
         const activo = await getDatos(`${host}activo.controller.php`, params)
         console.log("activos: ", activo)
         return activo
+    }
+
+    async function obtenerOdtporId() {
+        const params = new URLSearchParams()
+        params.append("operation", "obtenerOdtporId")
+        params.append("idodt", idodtgenerada)
+        const odt = await getDatos(`${host}ordentrabajo.controller.php`, params)
+        return odt
     }
     // ************************************ FIN DE FUNCIONES PARA OBTENER DATOS ******************************
 
@@ -287,8 +297,14 @@ $(document).ready(async () => {
 
         const odtActualizado = await actualizarEstadoOdt()
         console.log("odt actualizado?: ", odtActualizado)
-        window.localStorage.removeItem("idodt")
-        window.location.href = 'http://localhost/CMMS/views/odt'
+        if (odtActualizado?.actualizado) {
+            window.localStorage.clear()
+            window.location.href = 'http://localhost/CMMS/views/odt'
+            console.log("redirigiendop ....")
+        } else {
+            //window.location.href = 'http://localhost/CMMS/views/odt'
+            console.log("REDIRIGIR PERO NO ACTUALIZO.")
+        }
     })
 
     // ****************************** FIN DE EVENTOS ************************************
@@ -465,12 +481,57 @@ $(document).ready(async () => {
             contenedorRegistrarOdt.innerHTML = `
             <div class="container-fluid">
                 <div class="row">
-                    <h1 class="">No puedes registrar una orden ahora mismo.</h1>
+                    <h1 class="">No has seleccionado ninguna orden a editar</h1>
                 </div>
             </div>
             `
             console.log("BODY BORRADO")
             return
+        }
+    }
+
+    async function verificarFvencimiento() {
+        let existen = false
+        const odt = await obtenerOdtporId()
+        console.log("odt: ", odt)
+        if (odt[0]?.fecha_vencimiento == "0000-00-00" && odt[0]?.hora_vencimiento == "00:00:00") {
+            existen = false
+            console.log("no existe una fecha ni hora de v")
+            return
+        }
+        else {
+            const contenedorFechHoraExistente = $q("#contenedor-fecha-hora")
+            if (contenedorFechHoraExistente) {
+                contenedorFechHoraExistente.remove();
+            }
+            existen = true
+            return {
+                'existen': existen,
+                'fecha_vencimiento': odt[0]?.fecha_vencimiento,
+                'hora_vencimiento': odt[0]?.hora_vencimiento
+            }
+        }
+    }
+
+    async function verificarOdtEstado() {
+        const odtObtenida = await obtenerOdtporId()
+        console.log("odtObtenida: ", odtObtenida)
+        if (odtObtenida[0]?.clasificacion == 11 || odtObtenida[0]?.idestado == 11 || odtObtenida[0]?.idestado == 10) { //VERIFICAR SI YA ESTA FINALIZADA , SI LO ESTA NO DEBERIA DE MOSTRAR EL REGISTRO
+            contenedorRegistrarOdt.innerHTML = `
+            <div class="container-fluid">
+                <div class="row">
+                    <h1 class="">No puedes editar esta orden por que ya fue completada.</h1>
+                </div>
+            </div>
+            `
+        } else if (!window.localStorage.getItem("idodt")) {
+            contenedorRegistrarOdt.innerHTML = `
+            <div class="container-fluid">
+                <div class="row">
+                    <h1 class="">No has seleccionado ninguna orden a editar.</h1>
+                </div>
+            </div>
+            `
         }
     }
 
@@ -545,6 +606,8 @@ $(document).ready(async () => {
         const responsablesAsignados = await obtenerResponsablesAsignados()
         const diagnosticoEntrada = await obtenerDiagnosticoEntrada()
         const evidencias = await obtenerEvidencias(iddiagnosticoGenerado)
+        const existeFechaVencimiento = await verificarFvencimiento()
+        console.log("existeFechaVencimiento???????: ", existeFechaVencimiento)
         //
         const activos = await obtenerActivosPorTarea()
         if (responsablesAsignados.length > 0 && diagnosticoEntrada.length == 1 && evidencias.length > 0) {
@@ -565,14 +628,64 @@ $(document).ready(async () => {
             }
         }
 
+        if (existeFechaVencimiento.existen == true) {
+            const formActualizacionFVencimiento = new FormData()
+            formActualizacionFVencimiento.append("operation", "actualizarFechaVencimientoOdt")
+            formActualizacionFVencimiento.append("idodt", window.localStorage.getItem("idodt"))
+            formActualizacionFVencimiento.append("fecha_vencimiento", existeFechaVencimiento.fecha_vencimiento)
+            formActualizacionFVencimiento.append("hora_vencimiento", existeFechaVencimiento.hora_vencimiento)
+            const FVencimientoActualizado = await fetch(`${host}ordentrabajo.controller.php`, { method: 'POST', body: formActualizacionFVencimiento })
+            const FVactualizado = await FVencimientoActualizado.json()
+            console.log("FECHA Y HORA VENCIMIENTO ACTUALIZADAS?: ", FVactualizado)
 
-        const formActualizacion = new FormData()
-        formActualizacion.append("operation", "actualizarBorradorOdt")
-        formActualizacion.append("idordentrabajo", window.localStorage.getItem("idodt"))
-        formActualizacion.append("borrador", (responsablesAsignados.length > 0 && diagnosticoEntrada.length == 1 && evidencias.length > 0) ? 0 : 1)
-        const Factualizado = await fetch(`${host}ordentrabajo.controller.php`, { method: 'POST', body: formActualizacion })
-        const actualizado = await Factualizado.json()
-        return actualizado
+            const formActualizacion = new FormData()
+            formActualizacion.append("operation", "actualizarBorradorOdt")
+            formActualizacion.append("idordentrabajo", window.localStorage.getItem("idodt"))
+            formActualizacion.append("borrador", (responsablesAsignados.length > 0 && diagnosticoEntrada.length == 1 && evidencias.length > 0) ? 0 : 1)
+            const Factualizado = await fetch(`${host}ordentrabajo.controller.php`, { method: 'POST', body: formActualizacion })
+            const actualizado = await Factualizado.json()
+            return actualizado
+        }
+
+        else {
+            let fechaVencimiento = $q("#fecha-vencimiento").value;
+            let horaVencimiento = $q("#hora-vencimiento").value;
+
+            if (!fechaVencimiento || !horaVencimiento) {
+                alert("Por favor, asegúrese de llenar tanto la fecha como la hora de vencimiento.");
+                return;
+            }
+            // Convertir la fecha y hora de vencimiento en un objeto Date con la zona horaria de Lima
+            let fechaHoraVencimiento = new Date(`${fechaVencimiento}T${horaVencimiento}:00-05:00`);
+
+            // Obtener la fecha y hora actual en la zona horaria de Perú (America/Lima)
+            let ahora = new Date().toLocaleString("en-US", { timeZone: "America/Lima" });
+            let fechaHoraActual = new Date(ahora);
+
+            // Validar que la fecha y hora de vencimiento no sean menores a la fecha y hora actual
+            if (fechaHoraVencimiento < fechaHoraActual) {
+                alert("La fecha y hora de vencimiento no pueden ser anteriores a la fecha y hora actual.");
+                return;
+            }
+
+
+            const formActualizacionFVencimiento = new FormData()
+            formActualizacionFVencimiento.append("operation", "actualizarFechaVencimientoOdt")
+            formActualizacionFVencimiento.append("idodt", window.localStorage.getItem("idodt"))
+            formActualizacionFVencimiento.append("fecha_vencimiento", fechaVencimiento)
+            formActualizacionFVencimiento.append("hora_vencimiento", horaVencimiento)
+            const FVencimientoActualizado = await fetch(`${host}ordentrabajo.controller.php`, { method: 'POST', body: formActualizacionFVencimiento })
+            const FVactualizado = await FVencimientoActualizado.json()
+            console.log("FECHA Y HORA VENCIMIENTO ACTUALIZADAS?: ", FVactualizado)
+
+            const formActualizacion = new FormData()
+            formActualizacion.append("operation", "actualizarBorradorOdt")
+            formActualizacion.append("idordentrabajo", window.localStorage.getItem("idodt"))
+            formActualizacion.append("borrador", (responsablesAsignados.length > 0 && diagnosticoEntrada.length == 1 && evidencias.length > 0) ? 0 : 1)
+            const Factualizado = await fetch(`${host}ordentrabajo.controller.php`, { method: 'POST', body: formActualizacion })
+            const actualizado = await Factualizado.json()
+            return actualizado
+        }
     }
 
     async function actualizarEstadoActivo(idactivo, idestado) {

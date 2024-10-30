@@ -18,6 +18,30 @@ class OrdenTrabajo extends ExecQuery
         }
     } // INTEGRADO
 
+    public function obtenerHistorialOdt($params = []): array
+    {
+        try {
+            $cmd = parent::execQ("CALL obtenerHistorialOdt()");
+            $cmd->execute();
+            return $cmd->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+    } // INTEGRADO
+
+    public function obtenerOdtporId($params = []): array
+    {
+        try {
+            $cmd = parent::execQ("CALL obtenerOdtporId(?)");
+            $cmd->execute(array(
+                $params['idodt']
+            ));
+            return $cmd->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+    } // INTEGRADO
+
     public function obtenerDetalleOdt($params = []): array
     {
         try {
@@ -35,11 +59,15 @@ class OrdenTrabajo extends ExecQuery
     public function add($params = []): int
     {
         try {
-            $cmd = parent::execQ("call registrar_odt(@idordentrabajo,?,?)");
+            $cmd = parent::execQ("call registrar_odt(@idordentrabajo,?,?,?,?,?,?)");
             $cmd->execute(
                 array(
                     $params['idtarea'],
-                    $params['creado_por']
+                    $params['creado_por'],
+                    $params['fecha_inicio'],
+                    $params['hora_inicio'],
+                    $params['fecha_vencimiento'],
+                    $params['hora_vencimiento']
                 )
             );
             $response = parent::execQuerySimple("SELECT @idordentrabajo as idordentrabajo")->fetch(PDO::FETCH_ASSOC);
@@ -66,6 +94,23 @@ class OrdenTrabajo extends ExecQuery
             die($e->getMessage());
         }
     } // INTEGRADO
+
+    public function registrarHistorialOdt($params = []): int
+    {
+        try {
+            $cmd = parent::execQ("call registrarHistorialOdt(@idhistorial,?)");
+            $cmd->execute(
+                array(
+                    $params['idodt'],
+                )
+            );
+            $response = parent::execQuerySimple("SELECT @idhistorial as idhistorial")->fetch(PDO::FETCH_ASSOC);
+            return (int) $response['idhistorial'];
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+    } // INTEGRADO
+
 
     public function registrarComentarioOdt($params = []): bool
     {
@@ -168,5 +213,20 @@ class OrdenTrabajo extends ExecQuery
         }
     } //  INTEGRADO
 
+    public function actualizarFechaVencimientoOdt($params = []): bool
+    {
+        try {
+            $status = false;
+            $cmd = parent::execQ("CALL actualizarFechaVencimientoOdt(?,?,?)");
+            $status = $cmd->execute(array(
+                $params['idodt'],
+                $params['fecha_vencimiento'],
+                $params['hora_vencimiento']
+            ));
+            return $status;
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+    } // INTEGRADO
 
 }

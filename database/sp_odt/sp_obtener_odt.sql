@@ -8,8 +8,6 @@ BEGIN
         TAR.idtarea,
         PT.descripcion AS plantarea,
         TAR.descripcion,
-        TAR.fecha_inicio,
-        TAR.fecha_vencimiento,
         GROUP_CONCAT(ACT.descripcion SEPARATOR ', ') AS activos, -- Concatenar activos
         TP.tipo_prioridad AS prioridad,
         EST.nom_estado,
@@ -41,8 +39,6 @@ CREATE PROCEDURE `obtenerTareasPorEstado`
 BEGIN
 	SELECT 
 		TAR.descripcion,
-        TAR.fecha_inicio,
-        TAR.fecha_vencimiento,
         ACT.descripcion as activo,
         TP.tipo_prioridad,
         EST.nom_estado
@@ -65,9 +61,11 @@ BEGIN
         ODT.idorden_trabajo,
         GROUP_CONCAT(DISTINCT CONCAT(PERRES.nombres, ' ', PERRES.apellidos) SEPARATOR ', ') AS responsables,
         TAR.descripcion AS tarea,
-        TAR.fecha_inicio,
-        TAR.fecha_vencimiento,
+        ODT.fecha_inicio,
+        ODT.fecha_vencimiento,
+        ODT.hora_vencimiento,
         CONCAT(PERCRE.nombres, ' ', PERCRE.apellidos) AS creador,
+        CONCAT(PERCO.nombres, ' ', PERCO.apellidos) as revisado_por,
         TAR.idtarea AS idtarea,
         GROUP_CONCAT(DISTINCT ACT.descripcion SEPARATOR ', ') AS activos,
         EST.nom_estado,
@@ -84,7 +82,10 @@ BEGIN
     LEFT JOIN activos ACT ON ACT.idactivo = AVT.idactivo
     LEFT JOIN estados EST ON EST.idestado = ODT.idestado
     LEFT JOIN detalle_odt DODT ON DODT.idorden_trabajo = ODT.idorden_trabajo
-    GROUP BY ODT.idorden_trabajo, TAR.descripcion, TAR.fecha_inicio, TAR.fecha_vencimiento, 
+    LEFT JOIN comentarios_odt CO ON CO.idorden_trabajo = ODT.idorden_trabajo
+    LEFT JOIN usuarios USUCO ON USUCO.id_usuario = CO.revisadoPor
+    LEFT JOIN personas PERCO ON PERCO.id_persona = USUCO.idpersona
+    GROUP BY ODT.idorden_trabajo, TAR.descripcion, ODT.fecha_inicio, ODT.fecha_vencimiento, 
              PERCRE.nombres, PERCRE.apellidos, TAR.idtarea, EST.nom_estado;
 END //
 DELIMITER ;
@@ -104,7 +105,11 @@ BEGIN
         PT.descripcion as plantarea,
 		TAR.descripcion as tarea,
         TAR.idtarea as idtarea,
-        ACT.descripcion as activo
+        ACT.descripcion as activo,
+        ODT.fecha_inicio,
+        ODT.hora_inicio,
+        ODT.fecha_vencimiento,
+        ODT.hora_vencimiento
 		from odt ODT
         INNER JOIN tareas TAR ON TAR.idtarea = ODT.idtarea
         INNER JOIN activos_vinculados_tarea AVT ON AVT.idtarea = TAR.idtarea
@@ -157,3 +162,68 @@ BEGIN
     WHERE idorden_trabajo = _idordentrabajo;
 END //
 
+
+DROP PROCEDURE IF EXISTS `obtenerOdtporId`
+DELIMITER //
+CREATE PROCEDURE `obtenerOdtporId`
+( 
+    IN _idodt INT
+)
+BEGIN
+	SELECT * FROM odt ODT
+    INNER JOIN detalle_odt DODT ON DODT.idorden_trabajo = ODT.idorden_trabajo
+    WHERE ODT.idorden_trabajo = _idodt;
+END //
+
+call obtenerOdtporId(7)
+
+DROP PROCEDURE IF EXISTS `obtenerHistorialOdt`
+DELIMITER //
+CREATE PROCEDURE `obtenerHistorialOdt`
+()
+BEGIN
+	SELECT 
+		ODT.idorden_trabajo,
+        DODT.clasificacion,
+		CONCAT(PERCRE.nombres, ' ', PERCRE.apellidos) AS creador,
+		GROUP_CONCAT(DISTINCT CONCAT(PERRES.nombres, ' ', PERRES.apellidos) SEPARATOR ', ') AS responsables,        
+        DODT.tiempo_ejecucion,
+        DIA.diagnostico,
+        
+        GROUP_CONCAT(DISTINCT ACT.descripcion SEPARATOR ', ') AS activos,
+        
+        TAR.descripcion AS tarea,				
+        
+        CONCAT(PERCO.nombres, ' ', PERCO.apellidos) as revisado_por,
+        TAR.idtarea AS idtarea,
+        TP.tipo_prioridad,
+        ODT.fecha_inicio,
+        ODT.hora_inicio,
+        ODT.fecha_vencimiento,
+        ODT.hora_vencimiento,
+        
+        EST.nom_estado,
+        ODT.incompleto
+
+            FROM historial_odt HO
+    LEFT JOIN odt ODT ON ODT.idorden_trabajo = HO.idorden_trabajo
+    LEFT JOIN diagnosticos DIA ON DIA.idorden_trabajo = ODT.idorden_trabajo
+    LEFT JOIN responsables_asignados_odt RA ON RA.idorden_trabajo = ODT.idorden_trabajo
+    LEFT JOIN usuarios USURES ON USURES.id_usuario = RA.idresponsable
+    LEFT JOIN personas PERRES ON PERRES.id_persona = USURES.idpersona
+    LEFT JOIN usuarios USUCRE ON USUCRE.id_usuario = ODT.creado_por
+    LEFT JOIN personas PERCRE ON PERCRE.id_persona = USUCRE.idpersona
+    LEFT JOIN tareas TAR ON TAR.idtarea = ODT.idtarea
+    LEFT JOIN tipo_prioridades TP ON TP.idtipo_prioridad = TAR.idtipo_prioridad
+    LEFT JOIN activos_vinculados_tarea AVT ON AVT.idtarea = TAR.idtarea
+    LEFT JOIN activos ACT ON ACT.idactivo = AVT.idactivo
+    LEFT JOIN estados EST ON EST.idestado = ODT.idestado
+    LEFT JOIN detalle_odt DODT ON DODT.idorden_trabajo = ODT.idorden_trabajo
+    LEFT JOIN comentarios_odt CO ON CO.idorden_trabajo = ODT.idorden_trabajo
+    LEFT JOIN usuarios USUCO ON USUCO.id_usuario = CO.revisadoPor
+    LEFT JOIN personas PERCO ON PERCO.id_persona = USUCO.idpersona
+    GROUP BY ODT.idorden_trabajo, TAR.descripcion, ODT.fecha_inicio, ODT.fecha_vencimiento, 
+             PERCRE.nombres, PERCRE.apellidos, TAR.idtarea, EST.nom_estado;
+END //
+use gamp;
+call obtenerOdtporId(2)

@@ -17,15 +17,25 @@
                             </div>
                         </div>
                         <hr>
-                        <div class="contenedor-diagnostico-entrada">
-                            <h2 class="fs-5 fw-normal text-dark mb-2">Dianostico de Entrada</h2>
+                        <div class="contenedor-diagnostico-entrada mb-3">
+                            <h2 class="fs-5 fw-normal text-dark mb-2">Diagnostico de Entrada</h2>
                             <textarea class="comment-textarea form-control" id="diagnostico-entrada" rows="5" placeholder="Escribe tu diagnostico aquí..."></textarea>
+                        </div>
+                        <div class="row" id="contenedor-fecha-hora">
+                            <div class="form-floating mb-3 col-md-6">
+                                <input type="date" class="form-control" id="fecha-vencimiento" placeholder="Fecha de vencimiento">
+                                <label for="fecha-vencimiento" class="form-label">Fecha de vencimiento</label>
+                            </div>
+                            <div class="form-floating mb-3 col-md-6">
+                                <input type="time" class="form-control" id="hora-vencimiento" placeholder="Hora de vencimiento"  />
+                                <label for="hora-vencimiento" class="form-label">Hora de Vencimiento</label>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        
+
         <div class="contenedor-responsables col align-items-stretch tab-pane show pe-0 fade d-md-flex active kanbancol mb-3">
             <div class="card border-0 pb-3 w-100">
                 <div class="card-body p-4">
@@ -71,7 +81,7 @@
                             <div class="card-body">
                                 <div class="contenedor-responsables-asignados">
                                     <ul>
-                                        
+
                                     </ul>
                                 </div>
                             </div>

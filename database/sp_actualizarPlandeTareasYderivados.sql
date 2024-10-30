@@ -22,21 +22,13 @@ DELIMITER $$
 CREATE PROCEDURE `actualizarTarea`(
     IN _idtarea INT,
     IN _idtipo_prioridad INT,
-    IN _descripcion VARCHAR(200), 
-    IN _fecha_inicio DATETIME,
-    IN _fecha_vencimiento DATETIME, 
-    IN _cant_intervalo INT, 
-    IN _frecuencia VARCHAR(10), 
+    IN _descripcion VARCHAR(200),     
     IN _idestado INT)
 BEGIN
     UPDATE tareas 
     SET 
 		idtipo_prioridad = _idtipo_prioridad,
 		descripcion = _descripcion,
-        fecha_inicio = _fecha_inicio,
-        fecha_vencimiento = _fecha_vencimiento,
-        cant_intervalo = _cant_intervalo, 
-        frecuencia = _frecuencia,
         idestado = _idestado, 
         update_at = NOW()
     WHERE idtarea = _idtarea;

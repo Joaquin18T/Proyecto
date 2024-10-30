@@ -34,31 +34,7 @@
                                     <input type="text" class="form-control" id="txtDescripcionTarea" placeholder="Descripcion" disabled required autocomplete="off">
                                     <label for="txtDescripcionTarea" class="form-label">Descripcion</label>
                                 </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating mb-3">
-                                    <input type="date" class="form-control" id="fecha-inicio" placeholder="Fecha de inicio" disabled required>
-                                    <label for="fecha-inicio" class="form-label">Fecha de inicio</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating mb-3">
-                                    <input type="date" class="form-control" id="fecha-vencimiento" placeholder="Fecha de vencimiento" disabled required>
-                                    <label for="fecha-vencimiento" class="form-label">Fecha de vencimiento</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" id="txtIntervaloTarea" placeholder="Intervalo" disabled required>
-                                    <label for="txtIntervaloTarea" class="form-label">Intervalo</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" id="txtFrecuenciaTarea" placeholder="Frecuencia" disabled required>
-                                    <label for="txtFrecuenciaTarea" class="form-label">Frecuencia</label>
-                                </div>
-                            </div>
+                            </div>                                                                                
                             <div class="col-md-6 form-floating">
                                 <select class="form-select" id="tipoPrioridadTarea" disabled required>
 
@@ -73,7 +49,7 @@
                                 <button type="submit" id="btnGuardarTarea" class="btn btn-primary" disabled>Guardar</button>
                             </div>
                             <div id="btnsTareaAcciones">
-                                
+
                             </div>
                         </div>
                     </div>

@@ -40,10 +40,12 @@ $(document).ready(async () => {
 
     function habilitarCamposTarea(habilitado = true) {
         $q("#txtDescripcionTarea").disabled = habilitado
-        $q("#fecha-inicio").disabled = habilitado
+        /* $q("#fecha-inicio").disabled = habilitado
+        $q("#hora-inicio").disabled = habilitado
         $q("#fecha-vencimiento").disabled = habilitado
+        $q("#hora-vencimiento").disabled = habilitado
         $q("#txtIntervaloTarea").disabled = habilitado
-        $q("#txtFrecuenciaTarea").disabled = habilitado
+        $q("#txtFrecuenciaTarea").disabled = habilitado */
         $q("#tipoPrioridadTarea").disabled = habilitado
         $q("#txtDescripcionPlanTarea").disabled = !habilitado
         $q("#btnGuardarPlanTarea").remove()
@@ -139,10 +141,12 @@ $(document).ready(async () => {
 
     async function agregarTareas() {
         const descripcionTarea = $q("#txtDescripcionTarea");
-        const intervaloTarea = $q("#txtIntervaloTarea");
+        /* const intervaloTarea = $q("#txtIntervaloTarea");
         const frecuenciaTarea = $q("#txtFrecuenciaTarea");
         const fechaInicioTarea = $q("#fecha-inicio");
+        const horaInicioTarea = $q("#hora-inicio");
         const fechaVencimiento = $q("#fecha-vencimiento");
+        const horaVencimiento = $q("#hora-vencimiento"); */
 
 
         let formTarea = new FormData();
@@ -150,10 +154,12 @@ $(document).ready(async () => {
         formTarea.append("idplantarea", idplantarea_generado);
         formTarea.append("idtipo_prioridad", tipoPrioridadTarea.value);
         formTarea.append("descripcion", descripcionTarea.value);
-        formTarea.append("fecha_inicio", fechaInicioTarea.value);
+        /* formTarea.append("fecha_inicio", fechaInicioTarea.value);
+        formTarea.append("hora_inicio", horaInicioTarea.value)
         formTarea.append("fecha_vencimiento", fechaVencimiento.value);
+        formTarea.append("hora_vencimiento", horaVencimiento.value)
         formTarea.append("cant_intervalo", intervaloTarea.value);
-        formTarea.append("frecuencia", frecuenciaTarea.value);
+        formTarea.append("frecuencia", frecuenciaTarea.value); */
         formTarea.append("idestado", 8);
         //console.log("agregar tareas idplantarea: ", idplantarea_generado)
         const data = await fetch(`${host}tarea.controller.php`, { method: 'POST', body: formTarea })
@@ -257,6 +263,40 @@ $(document).ready(async () => {
     //AGREGAR NUEVA TAREA, FORMATEAR EL FORMULARIO TAREA, HABILITAR CAMPOS ACTIVOS Y RENDERIZAR LA TAREA AGREGADA AL SELECT
     $q("#form-tarea").addEventListener("submit", async (e) => {
         e.preventDefault()
+        /* let fechaInicioTarea = $q("#fecha-inicio").value;
+        let horaInicioTarea = $q("#hora-inicio").value;
+        let fechaVencimiento = $q("#fecha-vencimiento").value;
+        let horaVencimiento = $q("#hora-vencimiento").value;
+
+        // Combinar fecha y hora en objetos Date para cada uno
+        let fechaHoraInicio = new Date(`${fechaInicioTarea}T${horaInicioTarea}:00-05:00`);
+        let fechaHoraVencimiento = new Date(`${fechaVencimiento}T${horaVencimiento}:00-05:00`);
+
+        // Obtener la fecha y hora actual en horario de Perú
+        let ahora = new Date().toLocaleString("en-US", { timeZone: "America/Lima" });
+        let fechaHoraActual = new Date(ahora);
+
+        // Validar que las fechas no sean anteriores a hoy
+        if (fechaHoraInicio < fechaHoraActual) {
+            alert("La hora de inicio debe ser a partir de la hora actual.");
+            return;
+        }
+        if (fechaHoraVencimiento < fechaHoraActual) {
+            alert("La hora de vencimiento debe ser a partir de la hora actual.");
+            return;
+        }
+
+        // Validar que la fecha de inicio no sea posterior a la fecha de vencimiento
+        if (fechaInicioTarea > fechaVencimiento) {
+            alert("La fecha de inicio no puede ser posterior a la fecha de vencimiento.");
+            return;
+        }
+
+        // Validar que la hora de inicio no sea mayor que la hora de vencimiento si ambas fechas son iguales
+        if (fechaInicioTarea === fechaVencimiento && horaInicioTarea > horaVencimiento) {
+            alert("La hora de inicio no puede ser mayor que la hora de vencimiento en el mismo día.");
+            return;
+        } */
         let permitir = true
         let sintareas = false;
         const formtarea = $q("#form-tarea");
@@ -361,10 +401,12 @@ $(document).ready(async () => {
                         const tareaObtenida = await obtenerTareaPorId(idtarea)
                         //RENDERIZAR INFO EN LOS INPUTS Y SELECT de acuerdo a la tarea obtenida
                         $q("#txtDescripcionTarea").value = tareaObtenida[0].descripcion
-                        $q("#fecha-inicio").value = tareaObtenida[0].fecha_inicio
+                        /* $q("#fecha-inicio").value = tareaObtenida[0].fecha_inicio
+                        $q("#hora-inicio").value = tareaObtenida[0].hora_inicio
                         $q("#fecha-vencimiento").value = tareaObtenida[0].fecha_vencimiento
+                        $q("#hora-vencimiento").value = tareaObtenida[0].hora_vencimiento
                         $q("#txtIntervaloTarea").value = tareaObtenida[0].cant_intervalo
-                        $q("#txtFrecuenciaTarea").value = tareaObtenida[0].frecuencia
+                        $q("#txtFrecuenciaTarea").value = tareaObtenida[0].frecuencia */
                         $q("#tipoPrioridadTarea").value = tareaObtenida[0].idtipo_prioridad
                         //console.log("fecha: ", $q("#fecha-inicio").value)
                         btnGuardarTarea.style.display = 'none'
@@ -385,16 +427,52 @@ $(document).ready(async () => {
                         })
 
                         $q("#btnActualizarTarea").addEventListener("click", async () => {
+                            /* let fechaInicioTarea = $q("#fecha-inicio").value;
+                            let horaInicioTarea = $q("#hora-inicio").value;
+                            let fechaVencimiento = $q("#fecha-vencimiento").value;
+                            let horaVencimiento = $q("#hora-vencimiento").value;
+
+                            // Combinar fecha y hora en objetos Date para cada uno
+                            let fechaHoraInicio = new Date(`${fechaInicioTarea}T${horaInicioTarea}:00-05:00`);
+                            let fechaHoraVencimiento = new Date(`${fechaVencimiento}T${horaVencimiento}:00-05:00`);
+
+                            // Obtener la fecha y hora actual en horario de Perú
+                            let ahora = new Date().toLocaleString("en-US", { timeZone: "America/Lima" });
+                            let fechaHoraActual = new Date(ahora);
+
+                            // Validar que las fechas no sean anteriores a hoy
+                            if (fechaHoraInicio < fechaHoraActual) {
+                                alert("La hora de inicio debe ser a partir de la hora actual.");
+                                return;
+                            }
+                            if (fechaHoraVencimiento < fechaHoraActual) {
+                                alert("La hora de vencimiento debe ser a partir de la hora actual.");
+                                return;
+                            }
+
+                            // Validar que la fecha de inicio no sea posterior a la fecha de vencimiento
+                            if (fechaInicioTarea > fechaVencimiento) {
+                                alert("La fecha de inicio no puede ser posterior a la fecha de vencimiento.");
+                                return;
+                            }
+
+                            // Validar que la hora de inicio no sea mayor que la hora de vencimiento si ambas fechas son iguales
+                            if (fechaInicioTarea === fechaVencimiento && horaInicioTarea > horaVencimiento) {
+                                alert("La hora de inicio no puede ser mayor que la hora de vencimiento en el mismo día.");
+                                return;
+                            } */
                             // Aquí llamas tu función para actualizar la tarea
                             const formActualizarTarea = new FormData()
                             formActualizarTarea.append("operation", "actualizarTarea")
                             formActualizarTarea.append("idtarea", idtarea)
                             formActualizarTarea.append("idtipo_prioridad", $q("#tipoPrioridadTarea").value)
                             formActualizarTarea.append("descripcion", $q("#txtDescripcionTarea").value)
-                            formActualizarTarea.append("fecha_inicio", $q("#fecha-inicio").value)
+                            /* formActualizarTarea.append("fecha_inicio", $q("#fecha-inicio").value)
+                            formActualizarTarea.append("hora_inicio", $q("#hora-inicio").value)
                             formActualizarTarea.append("fecha_vencimiento", $q("#fecha-vencimiento").value)
+                            formActualizarTarea.append("hora_vencimiento", $q("#hora-vencimiento").value)
                             formActualizarTarea.append("cant_intervalo", $q("#txtIntervaloTarea").value)
-                            formActualizarTarea.append("frecuencia", $q("#txtFrecuenciaTarea").value)
+                            formActualizarTarea.append("frecuencia", $q("#txtFrecuenciaTarea").value) */
                             formActualizarTarea.append("idestado", 8)
 
                             const response = await fetch(`${host}tarea.controller.php`, {

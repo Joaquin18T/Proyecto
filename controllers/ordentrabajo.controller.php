@@ -19,6 +19,15 @@ if (isset($_GET['operation'])) {
     case 'obtenerDetalleOdt':
       echo json_encode($ordentrabajo->obtenerDetalleOdt(["idordentrabajo" => $_GET['idordentrabajo']]));
       break;
+
+
+    case 'obtenerOdtporId':
+      echo json_encode($ordentrabajo->obtenerOdtporId(["idodt" => $_GET['idodt']]));
+      break;
+
+    case 'obtenerHistorialOdt':
+      echo json_encode($ordentrabajo->obtenerHistorialOdt());
+      break;
   }
 }
 
@@ -28,7 +37,11 @@ if (isset($_POST['operation'])) {
       $id = -1;
       $datosEnviar = [
         "idtarea"   => $_POST["idtarea"],
-        "creado_por"     => $_POST["creado_por"]
+        "creado_por"     => $_POST["creado_por"],
+        "fecha_inicio"              => $_POST["fecha_inicio"],
+        "hora_inicio"               => $_POST["hora_inicio"],
+        "fecha_vencimiento"         => $_POST["fecha_vencimiento"],
+        "hora_vencimiento"          => $_POST["hora_vencimiento"],
       ];
 
       $id = $ordentrabajo->add($datosEnviar);
@@ -43,6 +56,16 @@ if (isset($_POST['operation'])) {
       ];
 
       $id = $ordentrabajo->registrarDetalleOdt($datosEnviar);
+      echo json_encode(["id" => $id]);
+      break;
+
+    case 'registrarHistorialOdt':
+      $id = -1;
+      $datosEnviar = [
+        "idodt"             => $_POST["idodt"]
+      ];
+
+      $id = $ordentrabajo->registrarHistorialOdt($datosEnviar);
       echo json_encode(["id" => $id]);
       break;
 
@@ -86,6 +109,17 @@ if (isset($_POST['operation'])) {
       ];
 
       $actualizado = $ordentrabajo->actualizarDetalleOdt($datosEnviar);
+      echo json_encode(["actualizado" => $actualizado]);
+      break;
+
+    case 'actualizarFechaVencimientoOdt':
+      $datosEnviar = [
+        "idodt"                     => $_POST["idodt"],
+        "fecha_vencimiento"         => $_POST["fecha_vencimiento"],
+        "hora_vencimiento"          => $_POST["hora_vencimiento"],
+      ];
+
+      $actualizado = $ordentrabajo->actualizarFechaVencimientoOdt($datosEnviar);
       echo json_encode(["actualizado" => $actualizado]);
       break;
 

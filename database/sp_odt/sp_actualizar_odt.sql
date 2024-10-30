@@ -56,3 +56,17 @@ BEGIN
     WHERE iddetalleodt = _iddetalleodt;
 END //
 
+DROP PROCEDURE IF exists `actualizarFechaVencimientoOdt`
+DELIMITER //
+CREATE PROCEDURE `actualizarFechaVencimientoOdt`
+(
+	IN _idodt INT,
+    IN _fecha_vencimiento DATE,
+    IN _hora_vencimiento TIME
+)
+BEGIN
+	UPDATE odt SET
+    fecha_vencimiento = _fecha_vencimiento,
+    hora_vencimiento = _hora_vencimiento
+    WHERE idorden_trabajo = _idodt;
+END //

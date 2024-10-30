@@ -1,6 +1,6 @@
 <?php require_once '../header.php' ?>
 
-<div class="row container-fluid">
+<div class="row container-fluid" id="contenedor-revisar-odt">
 
     <div class="card mb-3">
         <div class="row g-0">

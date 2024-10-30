@@ -12,6 +12,7 @@ $(document).ready(async () => {
         let data = await fetch(`${link}?${params}`);
         return data.json();
     }
+
     //VARIABLES
     let idtarea = -1
     let iddiagnosticoEntrada = -1
@@ -20,6 +21,7 @@ $(document).ready(async () => {
     let idordengenerada = window.localStorage.getItem("idodt")
 
     //UI
+    const contenedorRevisarOdt = $q("#contenedor-revisar-odt")
     const txtDiagnosticoEntrada = $q("#txtDiagnosticoEntrada")
     const txtDiagnosticoSalida = $q("#txtDiagnosticoSalida")
     const txtComentario = $q("#comentario")
@@ -31,6 +33,8 @@ $(document).ready(async () => {
     const contenedorEvidenciaPreviaSalida = $q("#preview-container-salida")
 
 
+    //EJECUTAR PRIMERO LO GENERAL
+    await verificarOdtEstado()
 
     //Ejecutar funciones 
     await renderUI()
@@ -113,6 +117,14 @@ $(document).ready(async () => {
         return detalleOdt
     }
 
+    async function obtenerOdtporId() {
+        const params = new URLSearchParams()
+        params.append("operation", "obtenerOdtporId")
+        params.append("idodt", idordengenerada)
+        const odt = await getDatos(`${host}ordentrabajo.controller.php`, params)
+        return odt
+    }
+
     // ******************* FIN SECCION DE OBTENER DATOS ****************************************************
 
     // *********************************** SECCION DE REGISTROS **********************************************
@@ -124,6 +136,15 @@ $(document).ready(async () => {
         formRegistro.append("comentario", txtComentario.value)
         formRegistro.append("revisadopor", idusuario)
         const Fcomentario = await fetch(`${host}ordentrabajo.controller.php`, { method: 'POST', body: formRegistro })
+        const comentario = await Fcomentario.json()
+        return comentario
+    }
+
+    async function registrarHistorialOdt() {
+        const formRegistroHistorialOdt = new FormData()
+        formRegistroHistorialOdt.append("operation", "registrarHistorialOdt")
+        formRegistroHistorialOdt.append("idodt", idordengenerada)
+        const Fcomentario = await fetch(`${host}ordentrabajo.controller.php`, { method: 'POST', body: formRegistroHistorialOdt })
         const comentario = await Fcomentario.json()
         return comentario
     }
@@ -159,17 +180,28 @@ $(document).ready(async () => {
             </div>
         `
         //await obtenerEvidencias() // paso 3
-        const activo = await obtenerActivosPorTarea(idtarea)
-        const tarea = await obtenerTareaPorId(idtarea)
-        contenedorDetallesOdtEntrada.innerHTML = `
-          <div class="row">
-              <p class="fw-bolder col">Activo: </p>
-              <p class="fw-normal d-flex align-items-center col">${activo[0].subcategoria} ${activo[0].marca}</p>
-          </div>
+        const activos = await obtenerActivosPorTarea(idtarea)
+        //const tarea = await obtenerTareaPorId(idtarea)
+        const odt = await obtenerOdt()
+
+        contenedorDetallesOdtEntrada.innerHTML = ``
+        contenedorDetallesOdtEntrada.innerHTML += `
+            <div class="row">
+              <p class="fw-bolder col">Activos: </p>
+            </div>`
+        for (let i = 0; i < activos.length; i++) {
+            contenedorDetallesOdtEntrada.innerHTML += `          
+            <p class="fw-normal d-flex align-items-center col">${activos[i].descripcion} - Cod: ${activos[i].cod_identificacion}</p>
+        `
+        }
+
+        contenedorDetallesOdtEntrada.innerHTML += `
           <div class="row">
               <p class="fw-bolder col">Fecha programada: </p>
-              <p class="fw-normal d-flex align-items-center col">${tarea[0].fecha_inicio}</p>
-          </div>     
+              <p class="fw-normal d-flex align-items-center col">${odt[0].fecha_inicio} - ${odt[0].hora_inicio}</p>
+              <p class="fw-bolder col">Fecha vencimiento: </p>
+              <p class="fw-normal d-flex align-items-center col">${odt[0].fecha_vencimiento} - ${odt[0].hora_vencimiento}</p>
+          </div>        
         `
 
         const responsables = await obtenerResponsablesAsignados()
@@ -267,6 +299,27 @@ $(document).ready(async () => {
         }
     }
 
+    async function verificarOdtEstado() {
+        const odtObtenida = await obtenerOdtporId()
+        if (odtObtenida[0]?.idestado == 11) { //VERIFICAR SI YA ESTA FINALIZADA , SI LO ESTA NO DEBERIA DE MOSTRAR EL REGISTRO
+            contenedorRevisarOdt.innerHTML = `
+            <div class="container-fluid">
+                <div class="row">
+                    <h1 class="">No puedes revisar esta orden por que ya fue finalizada.</h1>
+                </div>
+            </div>
+            `
+        } else if (!window.localStorage.getItem("idodt")) {
+            contenedorRevisarOdt.innerHTML = `
+            <div class="container-fluid">
+                <div class="row">
+                    <h1 class="">No has seleccionado ninguna orden a revisar.</h1>
+                </div>
+            </div>
+            `
+        }
+    }
+
     // **************************** FIN DE SECCION DE VERIFICACIONES **************************************
 
     // ****************************** SECCION DE EVENTOS **************************************************
@@ -276,8 +329,14 @@ $(document).ready(async () => {
         console.log("comentario registrado? : ", registrado)
         const actualizadoODT = await actualizarEstadoOdt(11, idordengenerada)
         console.log("odt actualizado a finalizado?: ", actualizadoODT)
-        if(actualizadoODT.actualizado){
+        if (actualizadoODT.actualizado) {
+            const registrado = await registrarHistorialOdt()
+            console.log("historial odt registrado?: ", registrado)
+            const estadoTareaActualizada = await actualizarTareaEstado(idtarea, 8)
+            console.log("ESTADO DE TAREA ACTUALIZADA?: ", estadoTareaActualizada)
+            window.localStorage.clear()
             window.location.href = `http://localhost/CMMS/views/odt`
+            console.log("redirigiendo...")
         }
     })
 
@@ -286,11 +345,54 @@ $(document).ready(async () => {
     // ************************** SECCION DE ACTUALIZACIONES ***********************************************
 
     async function actualizarEstadoOdt(idestado, idodt) {
+        //ACTUALIZACION DE ESTADOS DE ACTIVOS Y USUARIOS ASIGNADOS (RESPONSABLES): 
+        const activos = await obtenerActivosPorTarea(idtarea)
+        console.log("ACTIVOS ANTES DE ACTUALIZAR SUS ESTADOS: ", activos)
+        const responsablesAsignados = await obtenerResponsablesAsignados()
+        for (let o = 0; o < activos.length; o++) {
+            const actualizadoActivoEstado = await actualizarEstadoActivo(activos[o].idactivo, 1)
+            console.log("actualizadoActivoEstado: ", actualizadoActivoEstado)
+        }
+        for (let i = 0; i < responsablesAsignados.length; i++) {
+            const actualizadoAsignacionUsuario = await actualizarAsignacionUsuario(responsablesAsignados[i].idresponsable, 7)
+            console.log("actualizadoAsignacionUsuario: ", actualizadoAsignacionUsuario)
+        }
+
         const formActualizacionEstadoOdt = new FormData()
         formActualizacionEstadoOdt.append("operation", "actualizarEstadoOdt")
         formActualizacionEstadoOdt.append("idodt", idodt)
         formActualizacionEstadoOdt.append("idestado", idestado)
         const Factualizado = await fetch(`${host}ordentrabajo.controller.php`, { method: 'POST', body: formActualizacionEstadoOdt })
+        const actualizado = await Factualizado.json()
+        return actualizado
+    }
+
+    async function actualizarEstadoActivo(idactivo, idestado) {
+        const formActualizacion = new FormData()
+        formActualizacion.append("operation", "updateEstado")
+        formActualizacion.append("idactivo", idactivo)
+        formActualizacion.append("idestado", idestado)
+        const Factualizado = await fetch(`${host}activo.controller.php`, { method: 'POST', body: formActualizacion })
+        const actualizado = await Factualizado.json()
+        return actualizado
+    }
+
+    async function actualizarAsignacionUsuario(idusuario, asignacion) {
+        const formActualizacion = new FormData()
+        formActualizacion.append("operation", "updateAsignacion")
+        formActualizacion.append("idusuario", idusuario)
+        formActualizacion.append("asignacion", asignacion)
+        const Factualizado = await fetch(`${host}usuarios.controller.php`, { method: 'POST', body: formActualizacion })
+        const actualizado = await Factualizado.json()
+        return actualizado
+    }
+
+    async function actualizarTareaEstado(idtarea, estado) {
+        const formActualizacion = new FormData()
+        formActualizacion.append("operation", "actualizarTareaEstado")
+        formActualizacion.append("idtarea", idtarea)
+        formActualizacion.append("idestado", estado)
+        const Factualizado = await fetch(`${host}tarea.controller.php`, { method: 'POST', body: formActualizacion })
         const actualizado = await Factualizado.json()
         return actualizado
     }

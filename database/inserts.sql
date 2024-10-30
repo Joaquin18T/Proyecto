@@ -187,10 +187,10 @@ select * from estados;
 
 select * from activos_vinculados_tarea;
 
-INSERT INTO plandetareas (descripcion) values ('mantenimiento de impresora');
+-- INSERT INTO plandetareas (descripcion) values ('mantenimiento de impresora');
 
-INSERT INTO tareas (idplantarea, idtipo_prioridad, descripcion, fecha_inicio, fecha_vencimiento, cant_intervalo, frecuencia, idestado) values (1, 3, 'llenado de tinta color rojo','11-10-2024','15-10-2024', 1, 'mensual', 1);
+-- INSERT INTO tareas (idplantarea, idtipo_prioridad, descripcion, fecha_inicio, fecha_vencimiento, cant_intervalo, frecuencia, idestado) values (1, 3, 'llenado de tinta color rojo','11-10-2024','15-10-2024', 1, 'mensual', 1);
 
-INSERT INTO activos_vinculados_tarea (idtarea, idactivo) values (1, 5);
+-- INSERT INTO activos_vinculados_tarea (idtarea, idactivo) values (1, 5);
 
 select * from tareas;

@@ -196,6 +196,7 @@ $(document).ready(async () => {
 
   async function renderDiagnosticoEntrada() {
     const diagnosticoEntrada = await obtenerDiagnostico(1) // entrada
+    
     console.log("diagnosticoEntrada: ", diagnosticoEntrada)
     iddiagnosticoEntrada = diagnosticoEntrada[0]?.iddiagnostico
     txtDiagnosticoEntrada.innerHTML = diagnosticoEntrada[0].diagnostico
@@ -203,18 +204,28 @@ $(document).ready(async () => {
 
   async function renderDetalles() {
     //const diagnosticoEntrada = await obtenerDiagnostico(1) // entrada
-    const activo = await obtenerActivosPorTarea(idtarea)
-    const tarea = await obtenerTareaPorId(idtarea)
-    contenedorDetallesOdtEntrada.innerHTML = `
-      <div class="row">
-          <p class="fw-bolder col">Activo: </p>
-          <p class="fw-normal d-flex align-items-center col">${activo[0].subcategoria} ${activo[0].marca}</p>
-      </div>
-      <div class="row">
-          <p class="fw-bolder col">Fecha programada: </p>
-          <p class="fw-normal d-flex align-items-center col">${tarea[0].fecha_inicio}</p>
-      </div>     
-    `
+    const activos = await obtenerActivosPorTarea(idtarea)
+    const odt = await obtenerOdt()
+    //const tarea = await obtenerTareaPorId(idtarea)
+    contenedorDetallesOdtEntrada.innerHTML = ``
+    contenedorDetallesOdtEntrada.innerHTML += `
+            <div class="row">
+              <p class="fw-bolder col">Activos: </p>
+            </div>`
+    for (let i = 0; i < activos.length; i++) {
+      contenedorDetallesOdtEntrada.innerHTML += `          
+            <p class="fw-normal d-flex align-items-center col">${activos[i].descripcion} - Cod: ${activos[i].cod_identificacion}</p>
+        `
+    }
+
+    contenedorDetallesOdtEntrada.innerHTML += `
+          <div class="row">
+              <p class="fw-bolder col">Fecha programada: </p>
+              <p class="fw-normal d-flex align-items-center col">${odt[0].fecha_inicio} - ${odt[0].hora_inicio}</p>
+              <p class="fw-bolder col">Fecha vencimiento: </p>
+              <p class="fw-normal d-flex align-items-center col">${odt[0].fecha_vencimiento} - ${odt[0].hora_vencimiento}</p>
+          </div>     
+        `
   }
 
   async function renderResponsables() {
@@ -362,9 +373,12 @@ $(document).ready(async () => {
       iddetalleodtGenerado = detalleOdt[0].iddetalleodt
       btnIniciar.disabled = true
       btnIniciar.removeAttribute("id")
-      btnFinalizar.disabled = true
-      btnFinalizar.removeAttribute("id")
-      //console.log("btnIniciar: ", btnIniciar)
+      if (detalleOdt[0]?.tiempo_ejecucion !== null && detalleOdt[0]?.fecha_final !== null) {
+        btnFinalizar.disabled = true
+        btnFinalizar.removeAttribute("id")
+        //console.log("btnIniciar: ", btnIniciar)
+      }
+
       return
     } else {
       btnIniciar.disabled = false

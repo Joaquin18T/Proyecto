@@ -54,10 +54,10 @@ $(document).ready(async () => {
 
     function habilitarCamposTarea(habilitado = true) {
         $q("#txtDescripcionTarea").disabled = habilitado
-        $q("#fecha-inicio").disabled = habilitado
+        /* $q("#fecha-inicio").disabled = habilitado
         $q("#fecha-vencimiento").disabled = habilitado
         $q("#txtIntervaloTarea").disabled = habilitado
-        $q("#txtFrecuenciaTarea").disabled = habilitado
+        $q("#txtFrecuenciaTarea").disabled = habilitado */
         $q("#tipoPrioridadTarea").disabled = habilitado
         $q("#btnGuardarTarea").disabled = habilitado
     }
@@ -158,10 +158,10 @@ $(document).ready(async () => {
 
     async function agregarTareas() {
         const descripcionTarea = $q("#txtDescripcionTarea");
-        const intervaloTarea = $q("#txtIntervaloTarea");
+        /* const intervaloTarea = $q("#txtIntervaloTarea");
         const frecuenciaTarea = $q("#txtFrecuenciaTarea");
         const fechaInicioTarea = $q("#fecha-inicio");
-        const fechaVencimiento = $q("#fecha-vencimiento");
+        const fechaVencimiento = $q("#fecha-vencimiento"); */
 
 
         let formTarea = new FormData();
@@ -169,10 +169,10 @@ $(document).ready(async () => {
         formTarea.append("idplantarea", idplantarea_generado);
         formTarea.append("idtipo_prioridad", tipoPrioridadTarea.value);
         formTarea.append("descripcion", descripcionTarea.value);
-        formTarea.append("fecha_inicio", fechaInicioTarea.value);
+        /* formTarea.append("fecha_inicio", fechaInicioTarea.value);
         formTarea.append("fecha_vencimiento", fechaVencimiento.value);
         formTarea.append("cant_intervalo", intervaloTarea.value);
-        formTarea.append("frecuencia", frecuenciaTarea.value);
+        formTarea.append("frecuencia", frecuenciaTarea.value); */
         formTarea.append("idestado", 8);
         //console.log("agregar tareas idplantarea: ", idplantarea_generado)
         const data = await fetch(`${host}tarea.controller.php`, { method: 'POST', body: formTarea })
@@ -330,10 +330,10 @@ $(document).ready(async () => {
                     const tareaObtenida = await obtenerTareaPorId(idtarea)
                     //RENDERIZAR INFO EN LOS INPUTS Y SELECT de acuerdo a la tarea obtenida
                     $q("#txtDescripcionTarea").value = tareaObtenida[0].descripcion
-                    $q("#fecha-inicio").value = tareaObtenida[0].fecha_inicio
+                    /* $q("#fecha-inicio").value = tareaObtenida[0].fecha_inicio
                     $q("#fecha-vencimiento").value = tareaObtenida[0].fecha_vencimiento
                     $q("#txtIntervaloTarea").value = tareaObtenida[0].cant_intervalo
-                    $q("#txtFrecuenciaTarea").value = tareaObtenida[0].frecuencia
+                    $q("#txtFrecuenciaTarea").value = tareaObtenida[0].frecuencia */
                     $q("#tipoPrioridadTarea").value = tareaObtenida[0].idtipo_prioridad
                     //console.log("fecha: ", $q("#fecha-inicio").value)
                     btnGuardarTarea.style.display = 'none'
@@ -360,10 +360,10 @@ $(document).ready(async () => {
                         formActualizarTarea.append("idtarea", idtarea)
                         formActualizarTarea.append("idtipo_prioridad", $q("#tipoPrioridadTarea").value)
                         formActualizarTarea.append("descripcion", $q("#txtDescripcionTarea").value)
-                        formActualizarTarea.append("fecha_inicio", $q("#fecha-inicio").value)
+                        /* formActualizarTarea.append("fecha_inicio", $q("#fecha-inicio").value)
                         formActualizarTarea.append("fecha_vencimiento", $q("#fecha-vencimiento").value)
                         formActualizarTarea.append("cant_intervalo", $q("#txtIntervaloTarea").value)
-                        formActualizarTarea.append("frecuencia", $q("#txtFrecuenciaTarea").value)
+                        formActualizarTarea.append("frecuencia", $q("#txtFrecuenciaTarea").value) */
                         formActualizarTarea.append("idestado", 8)
 
                         const response = await fetch(`${host}tarea.controller.php`, {
@@ -376,10 +376,7 @@ $(document).ready(async () => {
 
                         const pTareaActual = document.querySelector(`p[data-tarea-id="${idtarea}"]`);
                         pTareaActual.innerHTML = `
-                                ${$q("#txtDescripcionTarea").value} - Tarea: ${idtarea}
-                                <span class="badge bg-primary rounded-pill btn-eliminar-tarea" data-tarea-id="${idtarea}">
-                                    <i class="fa-solid fa-trash"></i>
-                                </span>
+                                ${$q("#txtDescripcionTarea").value} - Tarea: ${idtarea}                                
                             `;
 
                         // Aquí puedes refrescar la lista de tareas si es necesario o cualquier acción adicional
@@ -452,6 +449,16 @@ $(document).ready(async () => {
     //AGREGAR NUEVA TAREA, FORMATEAR EL FORMULARIO TAREA, HABILITAR CAMPOS ACTIVOS Y RENDERIZAR LA TAREA AGREGADA AL SELECT
     $q("#form-tarea").addEventListener("submit", async (e) => {
         e.preventDefault()
+        /* const fechaInicioTarea = new Date($q("#fecha-inicio").value);
+        const fechaVencimiento = new Date($q("#fecha-vencimiento").value);
+        console.log("FECHA INICIO -> ", fechaInicioTarea)
+        console.log("FECHA VENCIMIENTO -> ", fechaVencimiento)
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+        if (fechaInicioTarea < hoy || fechaVencimiento < hoy) {
+            alert("La fecha de inicio y la fecha de vencimiento deben ser a partir de hoy.");
+            return;
+        } */
         let permitir = true
         let sintareas = false;
         const formtarea = $q("#form-tarea");
@@ -539,10 +546,10 @@ $(document).ready(async () => {
                         const tareaObtenida = await obtenerTareaPorId(idtarea)
                         //RENDERIZAR INFO EN LOS INPUTS Y SELECT de acuerdo a la tarea obtenida
                         $q("#txtDescripcionTarea").value = tareaObtenida[0].descripcion
-                        $q("#fecha-inicio").value = tareaObtenida[0].fecha_inicio
+                        /* $q("#fecha-inicio").value = tareaObtenida[0].fecha_inicio
                         $q("#fecha-vencimiento").value = tareaObtenida[0].fecha_vencimiento
                         $q("#txtIntervaloTarea").value = tareaObtenida[0].cant_intervalo
-                        $q("#txtFrecuenciaTarea").value = tareaObtenida[0].frecuencia
+                        $q("#txtFrecuenciaTarea").value = tareaObtenida[0].frecuencia */
                         $q("#tipoPrioridadTarea").value = tareaObtenida[0].idtipo_prioridad
                         //console.log("fecha: ", $q("#fecha-inicio").value)
                         btnGuardarTarea.style.display = 'none'
@@ -569,10 +576,10 @@ $(document).ready(async () => {
                             formActualizarTarea.append("idtarea", idtarea)
                             formActualizarTarea.append("idtipo_prioridad", $q("#tipoPrioridadTarea").value)
                             formActualizarTarea.append("descripcion", $q("#txtDescripcionTarea").value)
-                            formActualizarTarea.append("fecha_inicio", $q("#fecha-inicio").value)
+                            /* formActualizarTarea.append("fecha_inicio", $q("#fecha-inicio").value)
                             formActualizarTarea.append("fecha_vencimiento", $q("#fecha-vencimiento").value)
                             formActualizarTarea.append("cant_intervalo", $q("#txtIntervaloTarea").value)
-                            formActualizarTarea.append("frecuencia", $q("#txtFrecuenciaTarea").value)
+                            formActualizarTarea.append("frecuencia", $q("#txtFrecuenciaTarea").value) */
                             formActualizarTarea.append("idestado", 8)
 
                             const response = await fetch(`${host}tarea.controller.php`, {

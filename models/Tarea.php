@@ -19,16 +19,12 @@ class Tarea extends ExecQuery
   public function add($params = []): int
   {
     try {
-      $sp = parent::execQ("CALL insertarTarea(@idtarea,?,?,?,?,?,?,?,?)");
+      $sp = parent::execQ("CALL insertarTarea(@idtarea,?,?,?,?)");
       $sp->execute(
         array(
           $params['idplantarea'],
           $params['idtipo_prioridad'],
-          $params['descripcion'],
-          $params['fecha_inicio'],
-          $params['fecha_vencimiento'],
-          $params['cant_intervalo'],
-          $params['frecuencia'],
+          $params['descripcion'],          
           $params['idestado']
         ),
 
@@ -55,16 +51,12 @@ class Tarea extends ExecQuery
   public function actualizarTarea($params = []): array
   {
     try {
-      $sp = parent::execQ("CALL actualizarTarea(?,?,?,?,?,?,?,?)");
+      $sp = parent::execQ("CALL actualizarTarea(?,?,?,?)");
       $sp->execute(
         array(
           $params['idtarea'],
           $params['idtipo_prioridad'],
           $params['descripcion'],
-          $params['fecha_inicio'],
-          $params['fecha_vencimiento'],
-          $params['cant_intervalo'],
-          $params['frecuencia'],
           $params['idestado']
         )
       );

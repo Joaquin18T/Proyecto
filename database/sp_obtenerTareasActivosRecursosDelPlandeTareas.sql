@@ -90,7 +90,7 @@ DROP PROCEDURE IF EXISTS `obtenerTareasPorPlanTarea`
 DELIMITER $$
 CREATE PROCEDURE `obtenerTareasPorPlanTarea`(IN _idplantarea INT)
 BEGIN
-	SELECT TAR.idtarea, PT.descripcion as plan_tarea, TP.tipo_prioridad, TAR.descripcion, TAR.cant_intervalo, TAR.frecuencia ,ES.nom_estado FROM tareas TAR
+	SELECT TAR.idtarea, PT.descripcion as plan_tarea, TP.tipo_prioridad, TAR.descripcion ,ES.nom_estado FROM tareas TAR
     INNER JOIN plandetareas PT ON TAR.idplantarea = PT.idplantarea -- quitar esta linea luego pq no es necesario mostrar el plan de tareas al que pertenece
     INNER JOIN tipo_prioridades TP ON TAR.idtipo_prioridad = TP.idtipo_prioridad
     INNER JOIN estados ES ON TAR.idestado = ES.idestado
@@ -110,13 +110,13 @@ DROP PROCEDURE IF EXISTS `obtenerActivosPorTarea`
 DELIMITER $$
 CREATE PROCEDURE `obtenerActivosPorTarea`(IN _idtarea INT)
 BEGIN
-	SELECT ACTV.idactivo_vinculado, ACT.idactivo,SCAT.subcategoria, MAR.marca, ACT.modelo FROM activos_vinculados_tarea ACTV
+	SELECT ACTV.idactivo_vinculado, ACT.cod_identificacion,ACT.descripcion,ACT.idactivo,SCAT.subcategoria, MAR.marca, ACT.modelo FROM activos_vinculados_tarea ACTV
     INNER JOIN activos ACT ON ACTV.idactivo = ACT.idactivo
     INNER JOIN subcategorias SCAT ON ACT.idsubcategoria = SCAT.idsubcategoria
     INNER JOIN marcas MAR ON ACT.idmarca = MAR.idmarca
     WHERE ACTV.idtarea = _idtarea;
 END $$
-
+select * from activos;
 call obtenerActivosPorTarea(2)
 
 

@@ -39,10 +39,6 @@ CREATE PROCEDURE `insertarTarea`(
     IN _idplantarea INT,
     IN _idtipo_prioridad INT,
     IN _descripcion VARCHAR(200),
-    IN _fecha_inicio DATE,
-    IN _fecha_vencimiento DATE,
-    IN _cant_intervalo INT,
-    IN _frecuencia VARCHAR(10),
     IN _idestado INT
 )
 BEGIN
@@ -56,12 +52,10 @@ BEGIN
 	END;
         
     INSERT INTO tareas (
-        idplantarea, idtipo_prioridad, descripcion,
-        fecha_inicio, fecha_vencimiento, cant_intervalo, frecuencia, idestado
+        idplantarea, idtipo_prioridad, descripcion, idestado
     )
     VALUES (
-        _idplantarea, _idtipo_prioridad, _descripcion,
-        _fecha_inicio, _fecha_vencimiento, _cant_intervalo, _frecuencia, _idestado
+        _idplantarea, _idtipo_prioridad, _descripcion, _idestado
     );
     
     IF existe_error = 1 THEN
