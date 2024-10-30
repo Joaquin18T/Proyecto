@@ -86,3 +86,4 @@ BEGIN
 	WHERE idorden_trabajo = _idodt;
 END //
 
+call obtenerResponsables(4)

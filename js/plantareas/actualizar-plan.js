@@ -270,7 +270,6 @@ $(document).ready(async () => {
         const btnsEliminarTarea = $all(".btn-eliminar-tarea")
         btnsEliminarTarea.forEach(btn => {
             btn.addEventListener("click", async () => {
-                console.log("PUTAAAAAAAAAAAAAAAAAAAAAA: ", tareasObtenidasAntesDeEliminar)
                 console.log("eliminado")
                 console.log("data-tarea-id: ", btn.getAttribute("data-tarea-id"))
                 const idTarea = parseInt(btn.getAttribute("data-tarea-id"));
@@ -395,14 +394,15 @@ $(document).ready(async () => {
     async function renderAvt() {
 
         const avt = await obtenerActivosVinculados()
+        console.log("avt gaasaa: ", avt)
         listaActivosAsignados.innerHTML = ""
         for (let p = 0; p < avt.length; p++) {
             listaActivosAsignados.innerHTML += `
                 <li class="list-group-item d-flex justify-content-between align-items-center mb-3" data-idtarea="${avt[p].idtarea}">
                     ${avt[p].descripcion} - Tarea N°${avt[p].idtarea}
-                    <span class="badge bg-primary rounded-pill btn-eliminar" data-idactivovinculado="${avt[p].idactivo_vinculado}">
+                    ${avt[p].idestado !== 9 ? `<span class="badge bg-primary rounded-pill btn-eliminar" data-idactivovinculado="${avt[p].idactivo_vinculado}">
                         <i class="fa-solid fa-trash"></i>
-                    </span>
+                    </span>`: ''}
                 </li>
             `
         }

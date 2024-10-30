@@ -335,7 +335,7 @@ $(document).ready(async () => {
             const estadoTareaActualizada = await actualizarTareaEstado(idtarea, 8)
             console.log("ESTADO DE TAREA ACTUALIZADA?: ", estadoTareaActualizada)
             window.localStorage.clear()
-            window.location.href = `http://localhost/CMMS/views/odt`
+            //window.location.href = `http://localhost/CMMS/views/odt`
             console.log("redirigiendo...")
         }
     })

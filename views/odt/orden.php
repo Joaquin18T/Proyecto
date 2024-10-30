@@ -56,8 +56,8 @@
             <div class="col-md-8">
                 <div class="card-body ">
                     <h5 class="card-title">Diagnsotico salida</h5>
-                    <textarea class="comment-textarea form-control mb-3" id="diagnostico-salida" rows="5" placeholder="Escribe tu diagnostico aquí..."></textarea>
-                    <button class="btn btn-primary" id="btn-guardar-diagnostico">Guardar</button>
+                    <textarea class="comment-textarea form-control mb-3" id="diagnostico-salida" rows="5" placeholder="Escribe tu diagnostico aquí..." disabled></textarea>
+                    <button class="btn btn-primary" id="btn-guardar-diagnostico" disabled>Guardar</button>
                 </div>
                 <div class="card-footer">
                     <div class="row">
