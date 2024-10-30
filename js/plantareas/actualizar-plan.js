@@ -40,7 +40,7 @@ $(document).ready(async () => {
     let incompleto = -1
 
 
-    renderTablaActivos()
+    await filtrarActivosList()
     await renderDescripcionPlan()
     await obtenerTareas()
     await obtenerActivosVinculados()
@@ -182,8 +182,8 @@ $(document).ready(async () => {
     async function filtrarActivosList() {
         const params = new URLSearchParams()
         params.append("operation", "searchActivoResponsable")
-        params.append("idsubcategoria", (selectSubCategoria.value.trim() === "" || selectSubCategoria.value == -1) ? null : selectSubCategoria.value) //
-        params.append("idubicacion", (selectUbicacion.value.trim() === "" || selectUbicacion.value == -1) ? null : selectUbicacion.value) //
+        params.append("idsubcategoria", (selectSubCategoria.value.trim() === "" || selectSubCategoria.value == -1) ? "" : selectSubCategoria.value) //
+        params.append("idubicacion", (selectUbicacion.value.trim() === "" || selectUbicacion.value == -1) ? "" : selectUbicacion.value) //
         params.append("cod_identificacion", "")
 
         const data = await getDatos(`${host}activo.controller.php`, params)
@@ -749,7 +749,7 @@ $(document).ready(async () => {
         checkboxes.forEach(chk => {
             chk.checked = false;  // Deselecciona el checkbox
         });
-
+        await filtrarActivosList()
     })
 
     listaActivosAsignados.addEventListener("click", async (event) => {
