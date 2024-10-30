@@ -63,6 +63,7 @@
                       <th>Tipo doc.</th>
                       <th>Genero</th>
                       <th>Estado</th>
+                      <th>Asignado</th>
                       <th>Acciones</th>
                     </tr>
                   </thead>

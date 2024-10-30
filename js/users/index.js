@@ -76,6 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <td>${x.tipodoc}</td>
           <td>${x.genero}</td>
           <td>${x.estado==="1"?"Activo":"Baja"}</td>
+          <td>${parseInt(x.asignacion)===7?"No Asignado":"Asignado"}</td>
           <td>
               ${parseInt(x.estado)===0?'Ninguna Accion':
                 `<button type="button" class="btn btn-sm btn-warning update-user" data-iduser=${x.id_usuario}>Update</button>
