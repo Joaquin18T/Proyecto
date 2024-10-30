@@ -176,7 +176,9 @@ $(document).ready(async () => {
             const tareaHTML = `
                 <h3 class="card-title">${tarea.descripcion}</h3>
                 <p class="card-text">Plan de tarea: ${tarea.plantarea}</p>
-                <p class="card-text">Activos: ${tarea.activos}</p>
+                <div class="row">
+                    <p class="card-text fw-bolder">Activos: <p class="text-mute">${tarea.activos}</p></p>
+                </div>
                 <p class="card-text"><small class="text-muted">Prioridad: ${tarea.prioridad}</small></p>
             `;
 
