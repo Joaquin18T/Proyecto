@@ -15,6 +15,19 @@ document.addEventListener("DOMContentLoaded",()=>{
   }
 
   (async () => {
+    const data = await getDatos("http://localhost/CMMS/controllers/ubicacion.controller.php", "operation=getAll");
+    
+    data.forEach((x,i) => {
+      //console.log(x);
+      if(i<5){
+        const element = createOption(x.idubicacion, x.ubicacion);
+        selector("ubicacion").appendChild(element);
+      }
+    });
+  
+  })();
+
+  (async () => {
     const data = await getDatos(`${host}subcategoria.controller.php`, "operation=getSubCategoria");
     //console.log(data);
     data.forEach(x => {
@@ -150,7 +163,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       }
     });
   }
-
+  //ubicacion
   async function buttonDetail(e){
     console.log(e.target.getAttribute("data-idresp"));
     let value=e.target.getAttribute("data-idresp");

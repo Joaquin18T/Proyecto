@@ -9,6 +9,7 @@ $host = "http://localhost/CMMS/";
 ?>
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,7 +27,7 @@ $host = "http://localhost/CMMS/";
   <link rel="stylesheet" href="http://localhost/CMMS/css/global.css">
   <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-   
+
   <!-- jKanban CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jkanban@1.2.0/dist/jkanban.min.css">
 
@@ -230,7 +231,16 @@ $host = "http://localhost/CMMS/";
             </ul>
           </div>
         </li>
-        
+        <li class="nav-item">
+          <a href="<?= $host ?>views/bajas" class="nav-link d-flex justify-content-between">
+            <span>
+              <span class="sidebar-icon">
+                <!-- ICONO -->
+              </span>
+              <span class="sidebar-text">Bajas</span>
+            </span>
+          </a>
+        </li>
       </ul>
       <!--/ OPCIONES SIDEBAR -->
     </div>
@@ -321,7 +331,7 @@ $host = "http://localhost/CMMS/";
                 </li>
                 <!-- Opción de logout -->
                 <li>
-                  <a class="dropdown-item d-flex align-items-center" href="<?=$host?>/controllers/usuarios.controller.php?operation=destroy">
+                  <a class="dropdown-item d-flex align-items-center" href="<?= $host ?>/controllers/usuarios.controller.php?operation=destroy">
                     <svg
                       class="dropdown-icon text-danger me-2"
                       fill="none"

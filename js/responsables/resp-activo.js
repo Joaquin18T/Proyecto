@@ -560,12 +560,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   (async () => {
     const data = await getDatos("http://localhost/CMMS/controllers/ubicacion.controller.php", "operation=getAll");
-    data.forEach(x => {
+    console.log(data);
+    
+    data.forEach((x,i) => {
       //console.log(x);
-
-      const element = createOption(x.idubicacion, x.ubicacion);
-      selector("ubicacion").appendChild(element);
+      if(i<5){
+        const element = createOption(x.idubicacion, x.ubicacion);
+        selector("ubicacion").appendChild(element);
+      }
     });
+  
   })();
 
 
