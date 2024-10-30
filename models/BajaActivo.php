@@ -70,11 +70,10 @@ class BajaActivo extends ExecQuery{
 //echo json_encode($baja->activosBaja(['cod_identificacion'=>'C']));
 
 // $id = $baja->add([
-//   'idactivo'=> 2,
+//   'idactivo'=> 4,
 //   'motivo'=>'Sobrecalentamiento del motor en carretera',
 //   'coment_adicionales'=>null,
 //   'ruta_doc'=>'http://localhost/CMMS/uploads/archiv1.pdf',
 //   'aprobacion'=>1
 // ]);
-
 // echo $id;

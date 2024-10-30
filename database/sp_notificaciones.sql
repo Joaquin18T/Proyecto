@@ -1,56 +1,43 @@
 use gamp;
 
-DROP PROCEDURE IF EXISTS sp_add_notificacion;
+DROP PROCEDURE IF EXISTS sp_add_notificacion_activo;
 DELIMITER $$
-CREATE PROCEDURE sp_add_notificacion
+CREATE PROCEDURE sp_add_notificacion_activo
 (
-	IN _idusuario INT,
-    IN _tipo	VARCHAR(20),
-	IN _mensaje VARCHAR(400)
+	IN _idactivo_resp INT,
+    IN _tipo	VARCHAR(30),
+	IN _mensaje VARCHAR(400),
+    IN _idactivo INT
 )
 BEGIN
-	INSERT INTO notificaciones (idusuario, tipo, mensaje) VALUES
-	 (_idusuario, _tipo, _mensaje);
+	INSERT INTO notificaciones_activos (idactivo_resp, tipo, mensaje, idactivo) VALUES
+	 (NULLIF(_idactivo_resp,''), _tipo, _mensaje, NULLIF(_idactivo, ''));
 END $$
+-- CALL sp_add_notificacion_activo(21, 'Asignacion', 'Te han asignado un activo');
 
+-- crear otra lista para los activos que no tienen usuarios
 DROP PROCEDURE IF EXISTS sp_list_notificacion;
 DELIMITER $$
 CREATE PROCEDURE sp_list_notificacion
 (
-	IN _idusuario INT,
-    IN _idnotificacion INT
+	IN _idusuario INT
 )
 BEGIN
-SELECT
-    NOF.idusuario,
-    NOF.idnotificacion,
-    NOF.tipo,
-    NOF.estado,
-    NOF.mensaje,
-    MAX(NOF.fecha_creacion) AS fecha_creacion, -- Usamos MAX o alguna función agregada
-    RES.idusuario,
-    ACT.descripcion,
-    RES.descripcion AS desresp,
-    RES.idactivo_resp
-FROM notificaciones NOF
-RIGHT JOIN activos_responsables RES ON NOF.idusuario = RES.idusuario
-LEFT JOIN activos ACT ON RES.idactivo = ACT.idactivo
-	where 
-		(NOF.idusuario = _idusuario OR _idusuario IS NULL) 
-        AND (NOF.idnotificacion = _idnotificacion OR _idnotificacion IS NULL)
-GROUP BY 
-    NOF.idusuario,
-    NOF.idnotificacion,
-    NOF.tipo,
-    NOF.estado,
-    NOF.mensaje,
-    RES.idusuario,
-    ACT.descripcion,
-    RES.descripcion,
-    RES.idactivo_resp
-ORDER BY MAX(NOF.fecha_creacion) DESC;
+	SELECT
+		NA.idactivo_resp,
+		NA.idnotificacion_activo,
+		NA.tipo,
+		NA.visto,
+		NA.mensaje,
+		ACT.descripcion as descripcion_activo,
+		RES.descripcion
+		FROM notificaciones_activos NA
+		INNER JOIN activos_responsables RES ON NA.idactivo_resp = RES.idactivo_resp
+		INNER JOIN activos ACT ON RES.idactivo = ACT.idactivo
+        WHERE RES.idusuario = _idusuario
+        ORDER BY NA.fecha_creacion;
 END $$
--- CALL sp_list_notificacion(2,null);
+-- CALL sp_list_notificacion(3);
 
 DROP PROCEDURE IF EXISTS sp_responsable_notificacion;
 DELIMITER $$
@@ -71,13 +58,12 @@ BEGIN
     ORDER BY RES.idactivo_resp DESC;
 END $$
 
-CALL sp_responsable_notificacion(2);
+-- Crear otro SP para las notificaciones_mantenimientos
 
-DROP PROCEDURE IF EXISTS sp_detalle_notificacion_resp;
+DROP PROCEDURE IF EXISTS sp_detalle_notificacion_activo;
 DELIMITER $$
-CREATE PROCEDURE sp_detalle_notificacion_resp (
-    IN _idusuario INT,
-    IN _idactivo_resp INT
+CREATE PROCEDURE sp_detalle_notificacion_activo (
+    IN _idnotificacion_activo INT
 )
 BEGIN
     SELECT
@@ -85,53 +71,20 @@ BEGIN
         RES.idactivo_resp,
         ACT.cod_identificacion,
         ACT.descripcion,
+        NA.fecha_creacion,
         MAR.marca,
         ACT.modelo,
         RES.condicion_equipo,
         RES.fecha_asignacion,
         UBI.ubicacion
-    FROM activos_responsables RES
+    FROM historial_activos HIS
+    INNER JOIN ubicaciones UBI ON HIS.idubicacion = UBI.idubicacion
+    INNER JOIN activos_responsables RES ON HIS.idactivo_resp = RES.idactivo_resp
+    INNER JOIN notificaciones_activos NA ON RES.idactivo_resp = NA.idactivo_resp
     INNER JOIN activos ACT ON RES.idactivo = ACT.idactivo
     INNER JOIN marcas MAR ON ACT.idmarca = MAR.idmarca
-    INNER JOIN historial_activos HIS ON RES.idactivo_resp = HIS.idactivo_resp
-    INNER JOIN ubicaciones UBI ON HIS.idubicacion = UBI.idubicacion
-    WHERE RES.idusuario = _idusuario AND RES.idactivo_resp = _idactivo_resp
-    ORDER BY HIS.fecha_movimiento DESC;
+    WHERE NA.idnotificacion_activo = _idnotificacion_activo;
 END $$
-CALL sp_detalle_notificacion_resp(2, 18);
+-- CALL sp_detalle_notificacion_activo(4);
 
--- no se usa
-DROP PROCEDURE IF EXISTS sp_detalle_sol_estado
-DELIMITER $$
-CREATE PROCEDURE sp_detalle_sol_estado
-(
-	IN _idsolicitud INT
-)
-BEGIN
-	SELECT
-		SOL.estado_solicitud,
-        SOL.fecha_solicitud,
-        ACT.cod_identificacion,
-		SUB.subcategoria,
-        MAR.marca,
-        ACT.descripcion,
-        SOL.coment_autorizador
-	FROM solicitudes_activos SOL
-    INNER JOIN activos ACT ON SOL.idactivo = ACT.idactivo
-    INNER JOIN subcategorias SUB ON ACT.idsubcategoria = SUB.idsubcategoria
-    INNER JOIN marcas MAR ON ACT.idmarca = MAR.idmarca
-    WHERE (SOL.estado_solicitud='rechazado' OR SOL.estado_solicitud='pendiente') AND
-    SOL.idsolicitud=_idsolicitud;
-END $$
 
--- CALL sp_detalle_sol_estado(7);
-
-DROP PROCEDURE IF EXISTS sp_notificacion_designacion;
-DELIMITER $$
-CREATE PROCEDURE sp_notificacion_designacion
-(
-
-)
-BEGIN
-
-END $$

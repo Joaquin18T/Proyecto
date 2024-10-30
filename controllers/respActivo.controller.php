@@ -55,6 +55,21 @@ if(isset($_GET['operation'])){
       ];
       echo json_encode($respAct->getResponsablePrin($cleanData));
       break;
+    case 'verificarExisteColaboradores':
+      echo json_encode($respAct->verificarColaboradores(['idactivo'=>$_GET['idactivo']]));
+      break;
+    case 'getIdResp':
+      echo json_encode($respAct->getIdResp([
+        'idactivo'=>$_GET['idactivo'],
+        'idusuario'=>$_GET['idusuario']
+      ]));
+    case 'getAnyIdResp':
+      //$resp = $respAct->getAnyIdResp(['idactivo'=>$_GET['idactivo']]);
+      echo json_encode($respAct->getAnyIdResp(['idactivo'=>$_GET['idactivo']]));
+      break;
+    case 'getAnyIdUbicacion':
+      echo json_encode($respAct->getAnyIdUbicacion(['idactivo_resp'=>$_GET['idactivo_resp']]));
+      break;
   }
 }
 

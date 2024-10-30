@@ -25,8 +25,10 @@ if(isset($_POST['operation'])){
         'mensaje'=>''
       ];
       $enviarDatos=[
-        'idactivo_resp'=>$_POST['idactivo_resp'],
-        'idubicacion'=>$_POST['idubicacion']
+        'idactivo_resp'=>$_POST['idactivo_resp']==""?null:$_POST['idactivo_resp'],
+        'idubicacion'=>$_POST['idubicacion'],
+        'accion'=>$_POST['accion']==""?null:$_POST['accion'],
+        'responsable_accion'=>$_POST['responsable_accion']==""?null:$_POST['responsable_accion']
       ];
       $valor = $historialAc->add($enviarDatos);
       if($valor){

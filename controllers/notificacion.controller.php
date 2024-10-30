@@ -1,6 +1,6 @@
 <?php
 
-require_once '../models/Notificacion.php';
+require_once '../models/NotificacionActivo.php';
 
 $notificacion = new Notificacion();
 
@@ -8,15 +8,13 @@ if(isset($_GET['operation'])){
   switch($_GET['operation']){
     case 'listNotf':
       $cleanData = [
-        'idusuario'=>$_GET['idusuario']==""?null:$_GET['idusuario'],
-        'idnotificacion'=>$_GET['idnotificacion']==""?null:$_GET['idnotificacion']
+        'idusuario'=>$_GET['idusuario']==""?null:$_GET['idusuario']
       ];
       echo json_encode($notificacion->listNotifications($cleanData));
       break;
     case 'detalleNotf':
       $clearData = [
-        'idusuario'=>$notificacion->limpiarCadena($_GET['idusuario']),
-        'idactivo_resp'=>$notificacion->limpiarCadena($_GET['idactivo_resp'])
+        'idnotificacion'=>$notificacion->limpiarCadena($_GET['idnotificacion'])
       ];
       echo json_encode($notificacion->detalleNotificaciones($clearData));
       break;
@@ -31,9 +29,10 @@ if(isset($_POST['operation'])){
     case 'add':
       $estado=['respuesta'=>0];
       $datosEnviar=[
-        'idusuario'=>$_POST['idusuario'],
+        'idactivo_resp'=>$_POST['idactivo_resp']==""?null:$_POST['idactivo_resp'],
         'tipo'=>$_POST['tipo'],
-        'mensaje'=>$_POST['mensaje']
+        'mensaje'=>$_POST['mensaje'],
+        'idactivo'=>$_POST['idactivo']==""?null:$_POST['idactivo']
       ];
       $resp = $notificacion->add($datosEnviar);
       if($resp){

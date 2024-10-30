@@ -163,7 +163,7 @@ document.addEventListener("DOMContentLoaded", () => {
     selectChksCL();
   }
 
-
+  //Donde se envia la actualizacion de datos a la DB
   selector("update-test").addEventListener("click",async(e)=>{
     e.preventDefault();
     if(confirm("¿Estas seguro de actualizar la asignacion?")){
@@ -188,15 +188,16 @@ document.addEventListener("DOMContentLoaded", () => {
         const id = await getIdUser(usuario);
         console.log(usuario);
         
-        console.log(globals.idRes);
+        console.log("idresp global",globals.id);
+        console.log("idresp no  global",globals.idRes);
         console.log("ubi enviar", selector("ubicacion").value);
         
-        const isUpdated = await addHistorial(globals.idRes);
+        const isUpdated = await addHistorial(globals.idRes, "Actualizar ubicacion");
 
         if(isUpdated.mensaje==="Historial guardado"){
-          console.log(usuario);
-
-          const addNotif = await addNotificacion(id, "Cambio de ubicacion", "Se ha cambiado de ubicacion un activo que te han asignado");
+          //console.log(usuario);
+          const addNotif = await addNotificacion(globals.idRes, 
+            "Cambio de ubicacion", "Se ha cambiado de ubicacion un activo que te han asignado", globals.idactivo);
 
           if(addNotif>0){
             isUpUbi = true;
@@ -284,9 +285,9 @@ document.addEventListener("DOMContentLoaded", () => {
   async function cascadeUpdateAsignacion(data_user=[], data_resp=[], tipo, msg){
     let cont=0;
     for (let i = 0; i < data_user.length; i++) {
-      const isAdd = await addNotificacion(data_user[i], tipo, msg);
+      const isAdd = await addNotificacion(data_resp[i], tipo, msg, globals.idactivo);
       const updateAsg = await updateAsignacion(data_user[i], data_resp[i]);
-      const {mensaje} = await addHistorial(data_resp[i]);
+      const {mensaje} = await addHistorial(data_resp[i], "Designacion de activo");
       console.log(mensaje);
       
       if(isAdd>0 && updateAsg>0 && mensaje==="Historial guardado"){
@@ -297,6 +298,10 @@ document.addEventListener("DOMContentLoaded", () => {
     return (cont===data_user.length);
   }
 
+  /**
+   * Metodo que actualiza al responsable principal
+   * @returns Un booleano avisando si se ha cambiado correctamente al responsable principal
+   */
   async function changeResponsableP(){
     const chkEsResP =  contChks(".chk_es_responsable", "data-iduser");
     const diferentRP = getDiferent(globals.contResP[1], chkEsResP[1]);
@@ -322,8 +327,9 @@ document.addEventListener("DOMContentLoaded", () => {
       body:params
     });
     const resp = await data.json();
-    const isAdd = await addNotificacion(diferentRP[0], "Cambio de responsable Principal", "Ya no eres responsable principal del activo");
-    const {mensaje} = await addHistorial(diferentRespRP[0]);
+    const isAdd = await addNotificacion(diferentRespRP[0], 
+      "Cambio de responsable Principal", "Ya no eres responsable principal del activo", globals.idactivo);
+    const {mensaje} = await addHistorial(diferentRespRP[0], "Designacion responsable principal");
     if(isAdd>0 && resp.respuesta>0 && mensaje==="Historial guardado"){
       isChange = true;
     }
@@ -395,12 +401,13 @@ document.addEventListener("DOMContentLoaded", () => {
     return data[0];
   }
 
-  async function addNotificacion(iduser, tipoMsg, msg){
+  async function addNotificacion(idact_resp, tipoMsg, msg, idactivo){
     const params = new URLSearchParams();
     params.append("operation", "add");
-    params.append("idusuario", iduser);
+    params.append("idactivo_resp", idact_resp);
     params.append("tipo", tipoMsg);
     params.append("mensaje", msg);
+    params.append("idactivo", idactivo);
 
     const data = await fetch(`${globals.host}notificacion.controller.php`,{
       method:'POST',
@@ -415,7 +422,7 @@ document.addEventListener("DOMContentLoaded", () => {
    * @param {*} id idActivo_resp
    * @returns Retorna un booleano
    */
-  async function addHistorial(id) {
+  async function addHistorial(id, accion="") {
     //Insercion al historial
     console.log("ubi enviar", parseInt(selector("ubicacion").value));
     
@@ -423,6 +430,7 @@ document.addEventListener("DOMContentLoaded", () => {
     params.append("operation", "add");
     params.append("idactivo_resp", id);
     params.append("idubicacion", parseInt(selector("ubicacion").value));
+    params.append("accion", accion);
 
     const data = await fetch(`${globals.host}historialactivo.controller.php`, {
       method: "POST",

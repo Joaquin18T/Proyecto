@@ -6,11 +6,13 @@ class HistorialActivo extends ExecQuery{
   public function add($params=[]):bool{
     try{
       $status=false;
-      $cmd = parent::execQ("INSERT INTO historial_activos(idactivo_resp, idubicacion) VALUES(?,?)");
+      $cmd = parent::execQ("INSERT INTO historial_activos(idactivo_resp, idubicacion, accion, responsable_accion) VALUES(?,?,?,?)");
       $status = $cmd->execute(
         array(
           $params['idactivo_resp'],
-          $params['idubicacion']
+          $params['idubicacion'],
+          $params['accion'],
+          $params['responsable_accion']
         )
       );
       return $status;
@@ -52,7 +54,7 @@ class HistorialActivo extends ExecQuery{
 
 // $hist = new HistorialActivo();
 
-// echo json_encode($hist->ubicacionByActivo(['idactivo'=>3, 'idactivo_resp'=>14]));
+// echo json_encode($hist->ubicacionByActivo(['idactivo'=>4, 'idactivo_resp'=>5]));
 
 // echo json_encode($hist->add([
 //   'idactivo_resp'=>1,

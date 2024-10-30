@@ -5,16 +5,11 @@ require_once 'ExecQuery.php';
 class Notificacion extends ExecQuery{
   public function listNotifications($params=[]):array{
     try{
-      $defaultParams=[
-        'idusuario'=>null,
-        'idnotificacion'=>null
-      ];
-      $realArray = array_merge($defaultParams, $params);
-      $cmd = parent::execQ('CALL sp_list_notificacion(?,?)');
+
+      $cmd = parent::execQ('CALL sp_list_notificacion(?)');
       $cmd->execute(
         array(
-          $realArray['idusuario'],
-          $realArray['idnotificacion']
+          $params['idusuario']
         )
       );
       return $cmd->fetchAll(PDO::FETCH_ASSOC);
@@ -25,11 +20,10 @@ class Notificacion extends ExecQuery{
 
   public function detalleNotificaciones($params=[]):array{
     try{
-      $cmd = parent::execQ('CALL sp_detalle_notificacion_resp(?,?)');
+      $cmd = parent::execQ('CALL sp_detalle_notificacion_activo(?)');
       $cmd->execute(
         array(
-          $params['idusuario'],
-          $params['idactivo_resp']
+          $params['idnotificacion']
         )
       );
       return $cmd->fetchAll(PDO::FETCH_ASSOC);
@@ -41,12 +35,13 @@ class Notificacion extends ExecQuery{
   public function add($params=[]):bool{
     try{
       $status=false;
-      $cmd = parent::execQ('CALL sp_add_notificacion(?,?,?)');
+      $cmd = parent::execQ('CALL sp_add_notificacion_activo(?,?,?,?)');
       $status=$cmd->execute(
         array(
-          $params['idusuario'],
+          $params['idactivo_resp'],
           $params['tipo'],
-          $params['mensaje']
+          $params['mensaje'],
+          $params['idactivo']
         )
       );
       return $status;
@@ -85,11 +80,11 @@ class Notificacion extends ExecQuery{
  
 }
 
-// $not = new Notificacion();
+//$not = new Notificacion();
 
 // echo json_encode($not->dataRespNotificacion(['idusuario'=>12]));
 
-//echo json_encode($not->listNotifications(['idusuario'=>12]));
+//echo json_encode($not->listNotifications(['idusuario'=>2]));
 
 //echo json_encode($not->detalleNotificaciones(['idusuario'=>12, 'idactivo_resp'=>6]));
 

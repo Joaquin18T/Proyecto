@@ -183,7 +183,7 @@ BEGIN
     ORDER BY HIS.fecha_movimiento desc
     LIMIT 1;
 END $$
--- CALL sp_ubicacion_activo(12,4)
+-- CALL sp_ubicacion_activo(8,9)
 DROP PROCEDURE IF EXISTS sp_users_by_activo;
 DELIMITER $$
 CREATE PROCEDURE sp_users_by_activo
@@ -204,7 +204,7 @@ BEGIN
     INNER JOIN personas PER ON USU.idpersona = PER.id_persona
     WHERE RES.idactivo = _idactivo AND RES.fecha_designacion IS NULL;
 END $$
--- CALL sp_users_by_activo(1);
+-- CALL sp_users_by_activo(11);
 
 DROP PROCEDURE IF EXISTS sp_search_activo_responsable;
 DELIMITER $$
@@ -277,7 +277,7 @@ BEGIN
     
     SELECT COUNT(*) INTO isResP
     FROM activos_responsables WHERE es_responsable='1'
-    AND idactivo = _idactivo;
+    AND idactivo =_idactivo AND fecha_designacion IS NULL;
     
     IF isResP>0 THEN
 		SELECT 
@@ -296,12 +296,12 @@ BEGIN
 		FROM activos_responsables RES
 		INNER JOIN usuarios U ON RES.idusuario = U.id_usuario
 		INNER JOIN personas P ON U.idpersona = P.id_persona
-		WHERE RES.idactivo_resp = _idactivo_resp
+		WHERE RES.idactivo_resp = _idactivo_resp AND RES.fecha_designacion IS NULL
         ORDER BY RES.fecha_asignacion asc
         LIMIT 1;
 	END IF;
 END $$
--- CALL sp_getresp_principal(4,3);
+-- CALL sp_getresp_principal(5,4);
 -- designacion
 DROP PROCEDURE IF EXISTS sp_update_activo_responsable;
 DELIMITER $$
@@ -342,3 +342,60 @@ BEGIN
 	WHERE idactivo_resp = _idactivo_resp;
 END $$
 -- CALL sp_update_asignacion_principal(16, 1,7,'0',1);
+
+DROP PROCEDURE IF EXISTS sp_verificar_colaboradores;
+DELIMITER $$
+CREATE PROCEDURE sp_verificar_colaboradores
+(
+	IN _idactivo INT
+)
+BEGIN    
+    SELECT COUNT(*) colaboradores
+    FROM activos_responsables 
+    WHERE idactivo = _idactivo AND fecha_designacion IS NULL;
+END $$
+
+-- CALL sp_verificar_colaboradores(7);
+
+DROP PROCEDURE IF EXISTS get_idresp_activo;
+DELIMITER $$
+CREATE PROCEDURE get_idresp_activo
+(
+	IN _idactivo INT,
+    IN _idusuario INT
+)
+BEGIN
+	SELECT
+		idactivo_resp
+        FROM activos_responsables 
+		WHERE idactivo = _idactivo AND idusuario = _idusuario
+        AND fecha_designacion IS NULL;
+END $$
+
+DROP PROCEDURE IF EXISTS sp_get_any_idresp;
+DELIMITER $$
+CREATE PROCEDURE sp_get_any_idresp
+(
+	IN _idactivo INT
+)
+BEGIN
+	select idactivo_resp FROM activos_responsables 
+    WHERE idactivo = _idactivo
+    ORDER BY idactivo_resp desc
+    LIMIT 1;
+END $$
+-- CALL sp_get_any_idresp(9);
+-- Obtiene la ultima ubicacion del activo sin importar que el usuario se haya designado
+DROP PROCEDURE IF EXISTS sp_get_any_ubicacion_activo;
+DELIMITER $$
+CREATE PROCEDURE sp_get_any_ubicacion_activo
+(
+	IN _idactivo_resp INT
+)
+BEGIN
+	SELECT idubicacion FROM historial_activos
+    WHERE idactivo_resp = _idactivo_resp
+    ORDER BY fecha_movimiento DESC
+    LIMIT 1;
+END $$
+-- CALL sp_get_any_ubicacion_activo(10);
