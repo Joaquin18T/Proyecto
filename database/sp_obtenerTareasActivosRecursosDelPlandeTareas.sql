@@ -136,8 +136,9 @@ call obtenerUnActivoVinculadoAtarea(1);
 
 -- *******************************************************************************************************
 
+DROP PROCEDURE IF EXISTS `listarActivosPorTareaYPlan`
 DELIMITER $$
-CREATE PROCEDURE listarActivosPorTareaYPlan(IN p_idplantarea INT)
+CREATE PROCEDURE `listarActivosPorTareaYPlan`(IN p_idplantarea INT)
 BEGIN
   -- Listar todos los activos vinculados a cada tarea del plan de tareas
   SELECT 
@@ -146,7 +147,8 @@ BEGIN
     t.idtarea,
     t.descripcion AS descripcion_tarea,
     a.idactivo,
-    a.descripcion
+    a.descripcion,
+    t.idestado
   FROM
     plandetareas pt
     INNER JOIN tareas t ON pt.idplantarea = t.idplantarea
@@ -156,3 +158,6 @@ BEGIN
     pt.idplantarea = p_idplantarea;
 END$$
 
+select * from tareas;
+
+call listarActivosPorTareaYPlan(1)

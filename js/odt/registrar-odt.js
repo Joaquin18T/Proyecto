@@ -493,13 +493,14 @@ $(document).ready(async () => {
     async function verificarFvencimiento() {
         let existen = false
         const odt = await obtenerOdtporId()
-        console.log("odt: ", odt)
+        console.log("odt para verificar: ", odt)
         if (odt[0]?.fecha_vencimiento == "0000-00-00" && odt[0]?.hora_vencimiento == "00:00:00") {
             existen = false
             console.log("no existe una fecha ni hora de v")
             return
         }
         else {
+            console.log("BORRANDO CAMPOS PARA FV...")
             const contenedorFechHoraExistente = $q("#contenedor-fecha-hora")
             if (contenedorFechHoraExistente) {
                 contenedorFechHoraExistente.remove();
@@ -628,7 +629,7 @@ $(document).ready(async () => {
             }
         }
 
-        if (existeFechaVencimiento.existen == true) {
+        if (existeFechaVencimiento?.existen == true) {
             const formActualizacionFVencimiento = new FormData()
             formActualizacionFVencimiento.append("operation", "actualizarFechaVencimientoOdt")
             formActualizacionFVencimiento.append("idodt", window.localStorage.getItem("idodt"))

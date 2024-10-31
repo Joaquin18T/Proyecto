@@ -245,6 +245,7 @@ BEGIN
     WHERE 	(SUB.idsubcategoria = _idsubcategoria OR _idsubcategoria IS NULL) AND
 			(UBI.idubicacion = _idubicacion OR _idubicacion IS NULL) AND
 			(ACT.cod_identificacion LIKE CONCAT('%', _cod_identificacion, '%') OR _cod_identificacion IS NULL) AND 
+            ACT.idestado = 1 AND
             -- RES.fecha_designacion IS NULL
             ACT.idestado BETWEEN 1 AND 2
     GROUP BY ACT.idactivo

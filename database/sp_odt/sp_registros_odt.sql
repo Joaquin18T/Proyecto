@@ -1,5 +1,4 @@
 USE gamp;
-
 DROP PROCEDURE IF EXISTS `registrar_odt`
 DELIMITER //
 CREATE PROCEDURE `registrar_odt`
@@ -172,3 +171,4 @@ BEGIN
     END IF;
 END //
 
+select * from tareas;

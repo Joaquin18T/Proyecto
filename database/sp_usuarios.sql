@@ -66,15 +66,18 @@ BEGIN
         CONCAT(P.apellidos,' ',P.nombres) as nombres,
         TD.tipodoc,
         P.num_doc,
-		U.estado
+		U.estado,
+        U.asignacion
 	FROM usuarios U
     INNER JOIN roles R ON U.idrol = R.idrol
     INNER JOIN personas P ON U.idpersona = P.id_persona
     INNER JOIN tipo_doc TD ON P.idtipodoc = TD.idtipodoc
     AND (P.num_doc LIKE CONCAT('%', _numdoc ,'%') OR _numdoc IS NULL)
-    AND (P.apellidos LIKE CONCAT('%', _dato ,'%') OR P.nombres LIKE CONCAT('%', _dato ,'%') OR _dato IS NULL);
+    AND (P.apellidos LIKE CONCAT('%', _dato ,'%') OR P.nombres LIKE CONCAT('%', _dato ,'%') OR _dato IS NULL)
+    WHERE U.asignacion = 7;
 END $$
 
+select * from usuarios
 -- select * from personas;
 -- CALL sp_filtrar_usuarios(7,null);
 

@@ -88,7 +88,7 @@ $(document).ready(async () => {
 
             // BUSCAR LA TAREA SELECCIONADA EN AMBOS ARRAYS
             const tareaSeleccionada = tareas.find(t => t.idtarea == cardId);
-            const tareaOdtSeleccionada = tareasOdt.find(t => t.idtarea == cardId);
+            const tareaOdtSeleccionada = tareasOdt.find(t => t.idorden_trabajo == cardId); //ejemplo: card id: 1 == idtarea: 1
 
             // AGREGAR VALIDACIÓN PARA VERIFICAR SI LA TAREA EXISTE
             if (!tareaSeleccionada && !tareaOdtSeleccionada) {
@@ -254,14 +254,14 @@ $(document).ready(async () => {
             switch (todt.nom_estado) {
                 case 'proceso':
                     kanban.addElement('b-proceso', {
-                        id: todt.idtarea,
+                        id: todt.idorden_trabajo,
                         title: tareaOdtHTML
                     });
                     break;
 
                 case 'revision':
                     kanban.addElement('b-revision', {
-                        id: todt.idtarea,
+                        id: todt.idorden_trabajo,
                         title: tareaOdtHTML
                     })
                     break;

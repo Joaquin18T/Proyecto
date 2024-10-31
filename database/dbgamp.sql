@@ -102,7 +102,6 @@ CREATE TABLE ubicaciones
     CONSTRAINT uk_ubicacion UNIQUE(ubicacion)
 )ENGINE=INNODB;
 
-
 CREATE TABLE activos
 (
 	idactivo			INT AUTO_INCREMENT PRIMARY KEY,
@@ -323,7 +322,6 @@ CREATE TABLE `activos_vinculados_tarea`
     CONSTRAINT fk_idtarea5		foreign key (idtarea) references tareas (idtarea) ON DELETE CASCADE,
     CONSTRAINT fk_idactivo3		FOREIGN KEY (idactivo) REFERENCES activos (idactivo)
 )ENGINE=INNODB;
-
 
 DROP TABLE IF EXISTS `detalle_odt`;
 CREATE TABLE `detalle_odt`

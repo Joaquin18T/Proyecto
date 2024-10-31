@@ -34,6 +34,7 @@ $(document).ready(async () => {
   const contenedorResponsablesOdt = $q(".contenedor-responsablesOdt")
   const contenedorEvidenciaPreviaEntrada = $q("#preview-container-entrada")
   const contenedorEvidenciaPreviaSalida = $q("#preview-container")
+  
 
   //BOTONES
   const evidenciasInput = $q("#evidencias-img-input")
@@ -455,6 +456,8 @@ $(document).ready(async () => {
     const detalleRegistrado = await registrarDetalleOdt()
     btnIniciar.disabled = true
     btnIniciar.removeAttribute("id")
+    txtDiagnosticoSalida.disabled = false
+    btnGuardarDianogstico.disabled = false
     iddetalleodtGenerado = detalleRegistrado.id
     const detalleOdt = await obtenerDetalleOdt() // detalleRegistrado => id
     console.log("Detalle odt obtenido: ", detalleOdt)
