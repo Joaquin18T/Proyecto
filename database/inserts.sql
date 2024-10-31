@@ -115,23 +115,23 @@ INSERT INTO detalles_marca_subcategoria (idsubcategoria, idmarca) VALUES
 	(10,1),
 	(11,1);
 
-INSERT INTO activos(idsubcategoria, idmarca, modelo, cod_identificacion, fecha_adquisicion, descripcion, especificaciones)
+INSERT INTO activos(idsubcategoria, idmarca, modelo, cod_identificacion, fecha_adquisicion, descripcion, especificaciones, idestado)
 	VALUES
-	(2, 1, '14-EP', '123ABC', NOW(), 'Laptop 14-EP 16 RAM', '{"ram":"16GB", "disco":"solido"}'),
-	(10, 1, 'Monitor 4K', 'MON123', NOW(), 'Monitor LG de 27 pulgadas', '{"resolucion":"3840x2160"}'),
-    (11, 2, 'Teclado Mecánico', 'TEC123', NOW(), 'Teclado mecánico HP', '{"tipo":"mecánico", "conectividad":"inalámbrico"}'),
-    (7, 4, 'Compresor Industrial', 'COMP123', NOW(), 'Compresor Caterpillar de 10HP', '{"potencia":"10HP"}'),
-    (6, 5, 'Camión de Carga Hyundai', 'CAM123', NOW(), 'Camión de carga pesada Hyundai', '{"capacidad":"10 toneladas"}'),
-	(9, 2, 'L3110', 'IMP123', NOW(), 'Impresora HP L3110', '{"capacidad":"200 kilogramos"}'),
-    (1, 2, 'LG UltraGear', 'LG-001', '2023-01-15', 'Monitor para gaming', '{"resolucion": "2560x1440", "tasa_de_refresco": "144Hz"}'),
-	(2, 2, 'HP Pavilion', 'HP-002', '2023-02-20', 'Laptop para uso diario', '{"procesador": "Intel i5", "ram": "8GB"}'),
-	(3, 5, 'Caterpillar 320', 'CAT-003', '2023-03-10', 'Maquinaria pesada', '{"potencia": "150HP", "peso": "20ton"}'),
-	(4, 3, 'Nissan Frontier', 'NIS-004', '2023-04-05', 'Camioneta pickup', '{"motor": "2.5L", "traccion": "4x4"}'),
-	(5, 6, 'Hyundai Generator', 'HYD-005', '2023-05-12', 'Generador portátil', '{"potencia": "3000W", "tipo_combustible": "Gasolina"}'),
-	(6, 1, 'HP LaserJet', 'HP-006', '2023-06-18', 'Impresora láser', '{"tipo": "monocromo", "velocidad": "30ppm"}'),
-	(7, 1, 'LG Gram', 'LG-007', '2023-07-22', 'Laptop ultraligera', '{"peso": "999g", "pantalla": "14in"}'),
-	(8, 4, 'ABB Robot IRB', 'ABB-008', '2023-08-15', 'Robot industrial', '{"carga_util": "10kg", "alcance": "1.5m"}'),
-	(9, 7, 'FenWick Forklift', 'FW-009', '2023-09-10', 'Montacargas eléctrico', '{"capacidad_carga": "2000kg", "batería": "24V"}');
+	(2, 1, '14-EP', '123ABC', NOW(), 'Laptop 14-EP 16 RAM', '{"ram":"16GB", "disco":"solido"}',1),
+	(10, 1, 'Monitor 4K', 'MON123', NOW(), 'Monitor LG de 27 pulgadas', '{"resolucion":"3840x2160"}',1),
+    (11, 2, 'Teclado Mecánico', 'TEC123', NOW(), 'Teclado mecánico HP', '{"tipo":"mecánico", "conectividad":"inalámbrico"}',1),
+    (7, 4, 'Compresor Industrial', 'COMP123', NOW(), 'Compresor Caterpillar de 10HP', '{"potencia":"10HP"}',1),
+    (6, 5, 'Camión de Carga Hyundai', 'CAM123', NOW(), 'Camión de carga pesada Hyundai', '{"capacidad":"10 toneladas"}',1),
+	(9, 2, 'L3110', 'IMP123', NOW(), 'Impresora HP L3110', '{"capacidad":"200 kilogramos"}',1),
+    (1, 2, 'LG UltraGear', 'LG-001', '2023-01-15', 'Monitor para gaming', '{"resolucion": "2560x1440", "tasa_de_refresco": "144Hz"}',1),
+	(2, 2, 'HP Pavilion', 'HP-002', '2023-02-20', 'Laptop para uso diario', '{"procesador": "Intel i5", "ram": "8GB"}',1),
+	(3, 5, 'Caterpillar 320', 'CAT-003', '2023-03-10', 'Maquinaria pesada', '{"potencia": "150HP", "peso": "20ton"}',1),
+	(4, 3, 'Nissan Frontier', 'NIS-004', '2023-04-05', 'Camioneta pickup', '{"motor": "2.5L", "traccion": "4x4"}',1),
+	(5, 6, 'Hyundai Generator', 'HYD-005', '2023-05-12', 'Generador portátil', '{"potencia": "3000W", "tipo_combustible": "Gasolina"}',1),
+	(6, 1, 'HP LaserJet', 'HP-006', '2023-06-18', 'Impresora láser', '{"tipo": "monocromo", "velocidad": "30ppm"}',1),
+	(7, 1, 'LG Gram', 'LG-007', '2023-07-22', 'Laptop ultraligera', '{"peso": "999g", "pantalla": "14in"}',1),
+	(8, 4, 'ABB Robot IRB', 'ABB-008', '2023-08-15', 'Robot industrial', '{"carga_util": "10kg", "alcance": "1.5m"}',1),
+	(9, 7, 'FenWick Forklift', 'FW-009', '2023-09-10', 'Montacargas eléctrico', '{"capacidad_carga": "2000kg", "batería": "24V"}',4);
 -- select*from activos;
 INSERT INTO ubicaciones(ubicacion) 
 	VALUES
@@ -161,18 +161,30 @@ INSERT INTO activos_responsables(idactivo, idusuario, condicion_equipo, imagenes
 
 
  -- SELECT*FROM activos_responsables;
-INSERT INTO historial_activos (idactivo_resp,idubicacion)
+INSERT INTO historial_activos (idactivo_resp,idubicacion, accion, responsable_accion)
 	VALUES
-		-- (1,1),
-		(2,3),
-		(3,2),
-		(4,1),
-		(5,4),
-		(6,2),
-		(7,3),
-		(8,4),
-		(9,5),
-		(10,2);
+		(1,1, 'Asignacion',1),
+		(2,3, 'Asignacion',8),
+		(3,2, 'Asignacion',1),
+		(4,1, 'Asignacion',8),
+		(5,4, 'Asignacion',6),
+		(6,2, 'Asignacion',5),
+		(7,3, 'Asignacion',10),
+		(8,4, 'Asignacion',6),
+		(9,5, 'Asignacion',5),
+		(10,2, 'Asignacion',12);
+        
+INSERT INTO notificaciones_activos(idactivo_resp, tipo, mensaje) VALUES
+	(1),
+	(2),
+	(3),
+	(4),
+	(5),
+	(6),
+	(7),
+	(8),
+	(9),
+	(10);
         
 
 -- SELECT VERSION(); -- saber la version de mysql

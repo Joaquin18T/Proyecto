@@ -12,9 +12,9 @@ class ResponsableAct extends ExecQuery{
         array(
           $params['idactivo'],
           $params['idusuario'],
-          $params['descripcion'],
-          $params['imagenes'],
           $params['condicion_equipo'],
+          $params['imagenes'],
+          $params['descripcion'],
           $params['autorizacion'],
           $params['solicitud']
         )

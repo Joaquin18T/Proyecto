@@ -8,9 +8,10 @@ ALTER TABLE historial_activos AUTO_INCREMENT = 1;
 -- 9: ningun usuario
 -- 4: tiene usuarios y rp
 select* from activos_responsables where idactivo=9;
-select*from historial_activos where idactivo_resp=10;
-select*from notificaciones_activos where idactivo_resp = 1;
-select*from activos where idactivo =9;
+select* from activos_responsables where idusuario=4;
+select*from historial_activos where idactivo_resp=3;
+select*from notificaciones_activos where idactivo_resp = 3;
+select*from activos where idactivo =26;
 select*from usuarios;
 select*from personas;
 select*from estados;

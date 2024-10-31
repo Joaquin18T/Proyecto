@@ -165,6 +165,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     let valueStrings = [selector("descripcion").value, selector("condicion").value];
     let isvalidStrings = valueStrings.every(x => x !== "");
+
+    const condicion = tinymce.get('condicion').getContent(); 
+    
     if (isvalidIntegers && isvalidStrings && Object.keys(listImages).length > 0) {
       let valor = await getIdRol();
       const params = new FormData();
@@ -173,13 +176,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       params.append("idusuario", iduser);
       //console.log(listImages);
       
-      const condicion = tinymce.get('condicion').getContent();
       //const desp = replaceWords(selector("descripcion").value,['<p>','</p>'],'');
-      params.append("descripcion", selector("descripcion").value);
       params.append("condicion_equipo", replaceWords(condicion,['<p>','</p>'],'').trim());
       params.append("imagenes", JSON.stringify(listImages));
+      params.append("descripcion", selector("descripcion").value);
       params.append("autorizacion", valor[0].id_usuario);
-      params.append("solicitud", 1); //CONFIRMAR ESTO AL PROFESOR
+      params.append("solicitud", 1); 
 
 
       const options = {

@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const newArray = avoidRepeats(data);
       //const dataCombined = matchList(data, dataResp);
       //console.log("combined", dataCombined);
-      //console.log(newArray);
+      console.log("list nof",data);
       
       data.forEach((x, i) => {
         if(i<5){
@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
             x.mensaje,
             x.descripcion,
             x.fecha_creacion,
-            x.desresp,
+            x.idnotificacion_activo,
             1
           );
         }
@@ -80,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
           x.mensaje,
           x.descripcion,
           x.fecha_creacion,
-          x.desresp,
+          x.idnotificacion_activo,
           2
         );
       });
@@ -122,10 +122,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const notfs = document.querySelectorAll(".item-notifi");
     notfs.forEach(x=>{
       x.addEventListener("click", async (e) => {
-        console.log("id",e.target.dataset.idresp);
+        console.log("id",e.target.dataset.idnofact);
         console.log("iduser", idusuario);
         
-        const detail = await showDetail(e.target.dataset.idresp);
+        const detail = await showDetail(e.target.dataset.idnofact);
         console.log("detalle nof",detail);
         showModal(detail);
       });
@@ -152,8 +152,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function showDetail(id) {
     const params = new URLSearchParams();
     params.append("operation", "detalleNotf");
-    params.append("idusuario", idusuario);
-    params.append("idactivo_resp", parseInt(id));
+    params.append("idnotificacion", id);
     //console.log(id);
 
     const data = await getDatos(`${host}notificacion.controller.php`, params);
@@ -184,6 +183,7 @@ document.addEventListener("DOMContentLoaded", () => {
                   )}</p>
                   <p>- Fecha Asignacion : ${x.fecha_asignacion}</p>
                   <br>
+                  <p>- Fecha Creacion : ${x.fecha_creacion}</p>
               `;
     });
 
@@ -209,11 +209,11 @@ document.addEventListener("DOMContentLoaded", () => {
     return newWord;
   }
 
-  function createNotificacion(id,mensaje, descripcion, fecha, descrip_asig, type) {
+  function createNotificacion(id,mensaje, descripcion, fecha, idnof_activo, type) {
     let element = "";
     if(type===1){
       element = `
-      <a href="#" class="list-group-item list-group-item-action border-bottom item-notifi" data-idresp=${id}>
+      <a href="#" class="list-group-item list-group-item-action border-bottom item-notifi" data-idnofact=${idnof_activo}>
           <div class="row align-items-center " style="pointer-events:none;">
             <div class="col ps-0 ms-2">
               <div class="d-flex justify-content-between align-items-center">
@@ -285,7 +285,6 @@ document.addEventListener("DOMContentLoaded", () => {
   //MOSTRAR NOTIFICACIONES EN EL SIDEBAR
 
   selector("show-all-notificaciones").addEventListener("click",()=>{
-
 
     const sidebar = selector("sb-notificacion");
     const offCanvas = new bootstrap.Offcanvas(sidebar);

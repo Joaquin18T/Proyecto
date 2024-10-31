@@ -113,6 +113,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       const idactivo = e.target.getAttribute("data-idactivo");
       localStorage.setItem("idresp_act", parseInt(id));
       localStorage.setItem("idactivo", parseInt(idactivo));
+      myTable = null;
       window.location.href=`http://localhost/CMMS/views/responsables/update-asignacion`;
     }
   }

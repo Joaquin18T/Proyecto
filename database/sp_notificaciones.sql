@@ -30,14 +30,15 @@ BEGIN
 		NA.visto,
 		NA.mensaje,
 		ACT.descripcion as descripcion_activo,
-		RES.descripcion
+		RES.descripcion,
+        NA.fecha_creacion
 		FROM notificaciones_activos NA
 		INNER JOIN activos_responsables RES ON NA.idactivo_resp = RES.idactivo_resp
 		INNER JOIN activos ACT ON RES.idactivo = ACT.idactivo
         WHERE RES.idusuario = _idusuario
-        ORDER BY NA.fecha_creacion;
+        ORDER BY NA.fecha_creacion asc;
 END $$
--- CALL sp_list_notificacion(3);
+-- CALL sp_list_notificacion(4);
 
 DROP PROCEDURE IF EXISTS sp_responsable_notificacion;
 DELIMITER $$
@@ -83,8 +84,8 @@ BEGIN
     INNER JOIN notificaciones_activos NA ON RES.idactivo_resp = NA.idactivo_resp
     INNER JOIN activos ACT ON RES.idactivo = ACT.idactivo
     INNER JOIN marcas MAR ON ACT.idmarca = MAR.idmarca
-    WHERE NA.idnotificacion_activo = _idnotificacion_activo;
+    WHERE NA.idnotificacion_activo =_idnotificacion_activo;
 END $$
--- CALL sp_detalle_notificacion_activo(4);
+-- CALL sp_detalle_notificacion_activo(2);
 
 
