@@ -34,11 +34,32 @@
                                     <input type="text" class="form-control" id="txtDescripcionTarea" placeholder="Descripcion" disabled required autocomplete="off">
                                     <label for="txtDescripcionTarea" class="form-label">Descripcion</label>
                                 </div>
-                            </div>                                                                                
-                            <div class="col-md-6 form-floating">
-                                <select class="form-select" id="tipoPrioridadTarea" disabled required>
-
-                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <select class="form-select" id="tipoPrioridadTarea" disabled required>
+                                    </select>
+                                    <label for="tipoPrioridadTarea" class="form-label">Prioridad</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <select class="form-select" id="elegirSubCategoriaTarea" disabled required>
+                                    </select>
+                                    <label for="elegirSubCategoriaTarea" class="form-label">Sub Categoria</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="txtIntervaloTarea" placeholder="Intervalo" disabled required autocomplete="off">
+                                    <label for="txtIntervaloTarea" class="form-label">Intervalo</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="txtFrecuenciaTarea" placeholder="Intervalo" disabled required autocomplete="off">
+                                    <label for="txtFrecuenciaTarea" class="form-label">Frecuencia</label>
+                                </div>
                             </div>
                         </div>
 
@@ -79,15 +100,22 @@
                 <div class="card-header">
                     <div class="row">
                         <!--  filtros -->
-                        <div class="col-md-4 mb-3">
-                            <select class="form-select" name="" id="elegirTareaParaActivo" disabled></select>
+
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                <select class="form-select filter" name="" id="elegirTareaParaActivo" disabled></select>
+                                <label for="elegirTareaParaActivo" class="form-label">Tarea</label>
+                            </div>
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <!-- <div class="col-md-4 mb-3">
                             <select class="form-select filter" name="" id="elegirSubCategoria" disabled></select>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <select class="form-select filter" name="" id="elegirUbicacion" disabled></select>
-                        </div>
+                        </div> -->
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                <select class="form-select filter" name="" id="elegirUbicacion" disabled></select>
+                                <label for="elegirUbicacion" class="form-label">Ubicacion</label>
+                            </div>
+                        </div>                        
                     </div>
                 </div>
                 <div class="card-body">
@@ -120,7 +148,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col text-end">
+            <div class="col text-end mb-3">
                 <button class="btn btn-primary" id="btnTerminarPlan" disabled>
                     Terminar
                 </button>

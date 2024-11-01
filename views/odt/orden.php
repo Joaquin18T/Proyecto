@@ -6,7 +6,7 @@
         <div class="row g-0">
 
             <div class="contenedor-evidencias p-3 col-md-4 text-center">
-                <div id="preview-container-entrada" class="preview-container">                    
+                <div id="preview-container-entrada" class="preview-container">
                 </div>
             </div>
             <div class="col-md-8">
@@ -79,6 +79,10 @@
                                         <p class="fw-bolder col">Tiempo de ejecucion: </p>
                                         <p class="fw-normal d-flex align-items-center col" id="txtTiempoEjecucion"></p>
                                     </div>
+                                    <div class="row">
+                                        <p class="fw-bolder col">Intervalos ejecutados: </p>
+                                        <p class="fw-normal d-flex align-items-center col" id="txtTiempoEjecucion"></p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -88,10 +92,10 @@
                                     <h5 class="fw-bold">Acciones</h5>
                                 </div>
                                 <div class="card-body">
-                                    <div class="card-body text-center" >
+                                    <div class="card-body text-center">
                                         <button class="btn btn-primary" id="btn-iniciar">Iniciar</button>
                                     </div>
-                                    <div class="card-body text-center" >
+                                    <div class="card-body text-center">
                                         <button class="btn btn-secondary" id="btn-finalizar">Finalizar</button>
                                     </div>
                                 </div>
