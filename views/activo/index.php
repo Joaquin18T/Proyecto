@@ -5,7 +5,7 @@
     <div class="card">
       <div class="card-header d-flex justify-content-between m-0">
         <div class="mb-0 pt-1">Lista de Activos</div>
-        <a href="<?= $host ?>views/activo/register-activo" class="btn btn-outline-success btn-sm text-end" type="button">Registrar</a>
+        <button class="btn btn-outline-success btn-sm text-end" type="button" id="toRegistrar">Registrar</button>
       </div>
       <div class="card-body">
         <div class="row g-0 mb-3">
@@ -119,6 +119,7 @@
       </div>
     </div>
   </div>
+  <!-- Modal para actualizar el activo -->
   <div class="modal fade" tabindex="-1" id="modal-update">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -132,7 +133,24 @@
       </div>
     </div>
   </div>
+  <!-- ./Modal para actualizar el activo -->
 </div>
+
+<!-- SIDEBAR PARA EL REGISTRO DE ACTIVOS -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="sbRegistrar" aria-labelledby="offcanvasRightLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="offcanvasRightLabel">Offcanvas right</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <label for="cantidadEnviar">Cantidad de activos a registrar</label>
+    <input type="number" class="form-control w-25" id="cantidadEnviar">
+
+    <button type="button" class="btn btn-primary" id="registerAceptar">Ir a registrar</button>
+  </div>
+</div>
+<!-- ./SIDEBAR PARA EL REGISTRO DE ACTIVOS -->
+
 <!-- SIDEBAR DE DETALLES DE LA BAJA DE UN ACTIVO-->
 <div class="offcanvas offcanvas-end" tabindex="-1" id="activo-baja-detalle" aria-labelledby="offcanvasRightLabel">
   <div class="offcanvas-header">
@@ -183,7 +201,7 @@
 
 <!-- LIBRERIA -->
 <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
-<script src="<?=$host?>js/activos/index.js"></script>
+<script src="<?= $host ?>js/activos/index.js"></script>
 </body>
 
 </html>
