@@ -316,4 +316,26 @@ document.addEventListener("DOMContentLoaded", () => {
     return data[0].descripcion;
   }
 
+  //Datos a enviar a la vista registrar (cantidad de activos a registrar)
+  $selector("#toRegistrar").addEventListener("click",()=>{
+    //href="<?= $host ?>views/activo/register-activo"
+    const sidebar = $selector("#sbRegistrar");
+    const offCanvas = new bootstrap.Offcanvas(sidebar);
+    offCanvas.show();
+  });
+
+  $selector("#registerAceptar").addEventListener("click",()=>{
+    const value = parseInt($selector("#cantidadEnviar").value);
+
+    if(value>0){
+      console.log("puedes registar");
+      localStorage.setItem("cantidad", value);
+      $selector("#cantidadEnviar").value = 0;
+      window.location.href = "http://localhost/CMMS/views/activo/register-activo";
+      
+    }else{
+      alert("Debes registrar al menos 1");
+    }
+  });
+
 });

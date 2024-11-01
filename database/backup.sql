@@ -1,5 +1,5 @@
 /*
-SQLyog Ultimate v12.5.1 (64 bit)
+SQLyog Professional v12.5.1 (64 bit)
 MySQL - 10.4.32-MariaDB : Database - gamp
 *********************************************************************
 */
@@ -38,7 +38,7 @@ CREATE TABLE `activos` (
   CONSTRAINT `fk_actsubcategoria` FOREIGN KEY (`idsubcategoria`) REFERENCES `subcategorias` (`idsubcategoria`),
   CONSTRAINT `fk_idestado` FOREIGN KEY (`idestado`) REFERENCES `estados` (`idestado`),
   CONSTRAINT `fkidmarca` FOREIGN KEY (`idmarca`) REFERENCES `marcas` (`idmarca`)
-) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `activos` */
 
@@ -80,7 +80,13 @@ insert  into `activos`(`idactivo`,`idsubcategoria`,`idmarca`,`idestado`,`modelo`
 (37,2,1,1,'RV 2','D345SDFDSFDSCSDF','2024-10-26','Laptop LG RV 2','{\"ram\":\"64\",\"Color \":\"negro\",\"SO\":\"Windows\"}'),
 (38,2,1,1,'RV 2','SADASD34543FEWDS','2024-10-26','Laptop LG RV 2','{\"ram\":\"64\",\"Color \":\"negro\",\"SO\":\"Windows\"}'),
 (39,6,3,1,'Mandra','456IKOLNASLDASASDASDAS','2024-10-30','Camioneta Nisan Mandra','{\"color\":\"negro\"}'),
-(40,6,3,1,'Mandra','ASD324R32EWQASD3EQWD','2024-10-30','Camioneta Nisan Mandra','{\"color\":\"negro\"}');
+(40,6,3,1,'Mandra','ASD324R32EWQASD3EQWD','2024-10-30','Camioneta Nisan Mandra','{\"color\":\"negro\"}'),
+(41,4,5,1,'FR','D245ASDASD3232W','2024-10-31','Generador Einhell FR','{\"peso\":\"1 tonelada\"}'),
+(42,4,5,1,'FR','32432432QDASDAS','2024-10-31','Generador Einhell FR','{\"peso\":\"1 tonelada\"}'),
+(43,2,1,1,'BG 3','C5YASF43543ASDA','2024-10-31','Laptop LG BG 3','{\"ram\":\"64\",\"color\":\"negro\",\"SO\":\"Windows\",\"Windows\":\"11\",\"Pantalla\":\"144 hz\"}'),
+(44,2,1,1,'BG 3','F546MLAS43KASDS','2024-10-31','Laptop LG BG 3','{\"ram\":\"64\",\"color\":\"negro\",\"SO\":\"Windows\",\"Windows\":\"11\",\"Pantalla\":\"144 hz\"}'),
+(45,1,1,1,'AS 4','ADBJASKHRK34JSD','2024-10-31','Computadora LG AS 4','{\"SO\":\"Linux\",\"Ram\":\"164\"}'),
+(46,1,1,1,'AS 4','F345435SDFDSFSF','2024-10-31','Computadora LG AS 4','{\"SO\":\"Linux\",\"Ram\":\"164\"}');
 
 /*Table structure for table `activos_responsables` */
 
@@ -2094,6 +2100,7 @@ BEGIN
 		NA.tipo,
 		NA.visto,
 		NA.mensaje,
+        ACT.idactivo,
 		ACT.descripcion as descripcion_activo,
 		RES.descripcion,
         NA.fecha_creacion

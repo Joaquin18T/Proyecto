@@ -29,6 +29,7 @@ BEGIN
 		NA.tipo,
 		NA.visto,
 		NA.mensaje,
+        ACT.idactivo,
 		ACT.descripcion as descripcion_activo,
 		RES.descripcion,
         NA.fecha_creacion
@@ -38,7 +39,7 @@ BEGIN
         WHERE RES.idusuario = _idusuario
         ORDER BY NA.fecha_creacion asc;
 END $$
--- CALL sp_list_notificacion(4);
+-- CALL sp_list_notificacion(5);
 
 DROP PROCEDURE IF EXISTS sp_responsable_notificacion;
 DELIMITER $$
@@ -86,6 +87,6 @@ BEGIN
     INNER JOIN marcas MAR ON ACT.idmarca = MAR.idmarca
     WHERE NA.idnotificacion_activo =_idnotificacion_activo;
 END $$
--- CALL sp_detalle_notificacion_activo(2);
+-- CALL sp_detalle_notificacion_activo(8);
 
 

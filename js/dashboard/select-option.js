@@ -23,9 +23,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // }
 
   //CONSTANTES
-  
+
   const host = "http://localhost/CMMS/controllers/";
-  let idusuario=0;
+  let idusuario = 0;
 
   //FUNCIONES
   function selector(value) {
@@ -54,24 +54,25 @@ document.addEventListener("DOMContentLoaded", () => {
     params.append("idnotificacion", "");
 
     const data = await getDatos(`${host}notificacion.controller.php`, params);
-    console.log("notify",data);
-    if(data.length>0){
+    console.log("notify", data);
+    if (data.length > 0) {
       const dataResp = await dataRespNof(data[0].idusuario);
       idusuario = await getIdUser();
       //console.log("resp", dataResp);
       const newArray = avoidRepeats(data);
       //const dataCombined = matchList(data, dataResp);
       //console.log("combined", dataCombined);
-      console.log("list nof",data);
-      
+      console.log("list nof", data);
+
       data.forEach((x, i) => {
-        if(i<5){
+        if (i < 4) {
           createNotificacion(
             x.idactivo_resp,
             x.mensaje,
             x.descripcion,
             x.fecha_creacion,
             x.idnotificacion_activo,
+            x.idactivo,
             1
           );
         }
@@ -81,6 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
           x.descripcion,
           x.fecha_creacion,
           x.idnotificacion_activo,
+          x.idactivo,
           2
         );
       });
@@ -94,25 +96,24 @@ document.addEventListener("DOMContentLoaded", () => {
    * @param {*} arr2 Segundo array a combinar
    * @returns Retorna la combinacion de los dos array de objetos
    */
-  function matchList(arr1=[], arr2=[]){
-    const combinar = arr1.map((x, i)=>{
-      return {...x, ...arr2[i]}
+  function matchList(arr1 = [], arr2 = []) {
+    const combinar = arr1.map((x, i) => {
+      return { ...x, ...arr2[i] };
     });
-    return combinar
+    return combinar;
   }
 
-  function avoidRepeats(list=[]){
+  function avoidRepeats(list = []) {
     const idDuplicates = new Set();
-    const newArray=[];
-    list.forEach(x=>{
-      if(!idDuplicates.has(x.idnotificacion)){
+    const newArray = [];
+    list.forEach((x) => {
+      if (!idDuplicates.has(x.idnotificacion)) {
         newArray.push(x);
         idDuplicates.add(x.idnotificacion);
       }
     });
     console.log(newArray);
     return newArray;
-    
   }
 
   /*
@@ -120,13 +121,13 @@ document.addEventListener("DOMContentLoaded", () => {
    */
   function showPreviewDetailt() {
     const notfs = document.querySelectorAll(".item-notifi");
-    notfs.forEach(x=>{
+    notfs.forEach((x) => {
       x.addEventListener("click", async (e) => {
-        console.log("id",e.target.dataset.idnofact);
+        console.log("id", e.target.dataset.idnofact);
         console.log("iduser", idusuario);
-        
+
         const detail = await showDetail(e.target.dataset.idnofact);
-        console.log("detalle nof",detail);
+        console.log("detalle nof", detail);
         showModal(detail);
       });
     });
@@ -161,7 +162,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /**
-   * Muestra los datos en el Modal
+   * Muestra los datos de la notificacion en el Modal
    */
   function showModal(data) {
     selector("modal-body-notif").innerHTML = "";
@@ -209,9 +210,18 @@ document.addEventListener("DOMContentLoaded", () => {
     return newWord;
   }
 
-  function createNotificacion(id,mensaje, descripcion, fecha, idnof_activo, type) {
+  //Crea las notificaciones en la lista como en el SB
+  async function createNotificacion(
+    id,
+    mensaje,
+    descripcion,
+    fecha,
+    idnof_activo,
+    idactivo,
+    type
+  ) {
     let element = "";
-    if(type===1){
+    if (type === 1) {
       element = `
       <a href="#" class="list-group-item list-group-item-action border-bottom item-notifi" data-idnofact=${idnof_activo}>
           <div class="row align-items-center " style="pointer-events:none;">
@@ -225,39 +235,30 @@ document.addEventListener("DOMContentLoaded", () => {
                 </div>
               </div>
               <p class="font-small mt-1 mb-0">
-                ${descripcion}
+                Des. Activo: ${descripcion}
               </p>
             </div>
           </div>
           </a>
         `;
-      selector("list-notificaciones").innerHTML+=element;
-    }else if(type===2){
+      selector("list-notificaciones").innerHTML += element;
+    } else if (type === 2) {
+      const dataActivo = await getDataActivo(idactivo);
+      //console.log(dataActivo);
       element = `
-      <div class="card">
-        <div class="card-body">
-          <div class="row align-items-center">
-            <div class="col ps-0 ms-2">
-              <div class="d-flex justify-content-between align-items-center">
-                <div>
-                  <h4 class="h6 mb-0 text-small">${mensaje}</h4>
-                </div>
-                <div class="text-end">
-                  <small class="text-danger">${fecha}</small>
-                </div>
-              </div>
-              <p class="font-small mt-1 mb-0">
-                ${descripcion}
-              </p>
-            </div>
+        <div class="card sb-idnotificacion" data-idnof_activo=${idnof_activo}>
+          <div class="card-body">
+            <h5 class="card-title">${mensaje}</h5>
+            <h6 class="card-subtitle mb-2 text-body-secondary">Desc Act: ${descripcion}</h6>
+            <p class="card-text">
+              <strong>Fech. Creacion: <small class="text-danger">${fecha}</small></strong>
+            </p>
           </div>
         </div>
-      </div>
       `;
-
-      selector("sb-list-notificacion").innerHTML+=element;
+      selector("sb-list-notificacion").innerHTML += element;
+      showDataWSidebar();
     }
-
   }
 
   function removeExtraBackdrops() {
@@ -282,14 +283,38 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   );
 
+  //Obtiene los datos del activo mediante una id
+  async function getDataActivo(idactivo){
+    const params = new URLSearchParams();
+    params.append("operation","getById");
+    params.append("idactivo",idactivo);
+
+    const data = await getDatos(`${host}activo.controller.php`, params);
+    return data[0];
+  }
+
   //MOSTRAR NOTIFICACIONES EN EL SIDEBAR
-
-  selector("show-all-notificaciones").addEventListener("click",()=>{
-
+  selector("show-all-notificaciones").addEventListener("click", () => {
     const sidebar = selector("sb-notificacion");
     const offCanvas = new bootstrap.Offcanvas(sidebar);
     offCanvas.show();
   });
 
-  
+  function showDataWSidebar(){
+    const datanofSB = document.querySelectorAll(".sb-idnotificacion");
+    datanofSB.forEach(x=>{
+      x.addEventListener("click",async()=>{
+        const idnof = parseInt(x.getAttribute("data-idnof_activo"));
+        //console.log("id nof SB", idnof);
+        
+        const detail = await showDetail(idnof);
+        console.log("detalle nof sb", detail);
+        const sidebar = bootstrap.Offcanvas.getOrCreateInstance(
+          selector("sb-notificacion")
+        );
+        sidebar.hide();
+        showModal(detail);
+      });
+    });
+  }
 });
