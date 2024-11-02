@@ -19,12 +19,15 @@ class Tarea extends ExecQuery
   public function add($params = []): int
   {
     try {
-      $sp = parent::execQ("CALL insertarTarea(@idtarea,?,?,?,?)");
+      $sp = parent::execQ("CALL insertarTarea(@idtarea,?,?,?,?,?,?,?)");
       $sp->execute(
         array(
           $params['idplantarea'],
           $params['idtipo_prioridad'],
-          $params['descripcion'],          
+          $params['descripcion'],      
+          $params['idsubcategoria'],
+          $params['intervalo'],
+          $params['frecuencia'],
           $params['idestado']
         ),
 
@@ -51,16 +54,35 @@ class Tarea extends ExecQuery
   public function actualizarTarea($params = []): array
   {
     try {
-      $sp = parent::execQ("CALL actualizarTarea(?,?,?,?)");
+      $sp = parent::execQ("CALL actualizarTarea(?,?,?,?,?,?)");
       $sp->execute(
         array(
           $params['idtarea'],
           $params['idtipo_prioridad'],
           $params['descripcion'],
+          $params['intervalo'],
+          $params['frecuencia'],
           $params['idestado']
         )
       );
       return $sp->fetchAll(PDO::FETCH_ASSOC); // ME DEVOLVERA EL ULTIMO ID GENERADO
+    } catch (Exception $e) {
+      die($e->getMessage());
+    }
+  } // INTEGRADO ✔
+
+  public function actualizarTareaEstadoTrabajado($params = []): bool
+  {
+    try {
+      $status = false;
+      $sp = parent::execQ("CALL actualizarTareaEstadoTrabajado(?,?)");
+      $status = $sp->execute(
+        array(
+          $params['idtarea'],
+          $params['trabajado']
+        )
+      );
+      return $status; // ME DEVOLVERA EL ULTIMO ID GENERADO
     } catch (Exception $e) {
       die($e->getMessage());
     }

@@ -29,7 +29,10 @@ if (isset($_POST['operation'])) {
             $datosEnviar = [
                 "idplantarea"               => $_POST["idplantarea"],
                 "idtipo_prioridad"          => $_POST["idtipo_prioridad"],
-                "descripcion"               => $_POST["descripcion"],                                
+                "descripcion"               => $_POST["descripcion"],
+                "idsubcategoria"            => $_POST["idsubcategoria"],
+                "intervalo"                 => $_POST["intervalo"],
+                "frecuencia"                => $_POST["frecuencia"],
                 "idestado"                  => $_POST["idestado"],
             ];
 
@@ -46,17 +49,28 @@ if (isset($_POST['operation'])) {
             echo json_encode(["actualizado" => $actualizado]);
             break;
 
+        case 'actualizarTareaEstadoTrabajado':
+            $datosEnviar = [
+                "idtarea"  => $_POST["idtarea"],
+                "trabajado" => $_POST["trabajado"]
+            ];
+            $actualizado = $tarea->actualizarTareaEstadoTrabajado($datosEnviar);
+            echo json_encode(["actualizado" => $actualizado]);
+            break;
+
         case 'actualizarTarea':
             $datosEnviar = [
                 "idtarea"           => $_POST["idtarea"],
                 "idtipo_prioridad"  => $_POST["idtipo_prioridad"],
-                "descripcion"       => $_POST["descripcion"],                               
+                "descripcion"       => $_POST["descripcion"],
+                "intervalo"                 => $_POST["intervalo"],
+                "frecuencia"                => $_POST["frecuencia"],
                 "idestado"          => $_POST["idestado"],
             ];
             $actualizado = $tarea->actualizarTarea($datosEnviar);
             echo json_encode($actualizado[0]); // array , accedemos a posicion 0 por que ahi se encuentra
             break;
-        
+
         case 'eliminarTarea':
             $path = isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : '/';
 

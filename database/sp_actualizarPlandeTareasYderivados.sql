@@ -23,12 +23,16 @@ CREATE PROCEDURE `actualizarTarea`(
     IN _idtarea INT,
     IN _idtipo_prioridad INT,
     IN _descripcion VARCHAR(200),     
+    IN _intervalo		INT,
+    IN _frecuencia		VARCHAR(30),
     IN _idestado INT)
 BEGIN
     UPDATE tareas 
     SET 
 		idtipo_prioridad = _idtipo_prioridad,
 		descripcion = _descripcion,
+        intervalo	= _intervalo,
+        frecuencia	= _frecuencia,
         idestado = _idestado, 
         update_at = NOW()
     WHERE idtarea = _idtarea;
@@ -108,3 +112,16 @@ BEGIN
 END //
 
 -- *********************************************************************
+DROP PROCEDURE IF EXISTS `actualizarTareaEstadoTrabajado`
+DELIMITER //
+CREATE PROCEDURE `actualizarTareaEstadoTrabajado`
+(
+	IN _idtarea INT,
+    IN _trabajado INT
+)
+BEGIN
+	UPDATE tareas 
+    SET trabajado = _trabajado,
+        update_at = NOW()
+    WHERE idtarea = _idtarea;
+END //

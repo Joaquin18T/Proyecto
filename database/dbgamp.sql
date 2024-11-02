@@ -224,7 +224,7 @@ DROP TABLE IF EXISTS `plandetareas`;
 CREATE TABLE `plandetareas`
 (
 	idplantarea		int			auto_increment primary key,
-    descripcion		varchar(80)	not null,
+    descripcion		varchar(80)	not null,    
 	incompleto 		boolean		null default true,
     eliminado		boolean		null default false,
     create_at		datetime	not null default now(),
@@ -246,14 +246,18 @@ CREATE TABLE `tareas`
     idplantarea			int				not null,
     idtipo_prioridad	int 			not null,
     descripcion			varchar(200)	not null,
+    idsubcategoria		int				not null,
+    intervalo			int				not null,
+    frecuencia 			varchar(30)		not null,
 	idestado			int				not null,
-    trabajado			boolean			not null,
+    trabajado			boolean			not null default false,
     create_at			datetime		not null default now(),
     update_at			datetime		null,
     CONSTRAINT	fk_idplantarea		foreign key (idplantarea) 		REFERENCES plandetareas (idplantarea) ON DELETE CASCADE,
     CONSTRAINT	fk_idtipo_prioridad	foreign key (idtipo_prioridad) 	REFERENCES tipo_prioridades (idtipo_prioridad),
     CONSTRAINT	fk_descripcion_tarea 		unique(descripcion),
-	CONSTRAINT	fk_idestado2		foreign key (idestado)			REFERENCES estados (idestado)
+	CONSTRAINT	fk_idestado2		foreign key (idestado)			REFERENCES estados (idestado),
+	CONSTRAINT fk_idsubcategoria_plan FOREIGN KEY (idsubcategoria) references subcategorias (idsubcategoria)
 )ENGINE=INNODB;
 
 DROP TABLE IF EXISTS `odt`;

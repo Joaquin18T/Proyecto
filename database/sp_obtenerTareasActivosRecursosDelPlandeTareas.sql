@@ -90,7 +90,7 @@ DROP PROCEDURE IF EXISTS `obtenerTareasPorPlanTarea`
 DELIMITER $$
 CREATE PROCEDURE `obtenerTareasPorPlanTarea`(IN _idplantarea INT)
 BEGIN
-	SELECT TAR.idtarea, PT.descripcion as plan_tarea, TP.tipo_prioridad, TAR.descripcion ,ES.nom_estado FROM tareas TAR
+	SELECT TAR.idtarea, PT.descripcion as plan_tarea, TAR.idsubcategoria, TP.tipo_prioridad, TAR.descripcion ,ES.nom_estado FROM tareas TAR
     INNER JOIN plandetareas PT ON TAR.idplantarea = PT.idplantarea -- quitar esta linea luego pq no es necesario mostrar el plan de tareas al que pertenece
     INNER JOIN tipo_prioridades TP ON TAR.idtipo_prioridad = TP.idtipo_prioridad
     INNER JOIN estados ES ON TAR.idestado = ES.idestado
