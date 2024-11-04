@@ -185,6 +185,7 @@ INSERT INTO notificaciones_activos(idactivo_resp, tipo, mensaje) VALUES
 -- SELECT VERSION(); -- saber la version de mysql
 -- *************************** INSERCIONES DE ROYER ********************************
 -- 12/10/2024
+INSERT INTO frecuencias (frecuencia) VALUES ('diaria'),('semanal'),('mensual'),('anual');
 INSERT INTO tipo_prioridades (tipo_prioridad) values ('baja'),('media'),('alta'),('urgente');
 
 INSERT INTO tipo_diagnosticos (tipo_diagnostico) VALUES ('entrada'), ('salida');

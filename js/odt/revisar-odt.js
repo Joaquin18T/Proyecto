@@ -17,6 +17,9 @@ $(document).ready(async () => {
     let idtarea = -1
     let iddiagnosticoEntrada = -1
     let iddiagnosticoSalida = -1
+    let intervalos = -1
+    let frecuencia = ""
+
     const host = "http://localhost/CMMS/controllers/";
     let idordengenerada = window.localStorage.getItem("idodt")
 
@@ -26,20 +29,23 @@ $(document).ready(async () => {
     const txtDiagnosticoSalida = $q("#txtDiagnosticoSalida")
     const txtComentario = $q("#comentario")
     const btnFinalizar = $q("#btn-finalizar")
+    const btnVerDetalles = $q("#btn-verDetalles")
     const contenedorResponsablesOdt = $q(".contenedor-responsablesOdt")
     const contenedorDetallesOdtEntrada = $q(".contenedor-detallesOdtEntrada") // DIV
-    const contenedorDetallesOdtSalida = $q(".contenedor-detallesOdtSalida") // DIV
+    //const contenedorDetallesOdtSalida = $q(".contenedor-detallesOdtSalida") // DIV
     const contenedorEvidenciaPreviaEntrada = $q("#preview-container-entrada")
     const contenedorEvidenciaPreviaSalida = $q("#preview-container-salida")
 
 
     //EJECUTAR PRIMERO LO GENERAL
+    await obtenerOdt()
     await verificarOdtEstado()
-
+    await obtenerTareaPorId(idtarea)
     //Ejecutar funciones 
     await renderUI()
 
     //RENDERIZAR
+
     await verificarCantidadEvidenciasEntrada()
     await verificarEvidenciasRegistradas()
     /* await renderDiagnosticoEntrada()
@@ -87,6 +93,8 @@ $(document).ready(async () => {
         params.append("operation", "obtenerTareaPorId")
         params.append("idtarea", idtarea)
         const ultimaTareaAgregada = await getDatos(`${host}tarea.controller.php`, params)
+        intervalos = ultimaTareaAgregada[0].intervalo
+        frecuencia = ultimaTareaAgregada[0].frecuencia
         console.log("tarea obtenida: ", ultimaTareaAgregada)
         return ultimaTareaAgregada
     }
@@ -154,7 +162,6 @@ $(document).ready(async () => {
     // ********************** SECCION DE RENDERIZADO DE DATOS **************************************************
 
     async function renderUI() {
-        await obtenerOdt() // paso 1 
         const diagnosticoEntrada = await obtenerDiagnostico(1)
         const diagnosticoSalida = await obtenerDiagnostico(2)
 
@@ -163,22 +170,13 @@ $(document).ready(async () => {
         iddiagnosticoSalida = diagnosticoSalida[0]?.iddiagnostico
         txtDiagnosticoSalida.innerText = diagnosticoSalida[0].diagnostico
 
-        const detalleOdt = await obtenerDetalleOdt()
-        contenedorDetallesOdtSalida.innerHTML = `
+        //const detalleOdt = await obtenerDetalleOdt()
+        /* contenedorDetallesOdtSalida.innerHTML = `
+            <div class="row">
+                
+            </div>
+        ` */
 
-            <div class="row">
-                <p class="fw-bolder col">Fecha inicial: </p>
-                <p class="fw-normal d-flex align-items-center col">${detalleOdt[0].fecha_inicial}</p>
-            </div>
-            <div class="row">
-                <p class="fw-bolder col">Fecha acabado: </p>
-                <p class="fw-normal d-flex align-items-center col">${detalleOdt[0].fecha_final}</p>
-            </div>
-            <div class="row">
-                <p class="fw-bolder col">Tiempo de ejecucion: </p>
-                <p class="fw-normal d-flex align-items-center col">${detalleOdt[0].tiempo_ejecucion}</p>
-            </div>
-        `
         //await obtenerEvidencias() // paso 3
         const activos = await obtenerActivosPorTarea(idtarea)
         //const tarea = await obtenerTareaPorId(idtarea)
@@ -198,10 +196,16 @@ $(document).ready(async () => {
         contenedorDetallesOdtEntrada.innerHTML += `
           <div class="row">
               <p class="fw-bolder col">Fecha programada: </p>
-              <p class="fw-normal d-flex align-items-center col">${odt[0].fecha_inicio} - ${odt[0].hora_inicio}</p>
-              <p class="fw-bolder col">Fecha vencimiento: </p>
-              <p class="fw-normal d-flex align-items-center col">${odt[0].fecha_vencimiento} - ${odt[0].hora_vencimiento}</p>
-          </div>        
+              <p class="fw-normal d-flex align-items-center col">${odt[0].fecha_inicio} - ${odt[0].hora_inicio}</p>                                          
+          </div>  
+          <div class="row">
+              <p class="fw-bolder col">Intervalos: </p>
+              <p class="fw-normal col">${intervalos} </p>
+          </div>       
+          <div class="row">
+              <p class="fw-bolder col">Frecuencia: </p>
+              <p class="fw-normal col">${frecuencia} </p>
+          </div>   
         `
 
         const responsables = await obtenerResponsablesAsignados()
@@ -219,19 +223,42 @@ $(document).ready(async () => {
     //**************************** SECCION DE MODALES ******************************************************* */
 
     async function abrirModalSidebar(iddiagnostico) {
-        const modalEvidenciasContainer = document.getElementById("modal-evidencias-container");
-        modalEvidenciasContainer.innerHTML = ''; // Limpiar el contenedor
+        const bodyModal = $q(".offcanvas-body")
+        //modalEvidenciasContainer.innerHTML = ''; // Limpiar el contenedor
 
         const evidenciasObtenidas = await obtenerEvidencias(iddiagnostico);
-        console.log("Evidencias obtenidas: ", evidenciasObtenidas);
+        console.log("renderizando evidencias: ", evidenciasObtenidas);
 
+
+        if (iddiagnostico == null) {
+            const detalles = await obtenerDetalleOdt()
+            console.log("detalles: ", detalles)
+            bodyModal.innerHTML = ''
+            bodyModal.innerHTML = '<h2>Ejecuciones: </h2>'
+            detalles.forEach((d, key) => {
+                bodyModal.innerHTML += `          
+          <div class="card mb-3">
+            <div class="card-body">
+              <h5 class="card-title">Ejecucion N°${key + 1}</h5>
+              <p class="card-text"><strong>Fecha inicial: </strong>${d.fecha_inicial}</p>
+              <p class="card-text"><strong>Fecha acabado: </strong>${d.fecha_final}</p>
+              <p class="card-text"><strong>Tiempo ejecución: </strong>${d.tiempo_ejecucion}</p>             
+            </div>
+          </div>
+        `
+            });
+            return
+        }
+
+        bodyModal.innerHTML = ''
+        bodyModal.innerHTML = `<h2>Lista de todas las evidencias</h2>`
         // Iterar sobre cada evidencia y crear elementos de imagen
         evidenciasObtenidas.forEach(evidenciaObj => {
             const imgSrc = evidenciaObj.evidencia;
-            modalEvidenciasContainer.innerHTML += `
+            bodyModal.innerHTML += `        
                 <div class="card mb-3 text-center" data-id="${evidenciaObj.idevidencias_diagnostico}">
                     <img src="http://localhost/CMMS/dist/images/evidencias/${imgSrc}" class="card-img-top modal-img" width=450 alt="Evidencia ${imgSrc}">                                
-                </div>
+                </div>    
             `
         });
     }
@@ -335,9 +362,13 @@ $(document).ready(async () => {
             const estadoTareaActualizada = await actualizarTareaEstado(idtarea, 8)
             console.log("ESTADO DE TAREA ACTUALIZADA?: ", estadoTareaActualizada)
             window.localStorage.clear()
-            //window.location.href = `http://localhost/CMMS/views/odt`
+            window.location.href = `http://localhost/CMMS/views/odt`
             console.log("redirigiendo...")
         }
+    })
+
+    btnVerDetalles.addEventListener("click", async () => {
+        await abrirModalSidebar()
     })
 
     //******************************* FIN DE EVENTOS ***************************************************** */
@@ -392,10 +423,12 @@ $(document).ready(async () => {
         formActualizacion.append("operation", "actualizarTareaEstado")
         formActualizacion.append("idtarea", idtarea)
         formActualizacion.append("idestado", estado)
+        formActualizacion.append("trabajado", 1)
         const Factualizado = await fetch(`${host}tarea.controller.php`, { method: 'POST', body: formActualizacion })
         const actualizado = await Factualizado.json()
         return actualizado
     }
+
 
     // ******************** FIN DE SECCION DE ACTUALIZACIONES **********************************************
 });

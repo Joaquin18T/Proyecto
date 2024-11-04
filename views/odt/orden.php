@@ -1,19 +1,38 @@
 <?php require_once '../header.php' ?>
 
 <div class="row container-fluid">
-    <h1>Orden de trabajo</h1>
+    <div class="row">
+        <h1>Ejecución</h1>
+        <a href="http://localhost/CMMS/views/odt/" class="btn btn-primary">Volver</a>
+    </div>
+
     <div class="card mb-3" style="max-width: 100%;">
         <div class="row g-0">
-
-            <div class="contenedor-evidencias p-3 col-md-4 text-center">
+            <div class="col-md-4 p-3 text-center contenedor-evidencias-entrada">
+                <div class="mb-3">
+                    <h5 class="card-title">Evidencias de entrada</h5>
+                    <input type="file" name="evidencia[]" id="evidencias-img-input-entrada" class="custom-file-input form-control"
+                        accept="image/*">
+                </div>
                 <div id="preview-container-entrada" class="preview-container">
+                    <p id="no-images-text" class="no-images-text">No hay imágenes seleccionadas aún</p>
                 </div>
             </div>
+            <!-- <div class="contenedor-evidencias p-3 col-md-4 text-center">
+                <div id="preview-container-entrada" class="preview-container">
+                </div>
+            </div> -->
             <div class="col-md-8">
                 <div class="card-body ">
+                    <h5 class="card-title">Diagnostico de entrada</h5>
+                    <textarea class="comment-textarea form-control mb-3" id="diagnostico-entrada" rows="5" placeholder="Escribe tu diagnostico aquí..." disabled></textarea>
+                    <button class="btn btn-primary" id="btn-guardar-diagnostico-entrada" disabled>Guardar</button>
+                </div>
+
+                <!-- <div class="card-body ">
                     <h5 class="card-title">Diagnostico entrada</h5>
                     <p class="card-text" id="txtDiagnosticoEntrada">This is a wider Lorem ipsum dolor sit amet consectetur adipisicing elit. Laudantium dicta et provident, quae est accusantium, fuga eaque placeat assumenda eos labore enim molestiae iste ab nostrum, quaerat quasi veritatis ex. card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                </div>
+                </div> -->
                 <div class="card-footer">
                     <div class="row">
                         <div class="col-md-6 mb-3">
@@ -41,23 +60,23 @@
             </div>
         </div>
     </div>
-    <h1>Ejecución</h1>
     <div class="card mb-3" style="max-width: 100%;">
         <div class="row g-0">
             <div class="col-md-4 p-3 text-center contenedor-evidencias">
                 <div class="mb-3">
-                    <input type="file" name="evidencia[]" id="evidencias-img-input" class="custom-file-input form-control"
+                    <h5 class="card-title">Evidencias de salida</h5>
+                    <input type="file" name="evidencia[]" id="evidencias-img-input-salida" class="custom-file-input form-control"
                         accept="image/*">
                 </div>
-                <div id="preview-container" class="preview-container">
+                <div id="preview-container-salida" class="preview-container">
                     <p id="no-images-text" class="no-images-text">No hay imágenes seleccionadas aún</p>
                 </div>
             </div>
             <div class="col-md-8">
                 <div class="card-body ">
-                    <h5 class="card-title">Diagnsotico salida</h5>
+                    <h5 class="card-title">Diagnostico de salida</h5>
                     <textarea class="comment-textarea form-control mb-3" id="diagnostico-salida" rows="5" placeholder="Escribe tu diagnostico aquí..." disabled></textarea>
-                    <button class="btn btn-primary" id="btn-guardar-diagnostico" disabled>Guardar</button>
+                    <button class="btn btn-primary" id="btn-guardar-diagnostico-salida" disabled>Guardar</button>
                 </div>
                 <div class="card-footer">
                     <div class="row">
@@ -81,7 +100,7 @@
                                     </div>
                                     <div class="row">
                                         <p class="fw-bolder col">Intervalos ejecutados: </p>
-                                        <p class="fw-normal d-flex align-items-center col" id="txtTiempoEjecucion"></p>
+                                        <p class="fw-normal d-flex align-items-center col" id="txtIntervalosEjecutados"></p>
                                     </div>
                                 </div>
                             </div>
@@ -97,6 +116,9 @@
                                     </div>
                                     <div class="card-body text-center">
                                         <button class="btn btn-secondary" id="btn-finalizar">Finalizar</button>
+                                    </div>
+                                    <div class="card-body text-center">
+                                        <button class="btn btn-secondary" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRightEvidencias" id="btn-verDetalles">Ver Ejecuciones</button>
                                     </div>
                                 </div>
                             </div>
@@ -116,7 +138,7 @@
     </div>
     <div class="offcanvas-body">
         <h2>Lista de todas las evidencias</h2>
-        <div id="modal-evidencias-container">
+        <div id="modal-container">
 
         </div>
     </div>

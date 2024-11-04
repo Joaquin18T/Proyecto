@@ -49,8 +49,8 @@ $(document).ready(async () => {
  */
         $q("#elegirSubCategoriaTarea").disabled = habilitado
         $q("#txtIntervaloTarea").disabled = habilitado
-        $q("#txtFrecuenciaTarea").disabled = habilitado
         $q("#tipoPrioridadTarea").disabled = habilitado
+        $q("#selectFrecuenciaTarea").disabled = habilitado
         $q("#txtDescripcionPlanTarea").disabled = !habilitado
         $q("#btnGuardarPlanTarea").remove()
         $q("#btnGuardarTarea").disabled = habilitado
@@ -65,6 +65,7 @@ $(document).ready(async () => {
 
     async function loadFunctions() {
         await renderPrioridades()
+        await renderFrecuencias()
     }
 
 
@@ -148,11 +149,23 @@ $(document).ready(async () => {
               `;
         }
     }
+    
+    async function renderFrecuencias() {
+        const frecuencia = await obtenerFrecuencias()
+        //selects de prioridades
+        const selectFrecuenciaTarea = $q("#selectFrecuenciaTarea");
+        selectFrecuenciaTarea.innerHTML += `<option selected>Frecuencia</option>`
+        for (let i = 0; i < frecuencia.length; i++) {
+            selectFrecuenciaTarea.innerHTML += `
+                <option value="${frecuencia[i].idfrecuencia}">${frecuencia[i].frecuencia}</option>
+              `;
+        }
+    }
 
     async function agregarTareas() {
         const descripcionTarea = $q("#txtDescripcionTarea");
         const intervaloTarea = $q("#txtIntervaloTarea");
-        const frecuenciaTarea = $q("#txtFrecuenciaTarea");
+        const selectFrecuenciaTarea = $q("#selectFrecuenciaTarea");
         /* const fechaInicioTarea = $q("#fecha-inicio");
         const horaInicioTarea = $q("#hora-inicio");
         const fechaVencimiento = $q("#fecha-vencimiento");
@@ -167,7 +180,7 @@ $(document).ready(async () => {
         formTarea.append("descripcion", descripcionTarea.value);
         formTarea.append("idsubcategoria", subCategoriaTarea.value)
         formTarea.append("intervalo", intervaloTarea.value);
-        formTarea.append("frecuencia", frecuenciaTarea.value);
+        formTarea.append("idfrecuencia", selectFrecuenciaTarea.value);
 
         /* formTarea.append("fecha_inicio", fechaInicioTarea.value);
         formTarea.append("hora_inicio", horaInicioTarea.value)
@@ -244,7 +257,7 @@ $(document).ready(async () => {
 
     }
 
-    
+
 
     async function obtenerTareas() {
         const paramsTareasSearch = new URLSearchParams()
@@ -270,6 +283,12 @@ $(document).ready(async () => {
         return ultimaTareaAgregada
     }
 
+    async function obtenerFrecuencias() {
+        const paramsFrecuencia = new URLSearchParams()
+        paramsFrecuencia.append("operation", "obtenerFrecuencias")
+        const frecuencias = await getDatos(`${host}tarea.controller.php`, paramsFrecuencia)
+        return frecuencias
+    }
     /* ********************************************* EVENTOS *************************************************** */
 
 
@@ -422,7 +441,7 @@ $(document).ready(async () => {
                         //RENDERIZAR INFO EN LOS INPUTS Y SELECT de acuerdo a la tarea obtenida
                         $q("#txtDescripcionTarea").value = tareaObtenida[0].descripcion
                         $q("#txtIntervaloTarea").value = tareaObtenida[0].intervalo
-                        $q("#txtFrecuenciaTarea").value = tareaObtenida[0].frecuencia
+                        $q("#selectFrecuenciaTarea").value = tareaObtenida[0].idfrecuencia
                         /* $q("#fecha-inicio").value = tareaObtenida[0].fecha_inicio
                         $q("#hora-inicio").value = tareaObtenida[0].hora_inicio
                         $q("#fecha-vencimiento").value = tareaObtenida[0].fecha_vencimiento
@@ -496,7 +515,7 @@ $(document).ready(async () => {
                             //formActualizarTarea.append("fecha_vencimiento", $q("#fecha-vencimiento").value)
                             //formActualizarTarea.append("hora_vencimiento", $q("#hora-vencimiento").value)
                             formActualizarTarea.append("intervalo", $q("#txtIntervaloTarea").value)
-                            formActualizarTarea.append("frecuencia", $q("#txtFrecuenciaTarea").value)
+                            formActualizarTarea.append("idfrecuencia", $q("#selectFrecuenciaTarea").value)
                             formActualizarTarea.append("idestado", 8)
 
                             const response = await fetch(`${host}tarea.controller.php`, {

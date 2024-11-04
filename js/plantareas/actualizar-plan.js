@@ -47,6 +47,7 @@ $(document).ready(async () => {
     await obtenerTareas()
     await obtenerActivosVinculados()
     await renderPrioridades()
+    await renderFrecuencias()
     habilitarCamposTarea(false);
     btnTerminarPlan.disabled = false
 
@@ -62,7 +63,7 @@ $(document).ready(async () => {
         $q("#txtFrecuenciaTarea").disabled = habilitado */
         $q("#elegirSubCategoriaTarea").disabled = habilitado
         $q("#txtIntervaloTarea").disabled = habilitado
-        $q("#txtFrecuenciaTarea").disabled = habilitado
+        $q("#selectFrecuenciaTarea").disabled = habilitado
         $q("#tipoPrioridadTarea").disabled = habilitado
         //$q("#txtDescripcionPlanTarea").disabled = !habilitado
         //$q("#btnGuardarPlanTarea").remove()
@@ -167,10 +168,22 @@ $(document).ready(async () => {
         }
     }
 
+    async function renderFrecuencias() {
+        const frecuencia = await obtenerFrecuencias()
+        //selects de prioridades
+        const selectFrecuenciaTarea = $q("#selectFrecuenciaTarea");
+        selectFrecuenciaTarea.innerHTML += `<option selected>Frecuencia</option>`
+        for (let i = 0; i < frecuencia.length; i++) {
+            selectFrecuenciaTarea.innerHTML += `
+                <option value="${frecuencia[i].idfrecuencia}">${frecuencia[i].frecuencia}</option>
+              `;
+        }
+    }
+
     async function agregarTareas() {
         const descripcionTarea = $q("#txtDescripcionTarea");
         const intervaloTarea = $q("#txtIntervaloTarea");
-        const frecuenciaTarea = $q("#txtFrecuenciaTarea");
+        const frecuenciaTarea = $q("#selectFrecuenciaTarea")
         /* const intervaloTarea = $q("#txtIntervaloTarea");
         const frecuenciaTarea = $q("#txtFrecuenciaTarea");
         const fechaInicioTarea = $q("#fecha-inicio");
@@ -185,7 +198,7 @@ $(document).ready(async () => {
         formTarea.append("descripcion", descripcionTarea.value);
         formTarea.append("idsubcategoria", subCategoriaTarea.value)
         formTarea.append("intervalo", intervaloTarea.value);
-        formTarea.append("frecuencia", frecuenciaTarea.value);
+        formTarea.append("idfrecuencia", frecuenciaTarea.value);
         /* formTarea.append("fecha_inicio", fechaInicioTarea.value);
         formTarea.append("fecha_vencimiento", fechaVencimiento.value);
         formTarea.append("cant_intervalo", intervaloTarea.value);
@@ -268,11 +281,21 @@ $(document).ready(async () => {
         for (let k = 0; k < tareas.length; k++) {
             ulTareasAgregadas.innerHTML += `
                     <li class="list-group-item d-flex justify-content-between align-items-center mb-3">
-                        <p class="tarea-agregada" data-tarea-id="${tareas[k]?.idtarea}">${tareas[k]?.descripcion} - Tarea: ${tareas[k]?.idtarea} - estado: ${tareas[k].nom_estado}</p>
-                        <span class="badge bg-primary rounded-pill btn-eliminar-tarea" data-tarea-id="${tareas[k]?.idtarea}">
-                            <i class="fa-solid fa-trash"></i>
-                        </span>
+                        <p class="tarea-agregada mb-0" data-tarea-id="${tareas[k]?.idtarea}">
+                            ${tareas[k]?.descripcion} - Tarea: ${tareas[k]?.idtarea} - estado: ${tareas[k].nom_estado}
+                        </p>
+                        <div class="d-flex gap-2">
+                            <span class="badge bg-primary rounded-pill btn-eliminar-tarea d-flex align-items-center justify-content-center" 
+                                data-tarea-id="${tareas[k]?.idtarea}" style="cursor: pointer;">
+                                <i class="fa-solid fa-trash"></i>
+                            </span>
+                            <span class="badge bg-primary rounded-pill btn-pausar-tarea d-flex align-items-center justify-content-center" 
+                                data-tarea-id="${tareas[k]?.idtarea}" style="cursor: pointer;">
+                                <i class="fa-solid fa-pause"></i>
+                            </span>
+                        </div>
                     </li>
+
               `;
         }
 
@@ -287,6 +310,7 @@ $(document).ready(async () => {
         //confirmarEliminacionTarea()
         const liTareaAgregada = $all(".tarea-agregada")
         const btnsEliminarTarea = $all(".btn-eliminar-tarea")
+        const btnsPausarTarea = $all(".btn-pausar-tarea")
         btnsEliminarTarea.forEach(btn => {
             btn.addEventListener("click", async () => {
                 console.log("eliminado")
@@ -295,10 +319,16 @@ $(document).ready(async () => {
                 let procesoEncontrado = false;
                 console.log("ID tarea CLICKEADO: ", idTarea)
                 for (let w = 0; w < tareasObtenidasAntesDeEliminar.length; w++) {
-                    if (tareasObtenidasAntesDeEliminar[w].idtarea == idTarea && tareasObtenidasAntesDeEliminar[w].nom_estado == "proceso") {
-                        alert("ESTA TAREA NO SE PUEDE ELIMINAR POR QUE YA ESTA EN PROCESO")
-                        procesoEncontrado = true;
-                        break;
+                    if (tareasObtenidasAntesDeEliminar[w].idtarea == idTarea) {
+                        if (tareasObtenidasAntesDeEliminar[w].nom_estado === "proceso") {
+                            alert("ESTA TAREA NO SE PUEDE ELIMINAR POR QUE YA ESTA EN PROCESO");
+                            procesoEncontrado = true;
+                            break;
+                        } else if (tareasObtenidasAntesDeEliminar[w].trabajado === 1) {
+                            alert("ESTA TAREA NO SE PUEDE ELIMINAR POR QUE YA FUE TRABAJADA");
+                            procesoEncontrado = true;
+                            break;
+                        }
                     }
                 }
 
@@ -339,6 +369,13 @@ $(document).ready(async () => {
                 }
             })
         })
+
+        btnsPausarTarea.forEach(btn => {
+            btn.addEventListener("click", async ()=>{
+                console.log("data-tarea-id a pausar: ", btn.getAttribute("data-tarea-id"))
+            })
+        })
+
         console.log("sintareas? :", sintareas)
         if (!sintareas) {
             liTareaAgregada.forEach(litarea => {
@@ -350,7 +387,7 @@ $(document).ready(async () => {
                     //RENDERIZAR INFO EN LOS INPUTS Y SELECT de acuerdo a la tarea obtenida
                     $q("#txtDescripcionTarea").value = tareaObtenida[0].descripcion
                     $q("#txtIntervaloTarea").value = tareaObtenida[0].intervalo
-                    $q("#txtFrecuenciaTarea").value = tareaObtenida[0].frecuencia
+                    $q("#selectFrecuenciaTarea").value = tareaObtenida[0].idfrecuencia
                     /* $q("#fecha-inicio").value = tareaObtenida[0].fecha_inicio
                     $q("#fecha-vencimiento").value = tareaObtenida[0].fecha_vencimiento
                     $q("#txtIntervaloTarea").value = tareaObtenida[0].cant_intervalo
@@ -373,6 +410,9 @@ $(document).ready(async () => {
                     $q("#btnCancelarTarea").addEventListener("click", () => {
                         formtarea.reset()
                         btnGuardarTarea.style.display = 'block'
+                        $q("#elegirSubCategoriaTarea").disabled = false
+                        $q("#selectFrecuenciaTarea").disabled = false
+
                         btnsTareaAcciones.innerHTML = ""
                     })
 
@@ -388,7 +428,7 @@ $(document).ready(async () => {
                         formActualizarTarea.append("cant_intervalo", $q("#txtIntervaloTarea").value)
                         formActualizarTarea.append("frecuencia", $q("#txtFrecuenciaTarea").value) */
                         formActualizarTarea.append("intervalo", $q("#txtIntervaloTarea").value)
-                        formActualizarTarea.append("frecuencia", $q("#txtFrecuenciaTarea").value)
+                        formActualizarTarea.append("idfrecuencia", $q("#selectFrecuenciaTarea").value)
                         formActualizarTarea.append("idestado", 8)
 
                         const response = await fetch(`${host}tarea.controller.php`, {
@@ -426,7 +466,7 @@ $(document).ready(async () => {
             listaActivosAsignados.innerHTML += `
                 <li class="list-group-item d-flex justify-content-between align-items-center mb-3" data-idtarea="${avt[p].idtarea}">
                     ${avt[p].descripcion} - Tarea N°${avt[p].idtarea}
-                    ${avt[p].idestado !== 9 ? `<span class="badge bg-primary rounded-pill btn-eliminar" data-idactivovinculado="${avt[p].idactivo_vinculado}">
+                    ${avt[p].idestado !== 9 ? `<span class="badge bg-primary rounded-pill btn-eliminar" data-idactivovinculado="${avt[p].idactivo_vinculado}" style="cursor: pointer;">
                         <i class="fa-solid fa-trash"></i>
                     </span>`: ''}
                 </li>
@@ -466,6 +506,13 @@ $(document).ready(async () => {
         params.append("idtarea", idtarea)
         const ultimaTareaAgregada = await getDatos(`${host}tarea.controller.php`, params)
         return ultimaTareaAgregada
+    }
+
+    async function obtenerFrecuencias() {
+        const paramsFrecuencia = new URLSearchParams()
+        paramsFrecuencia.append("operation", "obtenerFrecuencias")
+        const frecuencias = await getDatos(`${host}tarea.controller.php`, paramsFrecuencia)
+        return frecuencias
     }
 
     // ************************ FIN SECCCION ***********************************************************
@@ -520,6 +567,7 @@ $(document).ready(async () => {
             await renderTareasSelect()
             await renderSubCategorias()
             await renderUbicacion()
+            const tareasObtenidasAntesDeEliminar = await obtenerTareas()
             //registrarTareasOk = true
 
             //confirmarEliminacionTarea()
@@ -530,37 +578,57 @@ $(document).ready(async () => {
                     console.log("eliminado")
                     console.log("data-tarea-id: ", btn.getAttribute("data-tarea-id"))
                     const idTarea = parseInt(btn.getAttribute("data-tarea-id"));
+                    let procesoEncontrado = false;
                     console.log("ID tarea CLICKEADO: ", idTarea)
-                    const li = btn.closest("li");
-                    li.remove();
-
-                    const activosVinculados = document.querySelectorAll(`li[data-idtarea="${idTarea}"]`);
-                    activosVinculados.forEach(activo => activo.remove());
-
-                    //ELIMINAMOS LA TAREA
-                    const formEliminacionTarea = new FormData();
-                    formEliminacionTarea.append("operation", "eliminarTarea")
-                    const eliminado = await fetch(`${host}tarea.controller.php/${idTarea}`, { method: 'POST', body: formEliminacionTarea })
-                    const elim = await eliminado.json()
-                    console.log("eliminado?: ", elim.eliminado)
-
-                    //CONSULTAMOS LAS TAREAS REGISTRADAS HASTA EL MOMENTO
-                    const tareasRegistradasObtenidas = await obtenerTareas()
-                    const avtObtenidas = await obtenerActivosVinculados()
-                    console.log("tareasRegistradasObtenidas: ", await tareasRegistradasObtenidas) // me quede aca
-                    console.log("avt data hasta el momento: ", avtObtenidas)
-                    //ELIMINAR CONTENIDO DE LAS CAJAS DE TEXTO
-                    formtarea.reset()
-
-                    if (elim.eliminado) {
-                        if (tareasRegistradasObtenidas.length == 0 && avtObtenidas.length == 0) {
-                            console.log("ya no hay tareas");
-                            habilitarCamposActivo(true)
+                    for (let w = 0; w < tareasObtenidasAntesDeEliminar.length; w++) {
+                        if (tareasObtenidasAntesDeEliminar[w].idtarea == idTarea) {
+                            if (tareasObtenidasAntesDeEliminar[w].nom_estado === "proceso") {
+                                alert("ESTA TAREA NO SE PUEDE ELIMINAR POR QUE YA ESTA EN PROCESO");
+                                procesoEncontrado = true;
+                                break;
+                            } else if (tareasObtenidasAntesDeEliminar[w].trabajado === 1) {
+                                alert("ESTA TAREA NO SE PUEDE ELIMINAR POR QUE YA FUE TRABAJADA");
+                                procesoEncontrado = true;
+                                break;
+                            }
                         }
                     }
-                    await renderTareasSelect()
-                    sintareas = true
-                    return
+
+                    if (!procesoEncontrado) {
+                        //console.log("tarea data en else: ", tareasObtenidasAntesDeEliminar[w])
+                        console.log("dataidtara: ", idTarea)
+                        console.log("ELIMINADO JAAAJJASASJJAJASJASD")
+                        const li = btn.closest("li");
+                        li.remove();
+
+                        const activosVinculados = document.querySelectorAll(`li[data-idtarea="${idTarea}"]`);
+                        activosVinculados.forEach(activo => activo.remove());
+
+                        //ELIMINAMOS LA TAREA
+                        const formEliminacionTarea = new FormData();
+                        formEliminacionTarea.append("operation", "eliminarTarea")
+                        const eliminado = await fetch(`${host}tarea.controller.php/${idTarea}`, { method: 'POST', body: formEliminacionTarea })
+                        const elim = await eliminado.json()
+                        console.log("eliminado?: ", elim.eliminado)
+
+                        //CONSULTAMOS LAS TAREAS REGISTRADAS HASTA EL MOMENTO
+                        const tareasRegistradasObtenidas = await obtenerTareas()
+                        const avtObtenidas = await obtenerActivosVinculados()
+                        console.log("tareasRegistradasObtenidas: ", await tareasRegistradasObtenidas) // me quede aca
+                        console.log("avt data hasta el momento: ", avtObtenidas)
+                        //ELIMINAR CONTENIDO DE LAS CAJAS DE TEXTO
+                        formtarea.reset()
+
+                        if (elim.eliminado) {
+                            if (tareasRegistradasObtenidas.length == 0 && avtObtenidas.length == 0) {
+                                console.log("ya no hay tareas");
+                                habilitarCamposActivo(true)
+                            }
+                        }
+                        await renderTareasSelect()
+                        sintareas = true
+                        return
+                    }
                 })
             })
             console.log("sintareas? :", sintareas)
@@ -574,7 +642,7 @@ $(document).ready(async () => {
                         //RENDERIZAR INFO EN LOS INPUTS Y SELECT de acuerdo a la tarea obtenida
                         $q("#txtDescripcionTarea").value = tareaObtenida[0].descripcion
                         $q("#txtIntervaloTarea").value = tareaObtenida[0].intervalo
-                        $q("#txtFrecuenciaTarea").value = tareaObtenida[0].frecuencia
+                        $q("#selectFrecuenciaTarea").value = tareaObtenida[0].idfrecuencia
                         /* $q("#fecha-inicio").value = tareaObtenida[0].fecha_inicio
                         $q("#fecha-vencimiento").value = tareaObtenida[0].fecha_vencimiento
                         $q("#txtIntervaloTarea").value = tareaObtenida[0].cant_intervalo
@@ -597,6 +665,8 @@ $(document).ready(async () => {
                         $q("#btnCancelarTarea").addEventListener("click", () => {
                             formtarea.reset()
                             btnGuardarTarea.style.display = 'block'
+                            $q("#elegirSubCategoriaTarea").disabled = false
+                            $q("#selectFrecuenciaTarea").disabled = false
                             btnsTareaAcciones.innerHTML = ""
                         })
 
@@ -612,7 +682,7 @@ $(document).ready(async () => {
                             formActualizarTarea.append("cant_intervalo", $q("#txtIntervaloTarea").value)
                             formActualizarTarea.append("frecuencia", $q("#txtFrecuenciaTarea").value) */
                             formActualizarTarea.append("intervalo", $q("#txtIntervaloTarea").value)
-                            formActualizarTarea.append("frecuencia", $q("#txtFrecuenciaTarea").value)
+                            formActualizarTarea.append("idfrecuencia", $q("#selectFrecuenciaTarea").value)
                             formActualizarTarea.append("idestado", 8)
 
                             const response = await fetch(`${host}tarea.controller.php`, {
@@ -764,7 +834,7 @@ $(document).ready(async () => {
                 listaActivosAsignados.innerHTML += `
                     <li class="list-group-item d-flex justify-content-between align-items-center mb-3" data-idtarea="${avt.idtarea}">
                         ${avt.descripcion} - Tarea N°${avt.idtarea}
-                        <span class="badge bg-primary rounded-pill btn-eliminar" data-idactivovinculado="${avt.idactivo_vinculado}">
+                        <span class="badge bg-primary rounded-pill btn-eliminar" data-idactivovinculado="${avt.idactivo_vinculado}" style="cursor: pointer;">
                             <i class="fa-solid fa-trash"></i>
                         </span>
                     </li>

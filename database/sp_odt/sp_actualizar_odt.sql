@@ -46,27 +46,15 @@ CREATE PROCEDURE `actualizarDetalleOdt`
 	IN _iddetalleodt INT,
     IN _fechafinal DATETIME,
     IN _tiempoejecucion TIME,
+    IN _intervalos_ejecutados INT,
     IN _clasificacion INT
 )
 BEGIN
 	UPDATE detalle_odt SET
     fecha_final = _fechafinal,
     tiempo_ejecucion = _tiempoejecucion,
+    intervalos_ejecutados = _intervalos_ejecutados,
     clasificacion = _clasificacion
     WHERE iddetalleodt = _iddetalleodt;
 END //
 
-DROP PROCEDURE IF exists `actualizarFechaVencimientoOdt`
-DELIMITER //
-CREATE PROCEDURE `actualizarFechaVencimientoOdt`
-(
-	IN _idodt INT,
-    IN _fecha_vencimiento DATE,
-    IN _hora_vencimiento TIME
-)
-BEGIN
-	UPDATE odt SET
-    fecha_vencimiento = _fecha_vencimiento,
-    hora_vencimiento = _hora_vencimiento
-    WHERE idorden_trabajo = _idodt;
-END //

@@ -61,7 +61,8 @@
                                 <div class="card-header fw-bolder border-0 text-center">
                                     Detalles
                                 </div>
-                                <div class="card-body contenedor-detallesOdtSalida">
+                                <div class="card-body text-center contenedor-detallesOdtSalida">
+                                    <button class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRightEvidencias" id="btn-verDetalles">Ver ejecuciones</button>
                                 </div>
                             </div>
                         </div>
@@ -92,10 +93,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">
-        <h2>Lista de todas las evidencias</h2>
-        <div id="modal-evidencias-container">
 
-        </div>
     </div>
 </div>
 
@@ -107,7 +105,6 @@
 <script src="https://cdn.jsdelivr.net/npm/jkanban@1.2.0/dist/jkanban.min.js"></script>
 <script>
     const idusuario = "<?php echo $_SESSION['login']['idusuario']; ?>"
-    
 </script>
 <script src="http://localhost/CMMS/js/odt/revisar-odt.js"></script>
 

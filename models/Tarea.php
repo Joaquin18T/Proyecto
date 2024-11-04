@@ -5,6 +5,17 @@ require_once 'ExecQuery.php';
 class Tarea extends ExecQuery
 {
 
+  public function obtenerFrecuencias($params = []): array
+  {
+    try {
+      $sp = parent::execQ("CALL obtenerFrecuencias");
+      $sp->execute();
+      return $sp->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+      die($e->getMessage());
+    }
+  } // INTEGRADO ✔
+
   public function obtenerTareasPorPlanTarea($params = []): array
   {
     try {
@@ -27,7 +38,7 @@ class Tarea extends ExecQuery
           $params['descripcion'],      
           $params['idsubcategoria'],
           $params['intervalo'],
-          $params['frecuencia'],
+          $params['idfrecuencia'],
           $params['idestado']
         ),
 
@@ -61,7 +72,7 @@ class Tarea extends ExecQuery
           $params['idtipo_prioridad'],
           $params['descripcion'],
           $params['intervalo'],
-          $params['frecuencia'],
+          $params['idfrecuencia'],
           $params['idestado']
         )
       );
@@ -115,10 +126,11 @@ class Tarea extends ExecQuery
   {
     try {
       $status = false;
-      $sp = parent::execQ("CALL actualizarTareaEstado(?,?)");
+      $sp = parent::execQ("CALL actualizarTareaEstado(?,?,?)");
       $status = $sp->execute(array(
         $params['idtarea'],
-        $params['idestado']
+        $params['idestado'],
+        $params['trabajado']
       ));
       return $status;
     } catch (Exception $e) {

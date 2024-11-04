@@ -1,5 +1,15 @@
 use gamp;
 
+DROP PROCEDURE IF EXISTS `obtenerFrecuencias`
+DELIMITER $$
+CREATE PROCEDURE `obtenerFrecuencias`()
+BEGIN
+	SELECT 
+	*
+    FROM frecuencias;
+END $$
+
+
 DROP PROCEDURE IF EXISTS `verificarPlanInconcluso`
 DELIMITER $$
 CREATE PROCEDURE `verificarPlanInconcluso`(IN _idplantarea INT)
@@ -83,21 +93,25 @@ DROP PROCEDURE IF EXISTS `obtenerTareaPorId`
 DELIMITER $$
 CREATE PROCEDURE `obtenerTareaPorId`(IN _idtarea INT)
 BEGIN
-	SELECT * FROM tareas WHERE idtarea = _idtarea;
+	SELECT 
+			*
+		FROM tareas TAR
+		INNER JOIN frecuencias FRE ON FRE.idfrecuencia = TAR.idfrecuencia
+        WHERE TAR.idtarea = _idtarea;
 END $$
 
 DROP PROCEDURE IF EXISTS `obtenerTareasPorPlanTarea`
 DELIMITER $$
 CREATE PROCEDURE `obtenerTareasPorPlanTarea`(IN _idplantarea INT)
 BEGIN
-	SELECT TAR.idtarea, PT.descripcion as plan_tarea, TAR.idsubcategoria, TP.tipo_prioridad, TAR.descripcion ,ES.nom_estado FROM tareas TAR
+	SELECT TAR.idtarea, TAR.trabajado, TAR.pausado ,PT.descripcion as plan_tarea, TAR.idsubcategoria, TP.tipo_prioridad, TAR.descripcion ,ES.nom_estado FROM tareas TAR
     INNER JOIN plandetareas PT ON TAR.idplantarea = PT.idplantarea -- quitar esta linea luego pq no es necesario mostrar el plan de tareas al que pertenece
     INNER JOIN tipo_prioridades TP ON TAR.idtipo_prioridad = TP.idtipo_prioridad
     INNER JOIN estados ES ON TAR.idestado = ES.idestado
     WHERE TAR.idplantarea = _idplantarea ORDER BY TAR.idtarea DESC;
 END $$
 
--- CALL obtenerTareasPorPlanTarea(16);
+-- CALL obtenerTareasPorPlanTarea(1);
 
 -- DELIMITER $$
 -- CREATE PROCEDURE obtenerRecursosPorTarea(IN _idtarea INT)
@@ -110,15 +124,28 @@ DROP PROCEDURE IF EXISTS `obtenerActivosPorTarea`
 DELIMITER $$
 CREATE PROCEDURE `obtenerActivosPorTarea`(IN _idtarea INT)
 BEGIN
-	SELECT ACTV.idactivo_vinculado, ACT.cod_identificacion,ACT.descripcion,ACT.idactivo,SCAT.subcategoria, MAR.marca, ACT.modelo FROM activos_vinculados_tarea ACTV
+	SELECT ACTV.idactivo_vinculado, ACT.idestado, ACTV.idtarea ,ACT.cod_identificacion,ACT.descripcion,ACT.idactivo,SCAT.subcategoria, MAR.marca, ACT.modelo FROM activos_vinculados_tarea ACTV
     INNER JOIN activos ACT ON ACTV.idactivo = ACT.idactivo
     INNER JOIN subcategorias SCAT ON ACT.idsubcategoria = SCAT.idsubcategoria
     INNER JOIN marcas MAR ON ACT.idmarca = MAR.idmarca
     WHERE ACTV.idtarea = _idtarea;
 END $$
-select * from activos;
+select * from tareas;
 call obtenerActivosPorTarea(2)
 
+DROP PROCEDURE IF EXISTS obtenerEstadoActivoEnOtrasTareas;
+DELIMITER $$
+CREATE PROCEDURE obtenerEstadoActivoEnOtrasTareas(IN _idactivo INT, IN _idtarea INT)
+BEGIN
+    SELECT *
+    FROM activos_vinculados_tarea ACTV
+    INNER JOIN activos ACT ON ACTV.idactivo = ACT.idactivo
+    WHERE ACT.idactivo = 1 
+      AND ACTV.idtarea <> 1  -- Omitir la tarea actual
+      AND ACT.idestado = 2         -- Buscar solo activos en mantenimiento
+    LIMIT 1;
+END $$
+DELIMITER ;
 
 
 DROP PROCEDURE IF EXISTS `obtenerUnActivoVinculadoAtarea`

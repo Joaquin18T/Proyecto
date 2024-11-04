@@ -50,7 +50,7 @@ BEGIN
         LEFT JOIN estados EST ON EST.idestado = TAR.idestado
         WHERE EST.idestado = _idestado;
 END //
-
+use gamp;
 select * from detalle_odt;
 select * from odt;
 DROP PROCEDURE IF EXISTS `obtenerTareasOdt`;
@@ -62,8 +62,6 @@ BEGIN
         GROUP_CONCAT(DISTINCT CONCAT(PERRES.nombres, ' ', PERRES.apellidos) SEPARATOR ', ') AS responsables,
         TAR.descripcion AS tarea,
         ODT.fecha_inicio,
-        ODT.fecha_vencimiento,
-        ODT.hora_vencimiento,
         CONCAT(PERCRE.nombres, ' ', PERCRE.apellidos) AS creador,
         CONCAT(PERCO.nombres, ' ', PERCO.apellidos) as revisado_por,
         TAR.idtarea AS idtarea,
@@ -85,7 +83,7 @@ BEGIN
     LEFT JOIN comentarios_odt CO ON CO.idorden_trabajo = ODT.idorden_trabajo
     LEFT JOIN usuarios USUCO ON USUCO.id_usuario = CO.revisadoPor
     LEFT JOIN personas PERCO ON PERCO.id_persona = USUCO.idpersona
-    GROUP BY ODT.idorden_trabajo, TAR.descripcion, ODT.fecha_inicio, ODT.fecha_vencimiento, 
+    GROUP BY ODT.idorden_trabajo, TAR.descripcion, ODT.fecha_inicio, 
              PERCRE.nombres, PERCRE.apellidos, TAR.idtarea, EST.nom_estado;
 END //
 DELIMITER ;
@@ -107,9 +105,7 @@ BEGIN
         TAR.idtarea as idtarea,
         ACT.descripcion as activo,
         ODT.fecha_inicio,
-        ODT.hora_inicio,
-        ODT.fecha_vencimiento,
-        ODT.hora_vencimiento
+        ODT.hora_inicio
 		from odt ODT
         INNER JOIN tareas TAR ON TAR.idtarea = ODT.idtarea
         INNER JOIN activos_vinculados_tarea AVT ON AVT.idtarea = TAR.idtarea
@@ -128,7 +124,14 @@ CREATE PROCEDURE `obtenerEvidenciasDiagnostico`
 	IN _iddiagnostico INT
 )
 BEGIN
-	SELECT * FROM evidencias_diagnostico WHERE iddiagnostico = _iddiagnostico;
+	SELECT 
+		ED.idevidencias_diagnostico,
+        ED.iddiagnostico,
+        ED.evidencia,
+        DIA.idtipo_diagnostico
+    FROM evidencias_diagnostico ED
+    INNER JOIN diagnosticos DIA ON DIA.iddiagnostico = ED.iddiagnostico
+    WHERE ED.iddiagnostico = _iddiagnostico;
 END //
 
 DROP PROCEDURE IF EXISTS `obtenerDiagnostico`
@@ -193,8 +196,6 @@ BEGIN
         TP.tipo_prioridad,
         ODT.fecha_inicio,
         ODT.hora_inicio,
-        ODT.fecha_vencimiento,
-        ODT.hora_vencimiento,
         
         EST.nom_estado,
         ODT.incompleto
@@ -216,7 +217,7 @@ BEGIN
     INNER JOIN comentarios_odt CO ON CO.idorden_trabajo = ODT.idorden_trabajo
     INNER JOIN usuarios USUCO ON USUCO.id_usuario = CO.revisadoPor
     INNER JOIN personas PERCO ON PERCO.id_persona = USUCO.idpersona
-    GROUP BY ODT.idorden_trabajo, TAR.descripcion, ODT.fecha_inicio, ODT.fecha_vencimiento, 
+    GROUP BY ODT.idorden_trabajo, TAR.descripcion, ODT.fecha_inicio, 
              PERCRE.nombres, PERCRE.apellidos, TAR.idtarea, EST.nom_estado;
 END //
 
