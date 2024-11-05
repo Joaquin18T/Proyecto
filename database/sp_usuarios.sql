@@ -17,6 +17,8 @@ BEGIN
     WHERE US.estado=1;
 END $$
 
+select * from roles;
+
 -- call sp_list_users
 
 DROP PROCEDURE IF EXISTS sp_list_persona_users;
@@ -74,7 +76,7 @@ BEGIN
     INNER JOIN tipo_doc TD ON P.idtipodoc = TD.idtipodoc
     AND (P.num_doc LIKE CONCAT('%', _numdoc ,'%') OR _numdoc IS NULL)
     AND (P.apellidos LIKE CONCAT('%', _dato ,'%') OR P.nombres LIKE CONCAT('%', _dato ,'%') OR _dato IS NULL)
-    WHERE U.asignacion = 7;
+    WHERE U.asignacion = 7 AND R.idrol = 2;
 END $$
 
 select * from usuarios
@@ -135,12 +137,13 @@ CREATE PROCEDURE sp_getUser_by_id
 	IN _idusuario INT
 )
 BEGIN
-	SELECT U.usuario, CONCAT(P.apellidos, ' ', P.nombres) as dato 
+	SELECT U.id_usuario, U.usuario, CONCAT(P.apellidos, ' ', P.nombres) as dato 
     FROM usuarios U
     INNER JOIN personas P ON U.idpersona = P.id_persona
-    WHERE id_usuario = _idusuario;
+    WHERE U.id_usuario = _idusuario;
 END $$
 
+call sp_getUser_by_id(7)
 
 DROP PROCEDURE IF EXISTS sp_update_usuario;
 DELIMITER $$

@@ -57,8 +57,9 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" id="txtFrecuenciaTarea" placeholder="Intervalo" disabled required autocomplete="off">
-                                    <label for="txtFrecuenciaTarea" class="form-label">Frecuencia</label>
+                                    <select class="form-select" id="selectFrecuenciaTarea" disabled required>
+                                    </select>
+                                    <label for="selectFrecuenciaTarea" class="form-label">Frecuencia</label>
                                 </div>
                             </div>
                         </div>
@@ -101,7 +102,7 @@
                     <div class="row">
                         <!--  filtros -->
 
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <div class="form-floating mb-3">
                                 <select class="form-select filter" name="" id="elegirTareaParaActivo" disabled></select>
                                 <label for="elegirTareaParaActivo" class="form-label">Tarea</label>
@@ -110,12 +111,12 @@
                         <!-- <div class="col-md-4 mb-3">
                             <select class="form-select filter" name="" id="elegirSubCategoria" disabled></select>
                         </div> -->
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <div class="form-floating mb-3">
                                 <select class="form-select filter" name="" id="elegirUbicacion" disabled></select>
                                 <label for="elegirUbicacion" class="form-label">Ubicacion</label>
                             </div>
-                        </div>                        
+                        </div>
                     </div>
                 </div>
                 <div class="card-body">

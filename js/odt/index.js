@@ -109,7 +109,7 @@ $(document).ready(async () => {
                         const horaInicioTarea = now.toTimeString().split(" ")[0].substring(0, 5); // Hora en formato HH:MM
                         let fechaHoraInicio = new Date(`${fechaInicioTarea}T${horaInicioTarea}:00-05:00`);
 
-
+                        
                         // SI LA TAREA ESTÁ EN PENDIENTE, REDIRIGIR
                         const idOdt = await registrarOdt(cardId, fechaInicioTarea, horaInicioTarea);
                         console.log(idOdt);
@@ -226,16 +226,9 @@ $(document).ready(async () => {
                             <img src="https://www.iconpacks.net/icons/1/free-user-group-icon-296-thumb.png" class="rounded-circle me-2" alt="Responsables" width="40" height="40"/>
                             <p class="mb-0">${todt.responsables}</p>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <p class="text-muted"> F.I: ${todt.fecha_inicio}</p>
-                            </div>
-                            <div class="col-md-6">
-                                <p class="text-muted"> F.V: ${todt.fecha_vencimiento}</p>
-                            </div>
-                        </div>
+                        <p class="text-muted"><strong>Inició el:</strong> ${todt.fecha_inicio}</p>
                         ${todt.revisado_por ? `<p class="text-muted">Revisado por ${todt.revisado_por}</p>` : ''}
-                        <p class="text-muted">Creada por ${todt.creador}</p>
+                        <p class="text-muted"><strong>Creada por:</strong> ${todt.creador}</p>
                         <p><strong>Activos:</strong> ${todt.activos}</p>
                         <div class="progress mb-2">
                             <div class="progress-bar ${todt.clasificacion === 11 ? 'bg-success' : todt.clasificacion === 9 ? 'bg-warning' : 'bg-danger'}" 
@@ -304,11 +297,9 @@ $(document).ready(async () => {
                         </div>
                         <div class="row">
                             <div class="col-md-6">
-                                <p class="text-muted"> F.I: ${historial.fecha_inicio}</p>
+                                <p class="text-muted"> Fecha de inicio: ${historial.fecha_inicio}</p>
                             </div>
-                            <div class="col-md-6">
-                                <p class="text-muted"> F.V: ${historial.fecha_vencimiento}</p>
-                            </div>
+                            
                         </div>
                         ${historial.revisado_por ? `<p class="text-muted">Revisado por ${historial.revisado_por}</p>` : ''}
                         <p class="text-muted">Creada por ${historial.creador}</p>
@@ -354,11 +345,13 @@ $(document).ready(async () => {
                         // Redirigir solo si la tarea está en proceso y completa
                         window.localStorage.clear();
                         window.localStorage.setItem('idodt', tareaOdtSeleccionada.idorden_trabajo);
+                        window.localStorage.setItem('idtarea', tareaOdtSeleccionada.idtarea)
                         window.location.href = `http://localhost/CMMS/views/odt/orden.php`;
                     }
                 } else if (tareaOdtSeleccionada && tareaOdtSeleccionada.nom_estado === "revision") {
                     window.localStorage.clear();
                     window.localStorage.setItem("idodt", tareaOdtSeleccionada.idorden_trabajo);
+                    window.localStorage.setItem('idtarea', tareaOdtSeleccionada.idtarea)
                     const actualizado = await actualizarEstadoOdt(10, tareaOdtSeleccionada.idorden_trabajo);
                     console.log("actualizado ODT A REVISION?: ", actualizado);
                     window.location.href = `http://localhost/CMMS/views/odt/revisar-odt.php`;
@@ -427,8 +420,8 @@ $(document).ready(async () => {
         formOdt.append("creado_por", idusuario)
         formOdt.append("fecha_inicio", fechainicio)
         formOdt.append("hora_inicio", horainicio)
-        formOdt.append("fecha_vencimiento", null)
-        formOdt.append("hora_vencimiento", null)
+        //formOdt.append("fecha_vencimiento", null)
+        //formOdt.append("hora_vencimiento", null)
         const dataOdt = await fetch(`${host}ordentrabajo.controller.php`, { method: 'POST', body: formOdt })
         const idodt = await dataOdt.json()
         return idodt
@@ -437,11 +430,12 @@ $(document).ready(async () => {
     // ******************************* FIN DE SECCION DE REGISTROS ****************************
 
     // ********************* SECCION DE ACTUALIZAR ******************************************
-    async function actualizarTareaEstado(idtarea, estado) {
+    async function actualizarTareaEstado(idtarea, estado) {        
         const formActualizacion = new FormData()
         formActualizacion.append("operation", "actualizarTareaEstado")
         formActualizacion.append("idtarea", idtarea)
         formActualizacion.append("idestado", estado)
+        formActualizacion.append("trabajado", 1)
         const Factualizado = await fetch(`${host}tarea.controller.php`, { method: 'POST', body: formActualizacion })
         const actualizado = await Factualizado.json()
         return actualizado
@@ -465,10 +459,10 @@ $(document).ready(async () => {
         console.log("VERIFICANDO ODT: ", odt);
 
         // Obtener la fecha y hora actual en horario de Lima
-        let ahora = new Date().toLocaleString("en-US", { timeZone: "America/Lima" });
-        let fechaHoraHoy = new Date(ahora);
+        //let ahora = new Date().toLocaleString("en-US", { timeZone: "America/Lima" });
+        //let fechaHoraHoy = new Date(ahora);
 
-        for (let i = 0; i < odt.length; i++) {
+        /* for (let i = 0; i < odt.length; i++) {
             // Si la fecha y hora de vencimiento existen
             if (odt[i].fecha_vencimiento && odt[i].hora_vencimiento) {
                 // Crear un objeto Date combinando la fecha y la hora de vencimiento
@@ -485,7 +479,7 @@ $(document).ready(async () => {
             } else {
                 console.log(`La ODT con id ${odt[i].idorden_trabajo} no tiene fecha o hora de vencimiento completa.`);
             }
-        }
+        } */
     }
 
     // ******************************* FIN SECCION DE VERIFICACIONES ******************************************

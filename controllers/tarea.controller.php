@@ -18,6 +18,10 @@ if (isset($_GET['operation'])) {
         case 'obtenerTareas':
             echo json_encode($tarea->obtenerTareas());
             break;
+
+        case 'obtenerFrecuencias':
+            echo json_encode($tarea->obtenerFrecuencias());
+            break;
     }
 }
 
@@ -32,7 +36,7 @@ if (isset($_POST['operation'])) {
                 "descripcion"               => $_POST["descripcion"],
                 "idsubcategoria"            => $_POST["idsubcategoria"],
                 "intervalo"                 => $_POST["intervalo"],
-                "frecuencia"                => $_POST["frecuencia"],
+                "idfrecuencia"                => $_POST["idfrecuencia"],
                 "idestado"                  => $_POST["idestado"],
             ];
 
@@ -43,7 +47,8 @@ if (isset($_POST['operation'])) {
         case 'actualizarTareaEstado':
             $datosEnviar = [
                 "idtarea"  => $_POST["idtarea"],
-                "idestado" => $_POST["idestado"]
+                "idestado" => $_POST["idestado"],
+                "trabajado" => $_POST["trabajado"]
             ];
             $actualizado = $tarea->actualizarTareaEstado($datosEnviar);
             echo json_encode(["actualizado" => $actualizado]);
@@ -64,7 +69,7 @@ if (isset($_POST['operation'])) {
                 "idtipo_prioridad"  => $_POST["idtipo_prioridad"],
                 "descripcion"       => $_POST["descripcion"],
                 "intervalo"                 => $_POST["intervalo"],
-                "frecuencia"                => $_POST["frecuencia"],
+                "idfrecuencia"                => $_POST["idfrecuencia"],
                 "idestado"          => $_POST["idestado"],
             ];
             $actualizado = $tarea->actualizarTarea($datosEnviar);

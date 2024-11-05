@@ -39,9 +39,7 @@ if (isset($_POST['operation'])) {
         "idtarea"   => $_POST["idtarea"],
         "creado_por"     => $_POST["creado_por"],
         "fecha_inicio"              => $_POST["fecha_inicio"],
-        "hora_inicio"               => $_POST["hora_inicio"],
-        "fecha_vencimiento"         => $_POST["fecha_vencimiento"],
-        "hora_vencimiento"          => $_POST["hora_vencimiento"],
+        "hora_inicio"               => $_POST["hora_inicio"]
       ];
 
       $id = $ordentrabajo->add($datosEnviar);
@@ -52,6 +50,7 @@ if (isset($_POST['operation'])) {
       $id = -1;
       $datosEnviar = [
         "idodt"             => $_POST["idodt"],
+        "intervalos_ejecutados" => $_POST["intervalos_ejecutados"],
         "clasificacion"     => $_POST["clasificacion"]
       ];
 
@@ -102,26 +101,18 @@ if (isset($_POST['operation'])) {
 
     case 'actualizarDetalleOdt':
       $datosEnviar = [
-        "iddetalleodt"      => $_POST["iddetalleodt"],
-        "fechafinal"        => $_POST["fechafinal"],
-        "tiempoejecucion"   => $_POST["tiempoejecucion"],
-        "clasificacion"     => $_POST["clasificacion"],
+        "iddetalleodt"          => $_POST["iddetalleodt"],
+        "fechafinal"            => $_POST["fechafinal"],
+        "tiempoejecucion"       => $_POST["tiempoejecucion"],
+        "intervalos_ejecutados" => $_POST["intervalos_ejecutados"],
+        "clasificacion"         => $_POST["clasificacion"],
       ];
 
       $actualizado = $ordentrabajo->actualizarDetalleOdt($datosEnviar);
       echo json_encode(["actualizado" => $actualizado]);
       break;
 
-    case 'actualizarFechaVencimientoOdt':
-      $datosEnviar = [
-        "idodt"                     => $_POST["idodt"],
-        "fecha_vencimiento"         => $_POST["fecha_vencimiento"],
-        "hora_vencimiento"          => $_POST["hora_vencimiento"],
-      ];
-
-      $actualizado = $ordentrabajo->actualizarFechaVencimientoOdt($datosEnviar);
-      echo json_encode(["actualizado" => $actualizado]);
-      break;
+    
 
     case 'eliminarOdt':
       $path = isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : '/';

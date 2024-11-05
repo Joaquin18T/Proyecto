@@ -59,15 +59,13 @@ class OrdenTrabajo extends ExecQuery
     public function add($params = []): int
     {
         try {
-            $cmd = parent::execQ("call registrar_odt(@idordentrabajo,?,?,?,?,?,?)");
+            $cmd = parent::execQ("call registrar_odt(@idordentrabajo,?,?,?,?)");
             $cmd->execute(
                 array(
                     $params['idtarea'],
                     $params['creado_por'],
                     $params['fecha_inicio'],
-                    $params['hora_inicio'],
-                    $params['fecha_vencimiento'],
-                    $params['hora_vencimiento']
+                    $params['hora_inicio']
                 )
             );
             $response = parent::execQuerySimple("SELECT @idordentrabajo as idordentrabajo")->fetch(PDO::FETCH_ASSOC);
@@ -81,10 +79,11 @@ class OrdenTrabajo extends ExecQuery
     public function registrarDetalleOdt($params = []): int
     {
         try {
-            $cmd = parent::execQ("call registrarDetalleOdt(@iddetalleodt,?,?)");
+            $cmd = parent::execQ("call registrarDetalleOdt(@iddetalleodt,?,?,?)");
             $cmd->execute(
                 array(
                     $params['idodt'],
+                    $params['intervalos_ejecutados'],
                     $params['clasificacion']
                 )
             );
@@ -186,11 +185,12 @@ class OrdenTrabajo extends ExecQuery
     {
         try {
             $status = false;
-            $cmd = parent::execQ("CALL actualizarDetalleOdt(?,?,?,?)");
+            $cmd = parent::execQ("CALL actualizarDetalleOdt(?,?,?,?,?)");
             $status = $cmd->execute(array(
                 $params['iddetalleodt'],
                 $params['fechafinal'],
                 $params['tiempoejecucion'],
+                $params['intervalos_ejecutados'],
                 $params['clasificacion']
             ));
             return $status;

@@ -24,7 +24,7 @@ CREATE PROCEDURE `actualizarTarea`(
     IN _idtipo_prioridad INT,
     IN _descripcion VARCHAR(200),     
     IN _intervalo		INT,
-    IN _frecuencia		VARCHAR(30),
+    IN _idfrecuencia		INT,
     IN _idestado INT)
 BEGIN
     UPDATE tareas 
@@ -32,13 +32,14 @@ BEGIN
 		idtipo_prioridad = _idtipo_prioridad,
 		descripcion = _descripcion,
         intervalo	= _intervalo,
-        frecuencia	= _frecuencia,
+        idfrecuencia	= _idfrecuencia,
         idestado = _idestado, 
         update_at = NOW()
     WHERE idtarea = _idtarea;
     
     SELECT MAX(idtarea) as idactualizado FROM tareas;
 END $$
+
 
 
 CALL actualizarTarea(2,2, 'linkin park', '', '', 2, 'mes', 1);
@@ -102,14 +103,18 @@ DELIMITER //
 CREATE PROCEDURE `actualizarTareaEstado`
 (
 	IN _idtarea INT,
-    IN _idestado INT
+    IN _idestado INT,
+    IN _trabajado BOOLEAN
 )
 BEGIN
 	UPDATE tareas 
     SET idestado = _idestado,
+		trabajado = _trabajado,
         update_at = NOW()
     WHERE idtarea = _idtarea;
 END //
+
+call actualizarTareaEstado(2, 9, true)
 
 -- *********************************************************************
 DROP PROCEDURE IF EXISTS `actualizarTareaEstadoTrabajado`

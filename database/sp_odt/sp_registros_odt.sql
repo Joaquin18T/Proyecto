@@ -7,9 +7,7 @@ CREATE PROCEDURE `registrar_odt`
 	IN _idtarea INT,
     IN _creado_por INT,
     IN _fecha_inicio DATE,
-    IN _hora_inicio	TIME,
-    IN _fecha_vencimiento DATE,
-    IN _hora_vencimiento	TIME
+    IN _hora_inicio	TIME
 )
 BEGIN
 	-- Declaracion de variables
@@ -21,8 +19,8 @@ BEGIN
         SET existe_error = 1;
         END;
         
-	INSERT INTO odt (idtarea, creado_por, fecha_inicio, hora_inicio, fecha_vencimiento, hora_vencimiento)
-		VALUES (_idtarea, _creado_por, _fecha_inicio, _hora_inicio, _fecha_vencimiento, _hora_vencimiento);
+	INSERT INTO odt (idtarea, creado_por, fecha_inicio, hora_inicio)
+		VALUES (_idtarea, _creado_por, _fecha_inicio, _hora_inicio);
         
 	IF existe_error = 1 THEN
 		SET _idorden_trabajo = -1;
@@ -109,6 +107,7 @@ CREATE PROCEDURE `registrarDetalleOdt`
 (
 	OUT _iddetalleodt 		INT,
 	IN _idorden_trabajo 	INT,
+    IN _intervalos_ejecutados INT,
     IN _clasificacion		INT
 )
 BEGIN
@@ -121,8 +120,8 @@ BEGIN
         SET existe_error = 1;
         END;
         
-	INSERT INTO detalle_odt (idorden_trabajo, clasificacion)	
-		VALUES (_idorden_trabajo, _clasificacion);
+	INSERT INTO detalle_odt (idorden_trabajo, intervalos_ejecutados, clasificacion)	
+		VALUES (_idorden_trabajo, _intervalos_ejecutados, _clasificacion);
         
 	IF existe_error = 1 THEN
 		SET _iddetalleodt = -1;
