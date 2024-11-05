@@ -26,8 +26,42 @@ document.addEventListener("DOMContentLoaded", () => {
     data.forEach((x) => {
       const element = createOption(x.idsubcategoria, x.subcategoria);
       $selector("#subcategoria").appendChild(element);
+      $selector("#sb-subcategoria").appendChild(element);
     });
   })();
+
+  $selector("#sb-subcategoria").addEventListener("change",async()=>{
+    const id = $selector("#sb-subcategoria").value;
+    await getMarcasSB(id);
+  });
+
+  async function getMarcasSB(id){
+    const params = new URLSearchParams();
+    params.append("operation", "getMarcasBySubcategoria");
+    params.append("idsubcategoria", parseInt(id));
+    const data = await getDatos(
+      `${host}subcategoria.controller.php`,
+      params
+    );
+    const elementsSelect = $selector("#sb-marca");
+    for (let i = elementsSelect.childElementCount - 1; i > 0; i--) {
+      elementsSelect.remove(i);
+    }
+
+    data.forEach((x) => {
+      const option = createOption(x.idmarca, x.marca);
+      elementsSelect.appendChild(option);
+    });
+  }
+
+  $selector("#sb-marca").addEventListener("change",()=>{
+    let valorMarca = $selector("#sb-marca").value;
+    if(valorMarca!==""){
+      $selector("#registerAceptar").disabled = false;
+    }else{
+      $selector("#registerAceptar").disabled = true;
+    }
+  });
 
   (async () => {
     const params = new URLSearchParams();
@@ -330,6 +364,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if(value>0){
       console.log("puedes registar");
       localStorage.setItem("cantidad", value);
+      localStorage.setItem("subcategoria", $selector("#sb-subcategoria").value);
+      localStorage.setItem("marca", $selector("#sb-marca").value);
       $selector("#cantidadEnviar").value = 0;
       window.location.href = "http://localhost/CMMS/views/activo/register-activo";
       

@@ -38,7 +38,7 @@ CREATE TABLE `activos` (
   CONSTRAINT `fk_actsubcategoria` FOREIGN KEY (`idsubcategoria`) REFERENCES `subcategorias` (`idsubcategoria`),
   CONSTRAINT `fk_idestado` FOREIGN KEY (`idestado`) REFERENCES `estados` (`idestado`),
   CONSTRAINT `fkidmarca` FOREIGN KEY (`idmarca`) REFERENCES `marcas` (`idmarca`)
-) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=69 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `activos` */
 
@@ -86,7 +86,23 @@ insert  into `activos`(`idactivo`,`idsubcategoria`,`idmarca`,`idestado`,`modelo`
 (43,2,1,1,'BG 3','C5YASF43543ASDA','2024-10-31','Laptop LG BG 3','{\"ram\":\"64\",\"color\":\"negro\",\"SO\":\"Windows\",\"Windows\":\"11\",\"Pantalla\":\"144 hz\"}'),
 (44,2,1,1,'BG 3','F546MLAS43KASDS','2024-10-31','Laptop LG BG 3','{\"ram\":\"64\",\"color\":\"negro\",\"SO\":\"Windows\",\"Windows\":\"11\",\"Pantalla\":\"144 hz\"}'),
 (45,1,1,1,'AS 4','ADBJASKHRK34JSD','2024-10-31','Computadora LG AS 4','{\"SO\":\"Linux\",\"Ram\":\"164\"}'),
-(46,1,1,1,'AS 4','F345435SDFDSFSF','2024-10-31','Computadora LG AS 4','{\"SO\":\"Linux\",\"Ram\":\"164\"}');
+(46,1,1,1,'AS 4','F345435SDFDSFSF','2024-10-31','Computadora LG AS 4','{\"SO\":\"Linux\",\"Ram\":\"164\"}'),
+(53,7,4,1,'D4R','JGFHGHJGFSDHGFS','2024-11-02','Eq Caterpillar D4R','{\"peso\":\"10\"}'),
+(54,4,5,1,'SE','MHFUSDGFDGSDFSD','2024-11-02','Generador Einhell','{\"peso\":\"3 T\"}'),
+(55,6,3,1,'SR ','JFJSGFSDF345345','2024-11-02','Camioneta Nissan','{\"color\":\"gris\",\"asientos\":\"2\"}'),
+(56,11,1,1,'RF','W45S-ADAS34-SDS','2024-11-02','Teclado LG RF','{\"tipo\":\"mecanico\",\"idioma\":\"ingles\"}'),
+(57,4,5,1,'FGT','DASYU435BMADASD','2024-11-02','Generador Einhell','{\"peso\":\"5T\"}'),
+(58,4,5,1,'AS 6','ASDASDSADADADAD','2024-11-02','Generador Einhell AS 6','{\"color\":\"verde\"}'),
+(59,5,6,1,'VAF','FSWEHI3U4YIUWFS','2024-11-02','Nisaan Vaf','{\"color\":\"negro\"}'),
+(60,5,6,1,'DR','NKJAJFGFJGFSDFS','2024-11-02','Hyundai DR','{\"clor\":\"verde\"}'),
+(61,5,6,1,'SE','FDSGGADJGGJFGKF','2024-11-02','hyundai SE','{\"color\":\"verde\"}'),
+(62,11,1,1,'R5','D4ASD-435436-AS','2024-11-03','Teclado LG R5','{\"tipo\":\"mecanico\"}'),
+(63,11,1,1,'R6','D-4RSADSA-DSDAS','2024-11-03','Teclado LG R6','{\"tipo\":\"membrana\"}'),
+(64,2,1,1,'SW 3','ASD3-ASD3-ASDWE','2024-11-04','Laptop LG SW 3','{\"Pantalla\":\"15\",\"Duracion\":\"10\",\"Resolucion\":\"1920x1080\",\"asda\":\"asdasda\"}'),
+(65,2,1,1,'CD S','SDFE-ASDE-ASDKE','2024-11-04','Laptop LG CD S','{\"Pantalla\":\"15\",\"Duracion\":\"10\",\"Resolucion\":\"1920x1080\"}'),
+(66,4,5,1,'DDA','SF5D-FKLS-5KD9F','2024-11-04','DDA Einhell','{\"Duracion\":\"24\",\"asdas\":\"ssss\",\"Combustible\":\"Gasolina\",\"Potencia\":\"250\"}'),
+(67,4,5,1,'SE','D4DF-DK4O-5KDDK','2024-11-04','Einhell SE','{\"Combustible\":\"Gasolina\",\"Potencia\":\"250\",\"Duracion\":\"24\"}'),
+(68,3,4,1,'FR 4G','F546-ASD4-5JFES','2024-11-04','Caterpillar FR 4G','{\"Capacidad\":\"10\",\"Consumo\":\"17\",\"Tipo\":\"Hidraulica\"}');
 
 /*Table structure for table `activos_responsables` */
 
@@ -294,6 +310,33 @@ CREATE TABLE `diagnosticos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `diagnosticos` */
+
+/*Table structure for table `especificacionesdefecto` */
+
+DROP TABLE IF EXISTS `especificacionesdefecto`;
+
+CREATE TABLE `especificacionesdefecto` (
+  `idespecificacionD` int(11) NOT NULL AUTO_INCREMENT,
+  `idsubcategoria` int(11) NOT NULL,
+  `especificaciones` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`especificaciones`)),
+  PRIMARY KEY (`idespecificacionD`),
+  UNIQUE KEY `uk_subcategoria_especificacion` (`idsubcategoria`,`especificaciones`) USING HASH
+) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+/*Data for the table `especificacionesdefecto` */
+
+insert  into `especificacionesdefecto`(`idespecificacionD`,`idsubcategoria`,`especificaciones`) values 
+(12,1,'{\"Procesador\":\"Intel i9\", \"RAM\":\"32GB\", \"Disco\":\"solido\"}'),
+(13,2,'{\"Pantalla\":\"15 pulgadas\", \"Duracion bateria\": \"10 horas\", \"Resolucion\":\"1920x1080\"}'),
+(23,3,'{\"Capacidad\": \"10 T\", \"Consumo\": \"17 kW\", \"Tipo motor\": \"Hidraulica\"}'),
+(24,4,'{\"Combustible\":\"Gasolina\", \"Potencia\": \"250 kW\", \"Duracion\": \"24 horas\"}'),
+(25,5,'{\"HP\": \"100\", \"Tipo Motor\": \"Diesel\", \"Transmision\": \"Manual\"}'),
+(26,6,'{\"Combustible\":\"Gasolina\", \"HP\":\"150\", \"A. fabricacion\": \"2019\"}'),
+(27,7,'{\"Material\":\"Plastico\",\"Capacidad\":\"50 piezas por minuto\", \"Velocidad\":\"2 ciclos por minuto\"}'),
+(28,8,'{\"Articulaciones\":\"3\", \"Capacidad\":\"500 kg\", \"Tipo\":\"Montaje\"}'),
+(29,9,'{\"Resolucion\":\"600x600\", \"Velocidad\":\"40 ppm\", \"Conectividad\":\"Wifi\"}'),
+(30,10,'{\"Resolucion\":\"1920x1080\",\"Tamaño\":\"23\\\"\", \"Frecuencia\":\"120 Hz\"}'),
+(31,11,'{\"Tipo\":\"Membrana\", \"Conectividad\":\"Inalambrico\", \"Teclado numerico\":\"No\"}');
 
 /*Table structure for table `estados` */
 
@@ -1797,6 +1840,22 @@ DELIMITER $$
 BEGIN
 	SELECT idbaja_activo, fecha_baja, motivo, coment_adicionales, ruta_doc, aprobacion FROM bajas_activo
     WHERE idactivo = _idactivo;
+END */$$
+DELIMITER ;
+
+/* Procedure structure for procedure `sp_default_especificacion` */
+
+/*!50003 DROP PROCEDURE IF EXISTS  `sp_default_especificacion` */;
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_default_especificacion`(
+	IN _idsubcategoria INT
+)
+BEGIN
+	SELECT especificaciones FROM 
+    especificacionesdefecto 
+    WHERE idsubcategoria = _idsubcategoria;
 END */$$
 DELIMITER ;
 

@@ -181,6 +181,18 @@ INSERT INTO notificaciones_activos(idactivo_resp, tipo, mensaje) VALUES
 	(9,'Asignacion', 'Te han asignado un nuevo activo'),
 	(10,'actualizar estado', 'Se ha actualizado el estado del activo');
         
+INSERT INTO especificacionesDefecto(idsubcategoria, especificaciones) VALUES
+	(1,'{"Procesador":"Intel i9", "RAM":"32GB", "Disco":"solido"}'),
+	(2,'{"Pantalla":"15 pulgadas", "Duracion bateria": "10 horas", "Resolucion":"1920x1080"}'),
+	(3,'{"Capacidad": "10 T", "Consumo": "17 kW", "Tipo motor": "Hidraulica"}'),
+	(4,'{"Combustible":"Gasolina", "Potencia": "250 kW", "Duracion": "24 horas"}'),
+	(5,'{"HP": "100", "Tipo Motor": "Diesel", "Transmision": "Manual"}'),
+	(6,'{"Combustible":"Gasolina", "HP":"150", "A. fabricacion": "2019"}'),
+	(7,'{"Material":"Plastico","Capacidad":"50 piezas por minuto", "Velocidad":"2 ciclos por minuto"}'),
+	(8,'{"Articulaciones":"3", "Capacidad":"500 kg", "Tipo":"Montaje"}'),
+	(9,'{"Resolucion":"600x600", "Velocidad":"40 ppm", "Conectividad":"Wifi"}'),
+	(10,'{"Resolucion":"1920x1080","Tamaño":"23\\"", "Frecuencia":"120 Hz"}'),
+	(11,'{"Tipo":"Membrana", "Conectividad":"Inalambrico", "Teclado numerico":"No"}');
 
 -- SELECT VERSION(); -- saber la version de mysql
 -- *************************** INSERCIONES DE ROYER ********************************

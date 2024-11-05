@@ -9,7 +9,10 @@ require_once '../header.php'
   <div class="card p-0">
     <div class="card-header d-flex justify-content-between m-0">
       <div class="mb-0 pt-1">Registrar Activos</div>
-      <button class="btn btn-sm btn-success" type="button" id="showSB">Agregar Cods. Identf.</button>
+      <div>
+        <a href="http://localhost/CMMS/views/activo/" class="btn btn-sm btn-warning">Volver</a>
+        <button class="btn btn-sm btn-success" type="button" id="showSB">Agregar Cods. Identf.</button>
+      </div>
     </div>
     <div class="card-body" id="list-register-activos">
 

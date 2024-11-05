@@ -120,7 +120,14 @@ CREATE TABLE activos
     -- CONSTRAINT uk_activo UNIQUE(idsubcategoria, idmarca, modelo) -- 10/10
 )ENGINE=INNODB;
 
--- TABLA AUN POR VERIFICAR
+CREATE TABLE especificacionesDefecto
+(
+	idespecificacionD	INT AUTO_INCREMENT PRIMARY KEY,
+    idsubcategoria		INT NOT NULL,
+    especificaciones 	JSON NOT NULL,
+    CONSTRAINT uk_subcategoria_especificacion UNIQUE(idsubcategoria, especificaciones)
+)ENGINE=INNODB;
+
 CREATE TABLE solicitudes_activos
 (
 	idsolicitud			INT AUTO_INCREMENT PRIMARY KEY,
