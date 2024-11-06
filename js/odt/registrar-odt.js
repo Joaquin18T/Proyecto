@@ -21,6 +21,9 @@ $(document).ready(async () => {
     let iddiagnosticoGenerado = -1
     let hayDiagnostico = false
     let idrolusuario = -1
+    let activos = ""
+    let tarea = ""
+    let idrespNot = ""   // responsable asignado a la notificacion
     //CONTAINERS DIV
     const contenedorRegistrarOdt = $q("#contenedor-registrar-odt")
     const previewContainer = $q("#preview-container")
@@ -46,6 +49,8 @@ $(document).ready(async () => {
     await verificarRolUsuario()
     await filtrarUsuariosList()
     await renderResponsablesOdt()
+    await obtenerTareaPorId(idtareagenerada)
+    await buscarNotificacionPorOdt()
     //await verificarEvidenciasRegistradas()
     //await obtenerActivosPorTarea()
     //sestadoBotonConfirmarAsignacion()
@@ -76,6 +81,27 @@ $(document).ready(async () => {
         params.append("idodt", window.localStorage.getItem("idodt"))
         const responsables = getDatos(`${host}responsablesAsignados.controller.php`, params)
         return responsables
+    }
+
+    async function obtenerTareaPorId(idtarea) {
+        const params = new URLSearchParams()
+        params.append("operation", "obtenerTareaPorId")
+        params.append("idtarea", idtarea)
+        const ultimaTareaAgregada = await getDatos(`${host}tarea.controller.php`, params)
+        activos = ultimaTareaAgregada[0]?.activos
+        tarea = ultimaTareaAgregada[0]?.descripcion //tarea
+        console.log("tarea obtenida: ", ultimaTareaAgregada)
+        return ultimaTareaAgregada
+    }
+
+    async function buscarNotificacionPorOdt() {
+        const params = new URLSearchParams()
+        params.append("operation", "buscarNotificacionPorOdt")
+        params.append("idodt", idodtgenerada)
+        const notiObtenida = await getDatos(`${host}notificacion.controller.php`, params)
+        idrespNot = notiObtenida[0]?.idresp
+        console.log("notificacion obtenida: ", notiObtenida)
+        return notiObtenida
     }
 
     // ************************************ FIN DE FUNCIONES PARA OBTENER DATOS ******************************
@@ -282,12 +308,25 @@ $(document).ready(async () => {
 
     btnCrearOdt.addEventListener("click", async () => {
         habilitarBeforeUnload = false;
+        const responsablesAsignados = await obtenerResponsablesAsignados()
+        console.log("responsablesAsignados: ", responsablesAsignados)
         //VERIFICAACION        
         //const actualizado = await actualizarDiagnosticoEntrada()
         //console.log("actualizado diagnostico:? ", actualizado)
 
-        const odtActualizado = await actualizarEstadoOdt()
+        const odtActualizado = await actualizarEstadoOdt(responsablesAsignados)
         console.log("odt actualizado?: ", odtActualizado)
+        if (responsablesAsignados.length > 0) {
+            for (let r = 0; r < responsablesAsignados.length; r++) {
+                if (responsablesAsignados[r].idresponsable == idrespNot) {
+                    showToast(`Ya se le ha asignado una notificacion al usuario ${idrespNot}.`, 'ERROR', 6000);
+                    break;
+                } else {
+                    const notiCreada = await registrarNotificacionMantenimiento(tarea, activos, responsablesAsignados[r].idresponsable, "se le ha asignado una nueva orden de trabajo.")
+                    console.log("NOTIFICACION CREADA?: ", notiCreada)
+                }
+            }
+        }
         if (odtActualizado?.actualizado) {
             window.localStorage.clear()
             window.location.href = 'http://localhost/CMMS/views/odt'
@@ -345,7 +384,18 @@ $(document).ready(async () => {
         }
     }
 
-
+    async function registrarNotificacionMantenimiento(tarea, activos, idresp, mensaje) {
+        const paramsRegistro = new FormData()
+        paramsRegistro.append("operation", "agregarNotificacionOdt")
+        paramsRegistro.append("idodt", idodtgenerada)
+        paramsRegistro.append("tarea", tarea)
+        paramsRegistro.append("activos", activos)
+        paramsRegistro.append("idresp", idresp)
+        paramsRegistro.append("mensaje", mensaje)
+        const FnotificacionCreada = await fetch(`${host}notificacion.controller.php`, { method: 'POST', body: paramsRegistro })
+        const notificacionCreada = await FnotificacionCreada.json()
+        return notificacionCreada
+    }
 
     // *************************** SECCION DE ELIMIACIONES *******************************************
     async function eliminarLiResponsable() {
@@ -388,12 +438,7 @@ $(document).ready(async () => {
 
     // ******************************** SECCION DE ACTUALIZACIONES ******************************************
 
-    async function actualizarEstadoOdt() {
-
-
-        const responsablesAsignados = await obtenerResponsablesAsignados()
-        console.log("responsablesAsignados: ", responsablesAsignados)
-
+    async function actualizarEstadoOdt(responsablesAsignados) {
         const formActualizacion = new FormData()
         formActualizacion.append("operation", "actualizarBorradorOdt")
         formActualizacion.append("idordentrabajo", window.localStorage.getItem("idodt"))

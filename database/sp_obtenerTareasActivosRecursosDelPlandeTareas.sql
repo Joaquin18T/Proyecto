@@ -94,10 +94,23 @@ DELIMITER $$
 CREATE PROCEDURE `obtenerTareaPorId`(IN _idtarea INT)
 BEGIN
 	SELECT 
-			*
+			TAR.idtarea,
+            TAR.descripcion,
+            FRE.frecuencia,
+            TAR.idestado,
+            TAR.idfrecuencia,
+            TAR.idplantarea,
+            TAR.idsubcategoria,
+            TAR.idtipo_prioridad,
+            TAR.intervalo,
+            TAR.pausado,
+            TAR.trabajado,
+            GROUP_CONCAT(DISTINCT ACT.descripcion SEPARATOR ', ') AS activos
 		FROM tareas TAR
 		INNER JOIN frecuencias FRE ON FRE.idfrecuencia = TAR.idfrecuencia
-        WHERE TAR.idtarea = _idtarea;
+		LEFT JOIN activos_vinculados_tarea AVT ON AVT.idtarea = TAR.idtarea
+		LEFT JOIN activos ACT ON ACT.idactivo = AVT.idactivo
+        WHERE TAR.idtarea = 1;
 END $$
 
 DROP PROCEDURE IF EXISTS `obtenerTareasPorPlanTarea`

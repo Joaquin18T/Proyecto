@@ -46,6 +46,15 @@ document.addEventListener("DOMContentLoaded", () => {
     //console.log(idusuario);
   }
 
+
+  async function listNotificationsMantenimiento(idusu) {
+    const params = new URLSearchParams();
+    params.append("operation", "listNotificationsMantenimiento");
+    params.append("idusuario", idusu);
+    const data = await getDatos(`${host}notificacion.controller.php`, params);
+    return data
+  }
+
   (async () => {
     const id = await getIdUser();
     const params = new URLSearchParams();
@@ -54,6 +63,8 @@ document.addEventListener("DOMContentLoaded", () => {
     params.append("idnotificacion", "");
 
     const data = await getDatos(`${host}notificacion.controller.php`, params);
+    const notisMantenimiento = await listNotificationsMantenimiento(id)
+    console.log("notisMantenimiento: ", notisMantenimiento)
     console.log("notify", data);
     if (data.length > 0) {
       const dataResp = await dataRespNof(data[0].idusuario);
@@ -83,11 +94,36 @@ document.addEventListener("DOMContentLoaded", () => {
           x.fecha_creacion,
           x.idnotificacion_activo,
           x.idactivo,
-          223
+          2
         );
       });
     }
+    if (notisMantenimiento.length > 0) {
+      notisMantenimiento.forEach((x, i) => {
+        if (i < 4) {
+          createNotificacion(
+            0,
+            x.mensaje,
+            "Asignacion a orden de trabajo.",
+            x.fecha_creacion,
+            x.idnotificacion_mantenimiento,
+            0,
+            1
+          )
+        }
+        createNotificacion(
+          0,
+          x.mensaje,
+          "Asignacion a orden de trabajo.",
+          x.fecha_creacion,
+          x.idnotificacion_mantenimiento,
+          0,
+          2
+        )
+      })
+    }
     showPreviewDetailt();
+
   })();
 
   /**
@@ -178,10 +214,10 @@ document.addEventListener("DOMContentLoaded", () => {
                   <p>- Descripcion: ${x.descripcion}</p>
                   <p>- Ubicacion: ${x.ubicacion}</p>
                   <p>- Condicion del Equipo: ${replaceWords(
-                    x.condicion_equipo,
-                    ["<p>", "</p>"],
-                    ""
-                  )}</p>
+        x.condicion_equipo,
+        ["<p>", "</p>"],
+        ""
+      )}</p>
                   <p>- Fecha Asignacion : ${x.fecha_asignacion}</p>
                   <br>
                   <p>- Fecha Creacion : ${x.fecha_creacion}</p>
@@ -246,7 +282,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const dataActivo = await getDataActivo(idactivo);
       //console.log(dataActivo);
       element = `
-        <div class="card sb-idnotificacion" data-idnof_activo=${idnof_activo}>
+        <div class="card sb-idnotificacion mb-3" data-idnof_activo=${idnof_activo}>
           <div class="card-body">
             <h5 class="card-title">${mensaje}</h5>
             <h6 class="card-subtitle mb-2 text-body-secondary">Desc Act: ${descripcion}</h6>
@@ -284,10 +320,10 @@ document.addEventListener("DOMContentLoaded", () => {
   );
 
   //Obtiene los datos del activo mediante una id
-  async function getDataActivo(idactivo){
+  async function getDataActivo(idactivo) {
     const params = new URLSearchParams();
-    params.append("operation","getById");
-    params.append("idactivo",idactivo);
+    params.append("operation", "getById");
+    params.append("idactivo", idactivo);
 
     const data = await getDatos(`${host}activo.controller.php`, params);
     return data[0];
@@ -300,13 +336,13 @@ document.addEventListener("DOMContentLoaded", () => {
     offCanvas.show();
   });
 
-  function showDataWSidebar(){
+  function showDataWSidebar() {
     const datanofSB = document.querySelectorAll(".sb-idnotificacion");
-    datanofSB.forEach(x=>{
-      x.addEventListener("click",async()=>{
+    datanofSB.forEach(x => {
+      x.addEventListener("click", async () => {
         const idnof = parseInt(x.getAttribute("data-idnof_activo"));
         //console.log("id nof SB", idnof);
-        
+
         const detail = await showDetail(idnof);
         console.log("detalle nof sb", detail);
         const sidebar = bootstrap.Offcanvas.getOrCreateInstance(

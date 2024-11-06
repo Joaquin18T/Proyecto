@@ -2,9 +2,11 @@
 
 require_once 'ExecQuery.php';
 
-class Notificacion extends ExecQuery{
-  public function listNotifications($params=[]):array{
-    try{
+class Notificacion extends ExecQuery
+{
+  public function listNotifications($params = []): array
+  {
+    try {
 
       $cmd = parent::execQ('CALL sp_list_notificacion(?)');
       $cmd->execute(
@@ -13,13 +15,30 @@ class Notificacion extends ExecQuery{
         )
       );
       return $cmd->fetchAll(PDO::FETCH_ASSOC);
-    }catch(Exception $e){
+    } catch (Exception $e) {
       die($e->getMessage());
     }
   }
 
-  public function detalleNotificaciones($params=[]):array{
-    try{
+  public function listNotificationsMantenimiento($params = []): array
+  {
+    try {
+
+      $cmd = parent::execQ('CALL sp_list_notificacion_mantenimiento(?)');
+      $cmd->execute(
+        array(
+          $params['idusuario']
+        )
+      );
+      return $cmd->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+      die($e->getMessage());
+    }
+  }
+
+  public function detalleNotificaciones($params = []): array
+  {
+    try {
       $cmd = parent::execQ('CALL sp_detalle_notificacion_activo(?)');
       $cmd->execute(
         array(
@@ -27,16 +46,17 @@ class Notificacion extends ExecQuery{
         )
       );
       return $cmd->fetchAll(PDO::FETCH_ASSOC);
-    }catch(Exception $e){
+    } catch (Exception $e) {
       die($e->getMessage());
     }
   }
 
-  public function add($params=[]):bool{
-    try{
-      $status=false;
+  public function add($params = []): bool
+  {
+    try {
+      $status = false;
       $cmd = parent::execQ('CALL sp_add_notificacion_activo(?,?,?,?)');
-      $status=$cmd->execute(
+      $status = $cmd->execute(
         array(
           $params['idactivo_resp'],
           $params['tipo'],
@@ -45,13 +65,51 @@ class Notificacion extends ExecQuery{
         )
       );
       return $status;
-    }catch(Exception $e){
+    } catch (Exception $e) {
       die($e->getMessage());
     }
   }
 
-  public function detalleByEstado($params=[]):array{
-    try{
+  public function agregarNotificacionOdt($params = []): int
+  {
+    try {
+      $cmd = parent::execQ('CALL agregarNotificacionOdt(@idnotificacion_mantenimiento,?,?,?,?,?)');
+      $cmd->execute(
+        array(
+          $params['idodt'],
+          $params['tarea'],
+          $params['activos'],
+          $params['idresp'],
+          $params['mensaje']
+        )
+      );
+      $response = parent::execQuerySimple("SELECT @idnotificacion_mantenimiento as idnotificacion_mantenimiento")->fetch(PDO::FETCH_ASSOC);
+      return (int) $response['idnotificacion_mantenimiento'];
+    } catch (Exception $e) {
+      die($e->getMessage());
+    }
+  }
+
+  public function buscarNotificacionPorOdt($params = []): array
+  {
+    try {
+
+      $cmd = parent::execQ('CALL buscarNotificacionPorOdt(?)');
+      $cmd->execute(
+        array(
+          $params['idodt']
+        )
+      );
+      return $cmd->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+      die($e->getMessage());
+    }
+  }
+
+
+  public function detalleByEstado($params = []): array
+  {
+    try {
       $cmd = parent::execQ('CALL sp_detalle_sol_estado(?)');
       $cmd->execute(
         array(
@@ -59,13 +117,14 @@ class Notificacion extends ExecQuery{
         )
       );
       return $cmd->fetchAll(PDO::FETCH_ASSOC);
-    }catch(Exception $e){
+    } catch (Exception $e) {
       die($e->getMessage());
     }
   }
 
-  public function dataRespNotificacion($params=[]):array{
-    try{
+  public function dataRespNotificacion($params = []): array
+  {
+    try {
       $cmd = parent::execQ("CALL sp_responsable_notificacion(?)");
       $cmd->execute(
         array(
@@ -73,11 +132,10 @@ class Notificacion extends ExecQuery{
         )
       );
       return $cmd->fetchAll(PDO::FETCH_ASSOC);
-    }catch(Exception $e){
+    } catch (Exception $e) {
       die($e->getMessage());
     }
   }
- 
 }
 
 //$not = new Notificacion();
