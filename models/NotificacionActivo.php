@@ -136,6 +136,67 @@ class Notificacion extends ExecQuery
       die($e->getMessage());
     }
   }
+
+  public function NotifDesignacionDetalle($params=[]):array{
+    try{
+      $cmd = parent::execQ("CALL sp_notificacion_designacion_detalle(?)");
+      $cmd->execute(
+        array(
+          $params['idnotificacion']
+        )
+      );
+      return $cmd->fetchAll(PDO::FETCH_ASSOC);
+    }catch(Exception $e){
+      die($e->getMessage());
+      return [];
+    }
+  }
+
+
+  public function NotifiDetalleBajaActivo($params=[]):array{
+    try{
+      $cmd=parent::execQ("CALL sp_notificacion_baja_detalle(?)");
+      $cmd->execute(
+        array(
+          $params['idnotificacion']
+        )
+      );
+      return $cmd->fetchAll(PDO::FETCH_ASSOC);
+    }catch(Exception $e){
+      die($e->getMessage());
+      return [];
+    }
+  }
+
+  public function listNof_wh_IdactivoResp($params=[]):array{
+    try{
+      $cmd = parent::execQ("CALL sp_list_notificacion_wh_idactivo_resp(?)");
+      $cmd->execute(
+        array(
+          $params['accion_responsable']
+        )
+      );
+      return $cmd->fetchAll(PDO::FETCH_ASSOC);
+    }catch(Exception $e){
+      die($e->getMessage());
+      return [];
+    }
+  }
+
+  public function detalleNof_wh_IdactivoResp($params=[]):array{
+    try{
+      $cmd = parent::execQ("CALL sp_detalle_notificacion_baja_wh_idactivo_resp(?)");
+      $cmd->execute(
+        array(
+          $params['idnotificacion']
+        )
+      );
+      return $cmd->fetchAll(PDO::FETCH_ASSOC);
+    }catch(Exception $e){
+      die($e->getMessage());
+      return [];
+    }
+  }
  
 }
 
