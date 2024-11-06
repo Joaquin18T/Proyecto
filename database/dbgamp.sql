@@ -212,19 +212,8 @@ CREATE TABLE notificaciones_activos
     CONSTRAINT fk_idactivo_noti_activo FOREIGN KEY(idactivo) REFERENCES activos(idactivo)
 )ENGINE = INNODB;
 
-CREATE TABLE notificaciones_mantenimiento
-(
-	idnotificacion_mantenimiento	INT AUTO_INCREMENT PRIMARY KEY,
-    idactivo						INT NOT NULL,
-    tipo							VARCHAR(30) NOT NULL,
-    mensaje							VARCHAR(250) NOT NULL,
-    fecha_programada				DATE NOT NULL,
-    fecha_creacion					DATETIME NOT NULL DEFAULT NOW(),
-    estado							VARCHAR(20) NOT NULL,
-    visto							CHAR(1) NOT NULL,
-    CONSTRAINT fk_idactivo_noti_mantenimiento FOREIGN KEY(idactivo) REFERENCES activos(idactivo)
-    -- validar que la fecha programada sea mayor que la fecha actual
-)ENGINE = INNODB;
+
+
 -- ********************************* TABLAS ROYER *************************************
 -- 12/10/2024
 
@@ -275,9 +264,7 @@ CREATE TABLE `odt`
     idtarea				int	 	not null,
     creado_por			int		not null,
 	fecha_inicio		date		not null,
-    hora_inicio			time		not null,
-    fecha_vencimiento	date		not null,
-    hora_vencimiento	time		not null,
+    hora_inicio			time		not null,    
     idestado			int		null default 9,
     incompleto 		boolean		null default true,
     eliminado		boolean		null default false,
@@ -285,6 +272,23 @@ CREATE TABLE `odt`
     CONSTRAINT			fk_creado_por				foreign key (creado_por) 				REFERENCES usuarios	(id_usuario),
     CONSTRAINT			fk_idestado4				FOREIGN KEY	(idestado)					REFERENCES estados	(idestado)
 )ENGINE=INNODB;	
+
+DROP TABLE IF EXISTS `notificaciones_mantenimiento`;
+CREATE TABLE `notificaciones_mantenimiento`
+(
+	idnotificacion_mantenimiento	INT AUTO_INCREMENT PRIMARY KEY,
+    idorden_trabajo					INT NOT NULL,	
+    tarea							varchar(100),
+    activos							text,
+    idresp							INT NOT NULL,
+    mensaje							VARCHAR(250) NOT NULL,
+    fecha_creacion					DATETIME NOT NULL DEFAULT NOW(),
+    visto							CHAR(1) NOT NULL DEFAULT('0'),
+    CONSTRAINT fk_idorden_trabajoNM FOREIGN KEY(idorden_trabajo) REFERENCES odt(idorden_trabajo),
+    CONSTRAINT fk_idresp			FOREIGN KEY (idresp) REFERENCES usuarios (id_usuario)
+    -- validar que la fecha programada sea mayor que la fecha actual
+)ENGINE = INNODB;
+
 
 DROP TABLE IF EXISTS `tipo_diagnosticos`;
 CREATE TABLE `tipo_diagnosticos`
@@ -355,14 +359,30 @@ CREATE TABLE `comentarios_odt`
     idorden_trabajo		int			 	not null,   
     comentario			varchar(300) 	null,
     revisadoPor			int		 		not null,
+    created_at			DATETIME		not null default now(),
+    update_at			DATETIME		null,
     CONSTRAINT 			fk_idorden_trabajo	foreign key (idorden_trabajo) references odt (idorden_trabajo) ON DELETE CASCADE,
     CONSTRAINT 			fk_revisadoPor		foreign key (revisadoPor) references usuarios (id_usuario)
 )ENGINE=INNODB;
 
-DROP TABLE IF EXISTS `historial_odt`;
-CREATE TABLE `historial_odt`
+DROP TABLE IF EXISTS historial_odt;
+CREATE TABLE historial_odt
 (
 	idhistorial			int		auto_increment primary key,
 	idorden_trabajo		int 	not null,
-    constraint fk_idodt_hist foreign key (idorden_trabajo) references odt (idorden_trabajo)
+    clasificacion		int		not null,
+    creador				varchar(100) not null,
+    responsables		longtext	not null,
+    tiempo_ejecucion	varchar(20) not null,
+    activos				longtext	not null,
+    tarea				varchar(100)	not null,
+    revisado_por		varchar(100)	not null,
+	tipo_prioridad		varchar(20)		not null,
+    fecha_inicio		varchar(20)		not null,    
+    hora_inicio			varchar(20)		not null,
+    nom_estado			varchar(15) 	not null,
+    incompleto			int				not null,
+    fecha_final			varchar(20)		not null,
+    hora_final			varchar(20)		not null,
+	CONSTRAINT			fk_clasificacion2	foreign key (clasificacion) references estados (idestado)    
 )ENGINE=INNODB;

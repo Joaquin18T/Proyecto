@@ -58,3 +58,19 @@ BEGIN
     WHERE iddetalleodt = _iddetalleodt;
 END //
 
+DROP PROCEDURE IF EXISTS `actualizarFechaFinalOdt`
+DELIMITER //
+CREATE PROCEDURE `actualizarFechaFinalOdt`
+(
+	IN _idorden_trabajo INT,
+    IN _fecha_final DATE,
+    IN _hora_final TIME
+)
+BEGIN
+	UPDATE odt SET
+    fecha_final = _fecha_final,
+    hora_final = _hora_final    
+    WHERE idorden_trabajo = _idorden_trabajo;
+END //
+
+call actualizarFechaFinalOdt(1, '2024-11-05', '11:22:00')

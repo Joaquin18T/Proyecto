@@ -117,16 +117,16 @@ END //
 call actualizarTareaEstado(2, 9, true)
 
 -- *********************************************************************
-DROP PROCEDURE IF EXISTS `actualizarTareaEstadoTrabajado`
+DROP PROCEDURE IF EXISTS `actualizarTareaEstadoPausado`
 DELIMITER //
-CREATE PROCEDURE `actualizarTareaEstadoTrabajado`
+CREATE PROCEDURE `actualizarTareaEstadoPausado`
 (
 	IN _idtarea INT,
-    IN _trabajado INT
+    IN _pausado INT
 )
 BEGIN
 	UPDATE tareas 
-    SET trabajado = _trabajado,
+    SET pausado = _pausado,
         update_at = NOW()
     WHERE idtarea = _idtarea;
 END //

@@ -30,10 +30,10 @@ BEGIN
 		FROM notificaciones_activos NA
 		inner JOIN activos_responsables RES ON NA.idactivo_resp = RES.idactivo_resp
 		INNER JOIN activos ACT ON RES.idactivo = ACT.idactivo
-        WHERE RES.idusuario = _idusuario 
+        WHERE RES.idusuario = _idusuario
         ORDER BY NA.fecha_creacion asc;
 END $$
--- CALL sp_list_notificacion(14);
+-- CALL sp_list_notificacion(5);
 
 DROP PROCEDURE IF EXISTS sp_responsable_notificacion;
 DELIMITER $$
@@ -55,6 +55,47 @@ BEGIN
 END $$
 
 -- Crear otro SP para las notificaciones_mantenimientos
+DROP PROCEDURE IF EXISTS `agregarNotificacionOdt`;
+DELIMITER $$
+CREATE PROCEDURE `agregarNotificacionOdt` (
+	OUT _idnotificacion_mantenimiento INT,
+    IN _idorden_trabajo INT,
+    IN _tarea			VARCHAR(100),
+    IN _activos			TEXT,
+    IN _idresp			INT,
+    IN _mensaje			VARCHAR(250)
+)
+BEGIN
+	-- Declaración de variable de control de error
+	DECLARE existe_error INT DEFAULT 0;
+
+	-- Manejador de excepciones
+	DECLARE CONTINUE HANDLER FOR SQLEXCEPTION
+		BEGIN
+			SET existe_error = 1;
+		END;
+        
+	INSERT INTO notificaciones_mantenimiento (idorden_trabajo, tarea, activos,idresp, mensaje) values
+	(_idorden_trabajo, _tarea, _activos, _idresp , _mensaje);
+    
+    IF existe_error = 1 THEN
+		SET _idnotificacion_mantenimiento = -1;
+	ELSE
+		SET _idnotificacion_mantenimiento = LAST_INSERT_ID();
+	END IF;
+END $$
+
+DROP PROCEDURE IF EXISTS `buscarNotificacionPorOdt`;
+DELIMITER $$
+CREATE PROCEDURE `buscarNotificacionPorOdt` (
+    IN _idodt INT
+)
+BEGIN
+    SELECT
+        *
+    FROM notificaciones_mantenimiento NM
+    INNER JOIN odt ODT ON ODT.idorden_trabajo = 12;    
+END $$
 
 -- ASIGNACION 
 DROP PROCEDURE IF EXISTS sp_detalle_notificacion_activo;

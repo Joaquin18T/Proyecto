@@ -19,6 +19,7 @@ $(document).ready(async () => {
     let iddiagnosticoSalida = -1
     let intervalos = -1
     let frecuencia = ""
+    let idrolusuario = -1
 
     const host = "http://localhost/CMMS/controllers/";
     let idordengenerada = window.localStorage.getItem("idodt")
@@ -38,6 +39,7 @@ $(document).ready(async () => {
 
 
     //EJECUTAR PRIMERO LO GENERAL
+    await verificarRolUsuario()
     await obtenerOdt()
     await verificarOdtEstado()
     await obtenerTareaPorId(idtarea)
@@ -57,13 +59,21 @@ $(document).ready(async () => {
     await verificarDetalleOdtRegistrado() */
 
     // ******************* SECCION DE OBTENER DATOS ********************************************************
+    async function obtenerUsuario() {
+        const paramsUsuario = new URLSearchParams()
+        paramsUsuario.append("operation", "getUserById")
+        paramsUsuario.append("idusuario", idusuario)
+        const usuarioObtenido = await getDatos(`${host}usuarios.controller.php`, paramsUsuario)
+        console.log("usuarioObtenido: ", usuarioObtenido)
+        return usuarioObtenido
+    }
 
     async function obtenerOdt() {
         const params = new URLSearchParams()
         params.append("operation", "obtenerTareaDeOdtGenerada")
         params.append("idodt", idordengenerada)
         const odt = await getDatos(`${host}ordentrabajo.controller.php`, params)
-        idtarea = odt[0].idtarea
+        idtarea = odt[0]?.idtarea
         console.log("odt: ", odt)
         return odt
     }
@@ -93,8 +103,8 @@ $(document).ready(async () => {
         params.append("operation", "obtenerTareaPorId")
         params.append("idtarea", idtarea)
         const ultimaTareaAgregada = await getDatos(`${host}tarea.controller.php`, params)
-        intervalos = ultimaTareaAgregada[0].intervalo
-        frecuencia = ultimaTareaAgregada[0].frecuencia
+        intervalos = ultimaTareaAgregada[0]?.intervalo
+        frecuencia = ultimaTareaAgregada[0]?.frecuencia
         console.log("tarea obtenida: ", ultimaTareaAgregada)
         return ultimaTareaAgregada
     }
@@ -148,13 +158,46 @@ $(document).ready(async () => {
         return comentario
     }
 
-    async function registrarHistorialOdt() {
-        const formRegistroHistorialOdt = new FormData()
-        formRegistroHistorialOdt.append("operation", "registrarHistorialOdt")
-        formRegistroHistorialOdt.append("idodt", idordengenerada)
-        const Fcomentario = await fetch(`${host}ordentrabajo.controller.php`, { method: 'POST', body: formRegistroHistorialOdt })
-        const comentario = await Fcomentario.json()
-        return comentario
+    async function registrarHistorialOdt(
+        clasificacion,
+        creador,
+        responsables,
+        tiempo_ejecucion,
+        activos,
+        tarea,
+        revisado_por,
+        tipo_prioridad,
+        fecha_inicio,
+        hora_inicio,
+        nom_estado,
+        incompleto,
+        fecha_final,
+        hora_final
+    ) {
+        const formRegistroHistorialOdt = new FormData();
+        formRegistroHistorialOdt.append("operation", "registrarHistorialOdt");
+        formRegistroHistorialOdt.append("idodt", idordengenerada);
+        formRegistroHistorialOdt.append("clasificacion", clasificacion);
+        formRegistroHistorialOdt.append("creador", creador);
+        formRegistroHistorialOdt.append("responsables", responsables);
+        formRegistroHistorialOdt.append("tiempo_ejecucion", tiempo_ejecucion);
+        formRegistroHistorialOdt.append("activos", activos);
+        formRegistroHistorialOdt.append("tarea", tarea);
+        formRegistroHistorialOdt.append("revisado_por", revisado_por);
+        formRegistroHistorialOdt.append("tipo_prioridad", tipo_prioridad);
+        formRegistroHistorialOdt.append("fecha_inicio", fecha_inicio);
+        formRegistroHistorialOdt.append("hora_inicio", hora_inicio);
+        formRegistroHistorialOdt.append("nom_estado", nom_estado);
+        formRegistroHistorialOdt.append("incompleto", incompleto);
+        formRegistroHistorialOdt.append("fecha_final", fecha_final);
+        formRegistroHistorialOdt.append("hora_final", hora_final);
+
+        const Fcomentario = await fetch(`${host}ordentrabajo.controller.php`, {
+            method: 'POST',
+            body: formRegistroHistorialOdt
+        });
+        const comentario = await Fcomentario.json();
+        return comentario;
     }
 
     // ******************************* FIN DE SECCION DE REGISTROS *******************************************
@@ -165,10 +208,10 @@ $(document).ready(async () => {
         const diagnosticoEntrada = await obtenerDiagnostico(1)
         const diagnosticoSalida = await obtenerDiagnostico(2)
 
-        txtDiagnosticoEntrada.innerText = diagnosticoEntrada[0].diagnostico
+        txtDiagnosticoEntrada.innerText = diagnosticoEntrada[0]?.diagnostico
         iddiagnosticoEntrada = diagnosticoEntrada[0]?.iddiagnostico
         iddiagnosticoSalida = diagnosticoSalida[0]?.iddiagnostico
-        txtDiagnosticoSalida.innerText = diagnosticoSalida[0].diagnostico
+        txtDiagnosticoSalida.innerText = diagnosticoSalida[0]?.diagnostico
 
         //const detalleOdt = await obtenerDetalleOdt()
         /* contenedorDetallesOdtSalida.innerHTML = `
@@ -189,14 +232,14 @@ $(document).ready(async () => {
             </div>`
         for (let i = 0; i < activos.length; i++) {
             contenedorDetallesOdtEntrada.innerHTML += `          
-            <p class="fw-normal d-flex align-items-center col">${activos[i].descripcion} - Cod: ${activos[i].cod_identificacion}</p>
+            <p class="fw-normal d-flex align-items-center col">${activos[i]?.descripcion} - Cod: ${activos[i]?.cod_identificacion}</p>
         `
         }
 
         contenedorDetallesOdtEntrada.innerHTML += `
           <div class="row">
               <p class="fw-bolder col">Fecha programada: </p>
-              <p class="fw-normal d-flex align-items-center col">${odt[0].fecha_inicio} - ${odt[0].hora_inicio}</p>                                          
+              <p class="fw-normal d-flex align-items-center col">${odt[0]?.fecha_inicio} - ${odt[0]?.hora_inicio}</p>                                          
           </div>  
           <div class="row">
               <p class="fw-bolder col">Intervalos: </p>
@@ -328,6 +371,7 @@ $(document).ready(async () => {
 
     async function verificarOdtEstado() {
         const odtObtenida = await obtenerOdtporId()
+        console.log("gaaaa: ", odtObtenida)
         if (odtObtenida[0]?.idestado == 11) { //VERIFICAR SI YA ESTA FINALIZADA , SI LO ESTA NO DEBERIA DE MOSTRAR EL REGISTRO
             contenedorRevisarOdt.innerHTML = `
             <div class="container-fluid">
@@ -344,26 +388,64 @@ $(document).ready(async () => {
                 </div>
             </div>
             `
+        } 
+    }
+
+    async function verificarRolUsuario() {
+        const usuario = await obtenerUsuario()
+        console.log("usuario: ", usuario)
+        idrolusuario = usuario[0]?.idrol
+        if (idrolusuario == 2) {
+            contenedorRevisarOdt.innerHTML = `
+            <div class="container-fluid">
+                <div class="row">
+                    <h1 class="">Solo administradores pueden revisar la orden de trabajo.</h1>
+                </div>
+            </div>
+            `
         }
     }
+
 
     // **************************** FIN DE SECCION DE VERIFICACIONES **************************************
 
     // ****************************** SECCION DE EVENTOS **************************************************
 
     btnFinalizar.addEventListener("click", async () => {
-        const registrado = await registrarComentario()
-        console.log("comentario registrado? : ", registrado)
-        const actualizadoODT = await actualizarEstadoOdt(11, idordengenerada)
-        console.log("odt actualizado a finalizado?: ", actualizadoODT)
-        if (actualizadoODT.actualizado) {
-            const registrado = await registrarHistorialOdt()
-            console.log("historial odt registrado?: ", registrado)
-            const estadoTareaActualizada = await actualizarTareaEstado(idtarea, 8)
-            console.log("ESTADO DE TAREA ACTUALIZADA?: ", estadoTareaActualizada)
-            window.localStorage.clear()
-            window.location.href = `http://localhost/CMMS/views/odt`
-            console.log("redirigiendo...")
+        if (idrolusuario == 1) { //ROL ADMIN
+            const registrado = await registrarComentario()
+            console.log("comentario registrado? : ", registrado)
+            const actualizadoODT = await actualizarEstadoOdt(11, idordengenerada)
+            console.log("odt actualizado a finalizado?: ", actualizadoODT)
+            if (actualizadoODT.actualizado) {
+                const odtObtenida = await obtenerOdtporId()
+                console.log("odtObtenida: ", odtObtenida)
+                const registroHistorial = await registrarHistorialOdt(
+                    odtObtenida[0]?.clasificacion,
+                    odtObtenida[0]?.creador,
+                    odtObtenida[0]?.responsables,
+                    odtObtenida[0]?.tiempo_ejecucion,
+                    odtObtenida[0]?.activos,
+                    odtObtenida[0]?.tarea,
+                    odtObtenida[0]?.revisado_por,
+                    odtObtenida[0]?.tipo_prioridad,
+                    odtObtenida[0]?.fecha_inicio,
+                    odtObtenida[0]?.hora_inicio,
+                    odtObtenida[0]?.nom_estado,
+                    odtObtenida[0]?.incompleto,
+                    odtObtenida[0]?.fecha_final,
+                    odtObtenida[0]?.hora_final
+                );
+                console.log("Historial ODT registrado?: ", registroHistorial);
+                const estadoTareaActualizada = await actualizarTareaEstado(idtarea, 8)
+                console.log("ESTADO DE TAREA ACTUALIZADA?: ", estadoTareaActualizada)
+                window.localStorage.clear()
+                window.location.href = `http://localhost/CMMS/views/odt`
+                console.log("redirigiendo...")
+            }
+        } else {
+            showToast(`Solo administradores pueden finalizar la orden de trabajo.`, 'ERROR', 6000);
+            return;
         }
     })
 

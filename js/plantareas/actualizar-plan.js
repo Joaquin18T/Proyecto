@@ -291,7 +291,8 @@ $(document).ready(async () => {
                             </span>
                             <span class="badge bg-primary rounded-pill btn-pausar-tarea d-flex align-items-center justify-content-center" 
                                 data-tarea-id="${tareas[k]?.idtarea}" style="cursor: pointer;">
-                                <i class="fa-solid fa-pause"></i>
+                                ${tareas[k].pausado == 1 ? `<i class="fa-solid fa-play"></i>` : `<i class="fa-solid fa-pause"></i>`}                            
+
                             </span>
                         </div>
                     </li>
@@ -371,8 +372,20 @@ $(document).ready(async () => {
         })
 
         btnsPausarTarea.forEach(btn => {
-            btn.addEventListener("click", async ()=>{
-                console.log("data-tarea-id a pausar: ", btn.getAttribute("data-tarea-id"))
+            btn.addEventListener("click", async () => {
+                let permitir = true
+                const idtarea = btn.getAttribute("data-tarea-id")
+                const tareaObtenida = await obtenerTareaPorId(idtarea)
+                console.log("tareaObtenida: ", tareaObtenida)
+                if (tareaObtenida[0].idestado == 9) {
+                    showToast(`No puedes pausar esta tarea porque se encuentra en proceso.`, 'ERROR', 6000);
+                    permitir = false
+                    return
+                }
+                if (permitir) {
+                    const tareaPausada = await actualizarTareaEstadoPausado(idtarea, tareaObtenida[0].pausado == 0 ? 1 : 0)
+                    console.log("tareaPausada?: ", tareaPausada)
+                }
             })
         })
 
@@ -517,6 +530,20 @@ $(document).ready(async () => {
 
     // ************************ FIN SECCCION ***********************************************************
 
+    //******************************** SECCION DE ACTUALIZACIONES ************************************** */
+
+    async function actualizarTareaEstadoPausado(idtarea, pausado) {
+        const paramsActualizar = new FormData()
+        paramsActualizar.append("operation", "actualizarTareaEstadoPausado")
+        paramsActualizar.append("idtarea", idtarea)
+        paramsActualizar.append("pausado", pausado)
+        const FtareaPausada = await fetch(`${host}tarea.controller.php`, { method: 'POST', body: paramsActualizar })
+        const tareaPausada = await FtareaPausada.json()
+        return tareaPausada
+    }
+
+    // ************************************ FIN DE SECCION ***********************************************
+
     /* ********************************************* EVENTOS *************************************************** */
 
     //AGREGAR NUEVA TAREA, FORMATEAR EL FORMULARIO TAREA, HABILITAR CAMPOS ACTIVOS Y RENDERIZAR LA TAREA AGREGADA AL SELECT
@@ -555,10 +582,19 @@ $(document).ready(async () => {
             //AGREGA LAS TAREAS AGREGADAS A LA INTERFAZ DE LA LISTA
             ulTareasAgregadas.innerHTML += `
                     <li class="list-group-item d-flex justify-content-between align-items-center mb-3">
-                        <p class="tarea-agregada" data-tarea-id="${ultimaTareaAgregada[0]?.idtarea}">${ultimaTareaAgregada[0]?.descripcion} - Tarea: ${ultimaTareaAgregada[0]?.idtarea}</p>
-                        <span class="badge bg-primary rounded-pill btn-eliminar-tarea" data-tarea-id="${ultimaTareaAgregada[0]?.idtarea}">
-                            <i class="fa-solid fa-trash"></i>
-                        </span>
+                        <p class="tarea-agregada mb-0" data-tarea-id="${ultimaTareaAgregada[0]?.idtarea}">
+                            ${ultimaTareaAgregada[0]?.descripcion} - Tarea: ${ultimaTareaAgregada[0]?.idtarea}
+                        </p>
+                        <div class="d-flex gap-2">
+                            <span class="badge bg-primary rounded-pill btn-eliminar-tarea d-flex align-items-center justify-content-center" 
+                                data-tarea-id="${ultimaTareaAgregada[0]?.idtarea}" style="cursor: pointer;">
+                                <i class="fa-solid fa-trash"></i>
+                            </span>
+                            <span class="badge bg-primary rounded-pill btn-pausar-tarea d-flex align-items-center justify-content-center" 
+                                data-tarea-id="${ultimaTareaAgregada[0]?.idtarea}" style="cursor: pointer;">
+                                ${ultimaTareaAgregada[0].pausado == 1 ? `<i class="fa-solid fa-play"></i>` : `<i class="fa-solid fa-pause"></i>`}                            
+                            </span>
+                        </div>
                     </li>
               `;
 
@@ -573,6 +609,7 @@ $(document).ready(async () => {
             //confirmarEliminacionTarea()
             const liTareaAgregada = $all(".tarea-agregada")
             const btnsEliminarTarea = $all(".btn-eliminar-tarea")
+            const btnsPausarTarea = $all(".btn-pausar-tarea")
             btnsEliminarTarea.forEach(btn => {
                 btn.addEventListener("click", async () => {
                     console.log("eliminado")
@@ -631,6 +668,26 @@ $(document).ready(async () => {
                     }
                 })
             })
+
+            btnsPausarTarea.forEach(btn => {
+                btn.addEventListener("click", async () => {
+                    let permitir = true
+                    const idtarea = btn.getAttribute("data-tarea-id")
+                    const tareaObtenida = await obtenerTareaPorId(idtarea)
+                    console.log("tareaObtenida: ", tareaObtenida)
+                    if (tareaObtenida[0].idestado == 9) {
+                        showToast(`No puedes pausar esta tarea porque se encuentra en proceso.`, 'ERROR', 6000);
+                        permitir = false
+                        return
+                    }
+                    if (permitir) {
+                        const tareaPausada = await actualizarTareaEstadoPausado(idtarea, tareaObtenida[0].pausado == 0 ? 1 : 0)
+                        console.log("tareaPausada?: ", tareaPausada)
+                    }
+
+                })
+            })
+
             console.log("sintareas? :", sintareas)
             if (!sintareas) {
                 liTareaAgregada.forEach(litarea => {

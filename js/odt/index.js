@@ -1,5 +1,5 @@
 $(document).ready(async () => {
-    //alert("idusuarioxdd: " + idusuario)
+    alert("idusuarioxdd: " + idusuario)
     window.localStorage.clear()
     function $q(object = null) {
         return document.querySelector(object);
@@ -15,12 +15,22 @@ $(document).ready(async () => {
     }
 
     //variables
-    
+    let idrolusuario = -1;
     let redirigir = false
     const host = "http://localhost/CMMS/controllers/";
+    await verificarRolUsuario()
     await verificarTerminadoOdt()
     await obtenerHistorialOdt()
     // **************************** SECCION DE OBTENER DATOS ****************************************************
+    async function obtenerUsuario() {
+        const paramsUsuario = new URLSearchParams()
+        paramsUsuario.append("operation", "getUserById")
+        paramsUsuario.append("idusuario", idusuario)
+        const usuarioObtenido = await getDatos(`${host}usuarios.controller.php`, paramsUsuario)
+        console.log("usuarioObtenido: ", usuarioObtenido)
+        return usuarioObtenido
+    }
+
     async function obtenerTareas() {
         const paramsTareasSearch = new URLSearchParams()
         paramsTareasSearch.append("operation", "obtenerTareas")
@@ -43,6 +53,15 @@ $(document).ready(async () => {
         const historialOodt = await getDatos(`${host}ordentrabajo.controller.php`, paramsHistorialOdt)
         console.log("Historial odt: ", historialOodt)
         return historialOodt;
+    }
+
+    async function obtenerActivosPorTarea(idtarea) {
+        const params = new URLSearchParams()
+        params.append("operation", "obtenerActivosPorTarea")
+        params.append("idtarea", idtarea)
+        const activo = await getDatos(`${host}activo.controller.php`, params)
+        console.log("activo: ", activo)
+        return activo
     }
 
     var kanban = new jKanban({
@@ -81,6 +100,7 @@ $(document).ready(async () => {
             console.log('Tarjeta ' + cardId + ' fue movida al board ' + targetBoardId);
 
             // OBTENER TAREAS ODT Y TAREAS
+
             const tareasOdt = await obtenerTareasOdt();
             const tareas = await obtenerTareas();
             console.log("tareasOdt: ", tareasOdt);
@@ -89,6 +109,7 @@ $(document).ready(async () => {
             // BUSCAR LA TAREA SELECCIONADA EN AMBOS ARRAYS
             const tareaSeleccionada = tareas.find(t => t.idtarea == cardId);
             const tareaOdtSeleccionada = tareasOdt.find(t => t.idorden_trabajo == cardId); //ejemplo: card id: 1 == idtarea: 1
+            const activoObtenidoPorTarea = await obtenerActivosPorTarea(tareaSeleccionada?.idtarea)
 
             // AGREGAR VALIDACIÓN PARA VERIFICAR SI LA TAREA EXISTE
             if (!tareaSeleccionada && !tareaOdtSeleccionada) {
@@ -99,66 +120,97 @@ $(document).ready(async () => {
             // VALIDAR ESTADOS
             switch (targetBoardId) {
                 case "b-proceso":
-                    // VALIDAR SI tareaOdtSeleccionada EXISTE Y SU ESTADO
-                    if (tareaOdtSeleccionada && tareaOdtSeleccionada.nom_estado === "proceso") {
-                        alert("Esta tarea ya está en proceso, no se puede redirigir");
-                        break;
-                    } else if (tareaSeleccionada && tareaSeleccionada.nom_estado === "pendiente") {
-                        const now = new Date();
-                        const fechaInicioTarea = now.toISOString().split("T")[0]; // Fecha en formato YYYY-MM-DD
-                        const horaInicioTarea = now.toTimeString().split(" ")[0].substring(0, 5); // Hora en formato HH:MM
-                        let fechaHoraInicio = new Date(`${fechaInicioTarea}T${horaInicioTarea}:00-05:00`);
+                    if (idrolusuario == 1) { //esto es administrador
+                        let permitir = true
+                        // VALIDAR SI tareaOdtSeleccionada EXISTE Y SU ESTADO
+                        if (tareaOdtSeleccionada && tareaOdtSeleccionada.nom_estado === "proceso") {
+                            alert("Esta tarea ya está en proceso, no se puede redirigir");
+                            break;
+                        } else if (tareaSeleccionada && tareaSeleccionada.nom_estado === "pendiente") {
+                            const now = new Date();
+                            const fechaInicioTarea = now.toISOString().split("T")[0]; // Fecha en formato YYYY-MM-DD
+                            const horaInicioTarea = now.toTimeString().split(" ")[0].substring(0, 5); // Hora en formato HH:MM
+                            //let fechaHoraInicio = new Date(`${fechaInicioTarea}T${horaInicioTarea}:00-05:00`);
 
-                        
-                        // SI LA TAREA ESTÁ EN PENDIENTE, REDIRIGIR
-                        const idOdt = await registrarOdt(cardId, fechaInicioTarea, horaInicioTarea);
-                        console.log(idOdt);
-                        window.localStorage.clear()
-                        window.localStorage.setItem("idtarea", cardId);
-                        window.localStorage.setItem("idodt", idOdt.id);
-                        const actualizado = await actualizarTareaEstado(cardId, 9)
-                        console.log("actualizado?: ", actualizado)
-                        console.log("redirigiendo ....")
-                        window.location.href = `http://localhost/CMMS/views/odt/registrar-odt.php`;
-                    } else if (tareaOdtSeleccionada && tareaOdtSeleccionada.nom_estado === "revision") {
-                        alert("Esta orden ya esta en revision, no se puede redirigir a proceso");
+                            console.log("tareaSeleccionada: ", tareaSeleccionada)
+                            // SI LA TAREA ESTÁ EN PENDIENTE, REDIRIGIR
+                            console.log("activoObtenidoPorTarea: ", activoObtenidoPorTarea)
+                            for (let a = 0; a < activoObtenidoPorTarea.length; a++) {
+                                if (activoObtenidoPorTarea[a].idestado == 2) {
+                                    showToast(`Hay activos asignados a esta tarea que están en mantenimiento ahora mismo.`, 'ERROR', 6000);
+                                    permitir = false;
+                                    return
+                                }
+                            }
+                            if (tareaSeleccionada.pausado == 1) {
+                                showToast(`Esta tarea esta pausada, no puedes procesarla por el momento.`, 'ERROR', 6000);
+                                permitir = false;
+                                return
+                            }
+
+                            if (permitir) {
+                                const idOdt = await registrarOdt(cardId, fechaInicioTarea, horaInicioTarea);
+                                console.log(idOdt);
+                                window.localStorage.clear()
+                                window.localStorage.setItem("idtarea", cardId);
+                                window.localStorage.setItem("idodt", idOdt.id);
+                                const actualizado = await actualizarTareaEstado(cardId, 9)
+                                console.log("actualizado?: ", actualizado)
+                                console.log("redirigiendo ....")
+                                window.location.href = `http://localhost/CMMS/views/odt/registrar-odt.php`;
+                            }
+
+
+                        } else if (tareaOdtSeleccionada && tareaOdtSeleccionada.nom_estado === "revision") {
+                            alert("Esta orden ya esta en revision, no se puede redirigir a proceso");
+                            break;
+                        } else if (tareaOdtSeleccionada && tareaOdtSeleccionada.nom_estado === "finalizado") {
+                            alert("Esta orden ya esta finalizada, no se puede redirigir a proceso");
+                            break;
+                        }
+
                         break;
-                    } else if (tareaOdtSeleccionada && tareaOdtSeleccionada.nom_estado === "finalizado") {
-                        alert("Esta orden ya esta finalizada, no se puede redirigir a proceso");
+                    } else {
+                        showToast(`Solo administradores pueden crear ordenes de trabajo.`, 'ERROR', 6000);
                         break;
                     }
-
-                    break;
 
                 case "b-revision":
-                    if (tareaOdtSeleccionada && tareaOdtSeleccionada.nom_estado === "proceso") {
-                        if (tareaOdtSeleccionada.incompleto === 1) {
-                            alert("LA TAREA ODT ESTA INCOMPLETA NO PUEDES REVISARLA");
+                    if (idrolusuario == 2) { //esto seria usuario normal
+                        if (tareaOdtSeleccionada && tareaOdtSeleccionada.nom_estado === "proceso") {
+                            if (tareaOdtSeleccionada.incompleto === 1) {
+                                alert("LA TAREA ODT ESTA INCOMPLETA NO PUEDES REVISARLA");
+                                break;
+                            }
+                            else if (tareaOdtSeleccionada.clasificacion == null || tareaOdtSeleccionada.clasificacion == 9) {
+                                alert("ESTA ODT NO PUEDE SER REVISADA POR QUE NO ESTA AL 100%")
+                                break;
+                            } else {
+                                //window.localStorage.clear()
+                                //window.localStorage.setItem("idodt", tareaOdtSeleccionada.idorden_trabajo);
+                                const actualizado = await actualizarEstadoOdt(10, tareaOdtSeleccionada.idorden_trabajo)
+                                console.log("actualizado ODT A REVISION?: ", actualizado)
+                                //window.location.href = `http://localhost/CMMS/views/odt/revisar-odt.php`
+                                showToast(`La orden de trabajo ha sido completada y enviada para revisión por un administrador.`, 'ERROR', 6000);
+                                break;
+                            }
+                        } else if (tareaOdtSeleccionada && tareaOdtSeleccionada.nom_estado === "pendientes") {
+                            alert("Esta orden esta en pendientes, primero procesala");
                             break;
                         }
-                        else if (tareaOdtSeleccionada.clasificacion == null || tareaOdtSeleccionada.clasificacion == 9) {
-                            alert("ESTA ODT NO PUEDE SER REVISADA POR QUE NO ESTA AL 100%")
-                            break;
-                        } else {
-                            window.localStorage.clear()
-                            window.localStorage.setItem("idodt", tareaOdtSeleccionada.idorden_trabajo);
-                            const actualizado = await actualizarEstadoOdt(10, tareaOdtSeleccionada.idorden_trabajo)
-                            console.log("actualizado ODT A REVISION?: ", actualizado)
-                            window.location.href = `http://localhost/CMMS/views/odt/revisar-odt.php`
+                        else if (tareaOdtSeleccionada && tareaOdtSeleccionada.nom_estado === "revision") {
+                            alert("Esta orden ya esta en reivison, no puedes redirigir");
                             break;
                         }
-                    } else if (tareaOdtSeleccionada && tareaOdtSeleccionada.nom_estado === "pendientes") {
-                        alert("Esta orden esta en pendientes, primero procesala");
+                        else if (tareaOdtSeleccionada && tareaOdtSeleccionada.nom_estado === "finalizado") {
+                            alert("Esta orden ya esta finalizada, no puedes redirigir");
+                            break;
+                        }
+                    } else {
+                        showToast(`Solo usuarios pueden mandar a revisar la orden de trabajo.`, 'ERROR', 6000);
                         break;
                     }
-                    else if (tareaOdtSeleccionada && tareaOdtSeleccionada.nom_estado === "revision") {
-                        alert("Esta orden ya esta en reivison, no puedes redirigir");
-                        break;
-                    }
-                    else if (tareaOdtSeleccionada && tareaOdtSeleccionada.nom_estado === "finalizado") {
-                        alert("Esta orden ya esta finalizada, no puedes redirigir");
-                        break;
-                    }
+
 
             }
         }
@@ -174,12 +226,20 @@ $(document).ready(async () => {
         const historialOdt = await obtenerHistorialOdt() //FINALIZADAS
         tareas.forEach(tarea => {
             const tareaHTML = `
-                <h3 class="card-title">${tarea.descripcion}</h3>
-                <p class="card-text">Plan de tarea: ${tarea.plantarea}</p>
+                <h3 class="card-title">${tarea.descripcion}</h3>                   
                 <div class="row">
-                    <p class="card-text fw-bolder">Activos: <p class="text-mute">${tarea.activos}</p></p>
-                </div>
-                <p class="card-text"><small class="text-muted">Prioridad: ${tarea.prioridad}</small></p>
+                    <div class="col-md-6">
+                        <p><small><strong>Intervalo: </strong>${tarea.intervalo}</small></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><small><strong>Frecuencia: </strong>${tarea.frecuencia}</small></p>
+                    </div>
+                </div>                
+                <p class="card-text"><strong>Plan de tarea: </strong>${tarea.plantarea}</p>
+                <p><strong>Activos: </strong>${tarea.activos}</p>
+                <hr>
+                <p><strong>Prioridad: </strong>${tarea.prioridad}</p>
+                                             
             `;
 
             // Asignar las tareas a diferentes boards según su estado
@@ -297,12 +357,14 @@ $(document).ready(async () => {
                         </div>
                         <div class="row">
                             <div class="col-md-6">
-                                <p class="text-muted"> Fecha de inicio: ${historial.fecha_inicio}</p>
+                                <p class="text-muted"><small>Inció el: ${historial.fecha_inicio}</small></p>
+                            </div>                                                           
+                            <div class="col-md-6">
+                                <p class="text-muted"><small>Finalizó el: ${historial.fecha_final}</small></p>
                             </div>
-                            
                         </div>
-                        ${historial.revisado_por ? `<p class="text-muted">Revisado por ${historial.revisado_por}</p>` : ''}
-                        <p class="text-muted">Creada por ${historial.creador}</p>
+                        ${historial.revisado_por ? `<p class="text-muted"><strong>Revisado por</strong> ${historial.revisado_por}</p>` : ''}
+                        <p class="text-muted"><strong>Creada por </strong> ${historial.creador}</p>
                         <p><strong>Activos:</strong> ${historial.activos}</p>
                         <div class="progress mb-2">
                             <div class="progress-bar ${historial.clasificacion === 11 ? 'bg-success' : historial.clasificacion === 9 ? 'bg-warning' : 'bg-danger'}" 
@@ -326,38 +388,44 @@ $(document).ready(async () => {
             }
         })
 
+        //ESTO FUNCIONA PARA PODER ENTRAR A REALIZAR LA ORDEN UNA VEZ CREADA - SOLO PUEDEN INGRESAR USUARIOS
         $all('.tarea-odt').forEach(kanbanItem => {
             kanbanItem.addEventListener('click', async function (event) {
-                const cardId = kanbanItem.getAttribute('data-id'); // Obtener el ID de la tarjeta
-                console.log('Hiciste clic en la tarjeta con ID: ' + cardId);
-                const targetElement = event.target; // El elemento donde ocurrió el clic
-                console.log("targetElement: ", targetElement);
+                if (idrolusuario == 2) { //ESTE ROL ES DE USUARio
+                    const cardId = kanbanItem.getAttribute('data-id'); // Obtener el ID de la tarjeta
+                    console.log('Hiciste clic en la tarjeta con ID: ' + cardId);
+                    const targetElement = event.target; // El elemento donde ocurrió el clic
+                    console.log("targetElement: ", targetElement);
 
-                const tareasOdt = await obtenerTareasOdt(); // Llama a la función para obtener tareas
-                console.log("tareasOdt: ", tareasOdt);
-                const tareaOdtSeleccionada = tareasOdt.find(t => t.idorden_trabajo == cardId);
-                console.log("Tarea odt seleccionada: ", tareaOdtSeleccionada);
+                    const tareasOdt = await obtenerTareasOdt(); // Llama a la función para obtener tareas
+                    console.log("tareasOdt: ", tareasOdt);
+                    const tareaOdtSeleccionada = tareasOdt.find(t => t.idorden_trabajo == cardId);
+                    console.log("Tarea odt seleccionada: ", tareaOdtSeleccionada);
 
-                if (tareaOdtSeleccionada && tareaOdtSeleccionada.nom_estado === "proceso") {
-                    if (tareaOdtSeleccionada.incompleto === 1) {
-                        alert("LA TAREA ODT ESTA INCOMPLETA NO PUEDES TRABAJARLA");
-                    } else if (tareaOdtSeleccionada.incompleto === 0) {
-                        // Redirigir solo si la tarea está en proceso y completa
+                    if (tareaOdtSeleccionada && tareaOdtSeleccionada.nom_estado === "proceso") {
+                        if (tareaOdtSeleccionada.incompleto === 1) {
+                            alert("LA TAREA ODT ESTA INCOMPLETA NO PUEDES TRABAJARLA");
+                        } else if (tareaOdtSeleccionada.incompleto === 0) {
+                            // Redirigir solo si la tarea está en proceso y completa
+                            window.localStorage.clear();
+                            window.localStorage.setItem('idodt', tareaOdtSeleccionada.idorden_trabajo);
+                            window.localStorage.setItem('idtarea', tareaOdtSeleccionada.idtarea)
+                            window.location.href = `http://localhost/CMMS/views/odt/orden.php`;
+                        }
+                    } else if (tareaOdtSeleccionada && tareaOdtSeleccionada.nom_estado === "revision") {
                         window.localStorage.clear();
-                        window.localStorage.setItem('idodt', tareaOdtSeleccionada.idorden_trabajo);
+                        window.localStorage.setItem("idodt", tareaOdtSeleccionada.idorden_trabajo);
                         window.localStorage.setItem('idtarea', tareaOdtSeleccionada.idtarea)
-                        window.location.href = `http://localhost/CMMS/views/odt/orden.php`;
+                        const actualizado = await actualizarEstadoOdt(10, tareaOdtSeleccionada.idorden_trabajo);
+                        console.log("actualizado ODT A REVISION?: ", actualizado);
+                        window.location.href = `http://localhost/CMMS/views/odt/revisar-odt.php`;
+                    } else {
+                        // No redirigir si la tarea no está en proceso
+                        alert("Solo las tareas en proceso pueden ser redirigidas.");
                     }
-                } else if (tareaOdtSeleccionada && tareaOdtSeleccionada.nom_estado === "revision") {
-                    window.localStorage.clear();
-                    window.localStorage.setItem("idodt", tareaOdtSeleccionada.idorden_trabajo);
-                    window.localStorage.setItem('idtarea', tareaOdtSeleccionada.idtarea)
-                    const actualizado = await actualizarEstadoOdt(10, tareaOdtSeleccionada.idorden_trabajo);
-                    console.log("actualizado ODT A REVISION?: ", actualizado);
-                    window.location.href = `http://localhost/CMMS/views/odt/revisar-odt.php`;
                 } else {
-                    // No redirigir si la tarea no está en proceso
-                    alert("Solo las tareas en proceso pueden ser redirigidas.");
+                    showToast(`Solo usuarios pueden realizar la orden de trabajo.`, 'ERROR', 6000);
+                    return
                 }
             });
         });
@@ -365,45 +433,55 @@ $(document).ready(async () => {
 
         $all(".li-editar").forEach(li => {
             li.addEventListener("click", async () => {
-                const liEditar = li.getAttribute('data-id')
-                const tareaId = li.getAttribute('data-tarea-id');
-                console.log("lioEditar: ", liEditar)
-                window.localStorage.clear();
-                window.localStorage.setItem('idodt', liEditar);
-                window.localStorage.setItem('idtarea', tareaId);
-                window.location.href = `http://localhost/CMMS/views/odt/registrar-odt.php`
+                if (idrolusuario == 1) { //ESTE ROL ES DE ADMINSITRACDOR
+                    const liEditar = li.getAttribute('data-id')
+                    const tareaId = li.getAttribute('data-tarea-id');
+                    console.log("lioEditar: ", liEditar)
+                    window.localStorage.clear();
+                    window.localStorage.setItem('idodt', liEditar);
+                    window.localStorage.setItem('idtarea', tareaId);
+                    window.location.href = `http://localhost/CMMS/views/odt/registrar-odt.php`
+                } else {
+                    showToast(`Solo administradores pueden editar la orden de trabajo.`, 'ERROR', 6000);
+                    return
+                }
             })
         })
 
         $all(".li-revision").forEach(li => {
             li.addEventListener("click", async () => {
-                const liRevision = li.getAttribute('data-id');
-                console.log("liRevisionIDDATA: ", liRevision);
+                if (idrolusuario == 2) {
+                    const liRevision = li.getAttribute('data-id');
+                    console.log("liRevisionIDDATA: ", liRevision);
 
-                // Llama a la función para obtener tareas y encuentra la tarea seleccionada
-                const tareasOdt = await obtenerTareasOdt();
-                console.log("tareasOdt: ", tareasOdt);
-                const tareaOdtSeleccionada = tareasOdt.find(t => t.idorden_trabajo == liRevision);
-                console.log("Tarea ODT seleccionada para revisión: ", tareaOdtSeleccionada);
+                    // Llama a la función para obtener tareas y encuentra la tarea seleccionada
+                    const tareasOdt = await obtenerTareasOdt();
+                    console.log("tareasOdt: ", tareasOdt);
+                    const tareaOdtSeleccionada = tareasOdt.find(t => t.idorden_trabajo == liRevision);
+                    console.log("Tarea ODT seleccionada para revisión: ", tareaOdtSeleccionada);
 
-                if (tareaOdtSeleccionada && tareaOdtSeleccionada.nom_estado === "proceso") {
-                    if (tareaOdtSeleccionada.clasificacion == null || tareaOdtSeleccionada.clasificacion == 9) {
-                        alert("ESTA ODT NO PUEDE SER REVISADA PORQUE NO ESTÁ AL 100%");
+                    if (tareaOdtSeleccionada && tareaOdtSeleccionada.nom_estado === "proceso") {
+                        if (tareaOdtSeleccionada.clasificacion == null || tareaOdtSeleccionada.clasificacion == 9) {
+                            alert("ESTA ODT NO PUEDE SER REVISADA PORQUE NO ESTÁ AL 100%");
+                        } else {
+                            window.localStorage.clear();
+                            window.localStorage.setItem('idodt', liRevision);
+                            const actualizado = await actualizarEstadoOdt(10, liRevision); // liRevision = idodt
+                            console.log("Actualizado ODT a revisión?: ", actualizado);
+                            window.location.href = `http://localhost/CMMS/views/odt/revisar-odt.php`;
+                        }
+                    } else if (tareaOdtSeleccionada && tareaOdtSeleccionada.nom_estado === "pendientes") {
+                        alert("Esta orden está en pendientes, primero procésala.");
+                    } else if (tareaOdtSeleccionada && tareaOdtSeleccionada.nom_estado === "revision") {
+                        alert("Esta orden ya está en revisión, no puedes redirigir.");
+                    } else if (tareaOdtSeleccionada && tareaOdtSeleccionada.nom_estado === "finalizado") {
+                        alert("Esta orden ya está finalizada, no puedes redirigir.");
                     } else {
-                        window.localStorage.clear();
-                        window.localStorage.setItem('idodt', liRevision);
-                        const actualizado = await actualizarEstadoOdt(10, liRevision); // liRevision = idodt
-                        console.log("Actualizado ODT a revisión?: ", actualizado);
-                        window.location.href = `http://localhost/CMMS/views/odt/revisar-odt.php`;
+                        alert("Estado de la tarea no válido para la revisión.");
                     }
-                } else if (tareaOdtSeleccionada && tareaOdtSeleccionada.nom_estado === "pendientes") {
-                    alert("Esta orden está en pendientes, primero procésala.");
-                } else if (tareaOdtSeleccionada && tareaOdtSeleccionada.nom_estado === "revision") {
-                    alert("Esta orden ya está en revisión, no puedes redirigir.");
-                } else if (tareaOdtSeleccionada && tareaOdtSeleccionada.nom_estado === "finalizado") {
-                    alert("Esta orden ya está finalizada, no puedes redirigir.");
                 } else {
-                    alert("Estado de la tarea no válido para la revisión.");
+                    showToast(`Solo usuarios pueden mandar a revisar la orden de trabajo.`, 'ERROR', 6000);
+                    return
                 }
             })
         })
@@ -430,7 +508,7 @@ $(document).ready(async () => {
     // ******************************* FIN DE SECCION DE REGISTROS ****************************
 
     // ********************* SECCION DE ACTUALIZAR ******************************************
-    async function actualizarTareaEstado(idtarea, estado) {        
+    async function actualizarTareaEstado(idtarea, estado) {
         const formActualizacion = new FormData()
         formActualizacion.append("operation", "actualizarTareaEstado")
         formActualizacion.append("idtarea", idtarea)
@@ -482,5 +560,10 @@ $(document).ready(async () => {
         } */
     }
 
+    async function verificarRolUsuario() {
+        const usuario = await obtenerUsuario()
+        console.log("usuario: ", usuario)
+        idrolusuario = usuario[0].idrol
+    }
     // ******************************* FIN SECCION DE VERIFICACIONES ******************************************
 })

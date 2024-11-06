@@ -35,7 +35,7 @@ class Tarea extends ExecQuery
         array(
           $params['idplantarea'],
           $params['idtipo_prioridad'],
-          $params['descripcion'],      
+          $params['descripcion'],
           $params['idsubcategoria'],
           $params['intervalo'],
           $params['idfrecuencia'],
@@ -110,9 +110,10 @@ class Tarea extends ExecQuery
     } catch (Exception $e) {
       die($e->getMessage());
     }
-  } 
+  }
 
-  public function obtenerTareas():array{
+  public function obtenerTareas(): array
+  {
     try {
       $sp = parent::execQ("CALL obtenerTareas");
       $sp->execute();
@@ -121,7 +122,7 @@ class Tarea extends ExecQuery
       die($e->getMessage());
     }
   } // INTEGRADO ✔
-  
+
   public function actualizarTareaEstado($params = []): bool
   {
     try {
@@ -131,6 +132,21 @@ class Tarea extends ExecQuery
         $params['idtarea'],
         $params['idestado'],
         $params['trabajado']
+      ));
+      return $status;
+    } catch (Exception $e) {
+      die($e->getMessage());
+    }
+  } // INTEGRADO ✔
+
+  public function actualizarTareaEstadoPausado($params = []): bool
+  {
+    try {
+      $status = false;
+      $sp = parent::execQ("CALL actualizarTareaEstadoPausado(?,?)");
+      $status = $sp->execute(array(
+        $params['idtarea'],
+        $params['pausado']
       ));
       return $status;
     } catch (Exception $e) {

@@ -20,6 +20,7 @@ $(document).ready(async () => {
   const host = "http://localhost/CMMS/controllers/";
   let idordengenerada = window.localStorage.getItem("idodt")
   let idtarea = -1
+  let idrolusuario = -1;
   let iddiagnosticoEntrada = -1
   let iddiagnosticoSalidaGenerado = -1;
   let iddiagnosticoGeneradoEntrada = -1
@@ -38,6 +39,7 @@ $(document).ready(async () => {
   const contenedorResponsablesOdt = $q(".contenedor-responsablesOdt")
   const contenedorEvidenciaPreviaEntrada = $q("#preview-container-entrada")
   const contenedorEvidenciaPreviaSalida = $q("#preview-container-salida")
+  const contenedorOrden = $q("#contenedor-orden")
 
 
   //BOTONES
@@ -50,6 +52,7 @@ $(document).ready(async () => {
   const btnGuardarDianogsticoEntrada = $q("#btn-guardar-diagnostico-entrada")
 
 
+  await verificarRolUsuario()
   //Ejecutar funciones 
   await obtenerOdt() // paso 1 
   //await obtenerDiagnostico(1)
@@ -74,13 +77,21 @@ $(document).ready(async () => {
 
 
   //******************************* SECCION DE OBTENER DATOS ***************************************
+  async function obtenerUsuario() {
+    const paramsUsuario = new URLSearchParams()
+    paramsUsuario.append("operation", "getUserById")
+    paramsUsuario.append("idusuario", idusuario)
+    const usuarioObtenido = await getDatos(`${host}usuarios.controller.php`, paramsUsuario)
+    console.log("usuarioObtenido: ", usuarioObtenido)
+    return usuarioObtenido
+  }
 
   async function obtenerOdt() {
     const params = new URLSearchParams()
     params.append("operation", "obtenerTareaDeOdtGenerada")
     params.append("idodt", idordengenerada)
     const odt = await getDatos(`${host}ordentrabajo.controller.php`, params)
-    idtarea = odt[0].idtarea
+    idtarea = odt[0]?.idtarea
     console.log("odt: ", odt)
     return odt
   }
@@ -235,6 +246,17 @@ $(document).ready(async () => {
     formActualizacion.append("idactivo", idactivo)
     formActualizacion.append("idestado", idestado)
     const Factualizado = await fetch(`${host}activo.controller.php`, { method: 'POST', body: formActualizacion })
+    const actualizado = await Factualizado.json()
+    return actualizado
+  }
+
+  async function actualizarFechaFinalOdt(idodt, fechafinal, horafinal) {
+    const formActualizacion = new FormData()
+    formActualizacion.append("operation", "actualizarFechaFinalOdt")
+    formActualizacion.append("idodt", idodt)
+    formActualizacion.append("fechafinal", fechafinal)
+    formActualizacion.append("horafinal", horafinal)
+    const Factualizado = await fetch(`${host}ordentrabajo.controller.php`, { method: 'POST', body: formActualizacion })
     const actualizado = await Factualizado.json()
     return actualizado
   }
@@ -454,47 +476,55 @@ $(document).ready(async () => {
   }
 
   async function verificarDiagnosticoSalidaRegistrado() {
-    const diagnostico = await obtenerDiagnostico(2)
-    const detalleOdt = await obtenerDetalleOdt()
-    if (diagnostico.length == 1 || detalleOdt.length > 1) {
-      hayDiagnostico = true
-      txtDiagnosticoSalida.disabled = false
-      btnGuardarDianogsticoSalida.disabled = false
-      alert("ya hay un diagnostico de salida registrado")
-      txtDiagnosticoSalida.value = diagnostico[0].diagnostico
-      console.log("DIAGNOSTICO TRAIDO: ", diagnostico)
-      iddiagnosticoSalidaGenerado = diagnostico[0].iddiagnostico
-      return
+    if (idrolusuario == 2) {
+      const diagnostico = await obtenerDiagnostico(2)
+      const detalleOdt = await obtenerDetalleOdt()
+      if (diagnostico.length == 1 || detalleOdt.length > 1) {
+        hayDiagnostico = true
+        txtDiagnosticoSalida.disabled = false
+        btnGuardarDianogsticoSalida.disabled = false
+        alert("ya hay un diagnostico de salida registrado")
+        txtDiagnosticoSalida.value = diagnostico[0].diagnostico
+        console.log("DIAGNOSTICO TRAIDO: ", diagnostico)
+        iddiagnosticoSalidaGenerado = diagnostico[0].iddiagnostico
+        return
+      } else {
+        const diagnostico = await registrarDiagnosticoSalida()
+        alert("se creo un nuevo diagnostico de salida")
+        hayDiagnostico = true
+        console.log("id diagnostico generado: ", diagnostico)
+        alert("registrando diagn,.....")
+        iddiagnosticoSalidaGenerado = diagnostico.id
+        console.log("iddiagnosticoSalidaGenerado: ", iddiagnosticoSalidaGenerado)
+        return
+      }
     } else {
-      const diagnostico = await registrarDiagnosticoSalida()
-      alert("se creo un nuevo diagnostico de salida")
-      hayDiagnostico = true
-      console.log("id diagnostico generado: ", diagnostico)
-      alert("registrando diagn,.....")
-      iddiagnosticoSalidaGenerado = diagnostico.id
-      console.log("iddiagnosticoSalidaGenerado: ", iddiagnosticoSalidaGenerado)
       return
     }
   }
 
   async function verificarDiagnosticoEntradaRegistrado() {
-    const diagnostico = await obtenerDiagnostico(1)
-    const detalleOdt = await obtenerDetalleOdt()
-    console.log("diagnostico para verificar: ", diagnostico)
-    if (diagnostico.length == 1 || detalleOdt.length > 1) {
-      hayDiagnostico = true
-      txtDiagnosticoEntrada.disabled = false
-      btnGuardarDianogsticoEntrada.disabled = false
-      alert("ya hay un diagnostico de entrada registrado")
-      txtDiagnosticoEntrada.value = diagnostico[0].diagnostico
-      iddiagnosticoGeneradoEntrada = diagnostico[0].iddiagnostico
-      return
+    if (idrolusuario == 2) {
+      const diagnostico = await obtenerDiagnostico(1)
+      const detalleOdt = await obtenerDetalleOdt()
+      console.log("diagnostico para verificar: ", diagnostico)
+      if (diagnostico.length == 1 || detalleOdt.length > 1) {
+        hayDiagnostico = true
+        txtDiagnosticoEntrada.disabled = false
+        btnGuardarDianogsticoEntrada.disabled = false
+        alert("ya hay un diagnostico de entrada registrado")
+        txtDiagnosticoEntrada.value = diagnostico[0].diagnostico
+        iddiagnosticoGeneradoEntrada = diagnostico[0].iddiagnostico
+        return
+      } else {
+        const diagnostico = await registrarDiagnosticoEntrada()
+        //alert("se creo un nuevo diagnostico")
+        hayDiagnostico = true
+        console.log("id diagnostico entrada generado: ", diagnostico.id)
+        iddiagnosticoGeneradoEntrada = diagnostico.id
+        return
+      }
     } else {
-      const diagnostico = await registrarDiagnosticoEntrada()
-      //alert("se creo un nuevo diagnostico")
-      hayDiagnostico = true
-      console.log("id diagnostico entrada generado: ", diagnostico.id)
-      iddiagnosticoGeneradoEntrada = diagnostico.id
       return
     }
   }
@@ -572,6 +602,22 @@ $(document).ready(async () => {
     } */
   }
 
+  async function verificarRolUsuario() {
+    const usuario = await obtenerUsuario()
+    console.log("usuario: ", usuario)
+    idrolusuario = usuario[0].idrol
+    if (idrolusuario == 1) {
+      contenedorOrden.innerHTML = `        
+      <div class="container-fluid">
+          <div class="row">
+              <h1 class="">Solo usuarios pueden registrar una orden de trabajo.</h1>
+          </div>
+      </div>
+      `
+      return
+    }
+  }
+
   /* async function verificarEvidenciasRegistradas(iddiagnostico) {
     const evidenciasObtenidas = await obtenerEvidencias(iddiagnostico);
     console.log("Evidencias obtenidas: ", evidenciasObtenidas);
@@ -609,22 +655,23 @@ $(document).ready(async () => {
       }
 
       // Crear el objeto FormData y añadir los datos
-      const formEvidencia = new FormData();
-      formEvidencia.append("operation", "registrarEvidenciaDiagnostico")
-      formEvidencia.append("iddiagnostico", iddiagnosticoGeneradoEntrada);
-      formEvidencia.append("evidencia", evidenciaImagen); // Aquí se añade el archivo de evidencia (imagen)
+      if (idrolusuario == 2) {
+        const formEvidencia = new FormData();
+        formEvidencia.append("operation", "registrarEvidenciaDiagnostico")
+        formEvidencia.append("iddiagnostico", iddiagnosticoGeneradoEntrada);
+        formEvidencia.append("evidencia", evidenciaImagen); // Aquí se añade el archivo de evidencia (imagen)
 
-      try {
-        const Frespuesta = await fetch(`${host}diagnostico.controller.php`, { method: 'POST', body: formEvidencia })
-        const subida = await Frespuesta.json();
-        if (subida.guardado === 'success') {
-          showToast(subida.message, 'INFO')
-          //renderizar imagen
+        try {
+          const Frespuesta = await fetch(`${host}diagnostico.controller.php`, { method: 'POST', body: formEvidencia })
+          const subida = await Frespuesta.json();
+          if (subida.guardado === 'success') {
+            showToast(subida.message, 'INFO')
+            //renderizar imagen
 
-          // Renderizar imagen y botón usando HTML directo
-          const imgSrc = URL.createObjectURL(evidenciaImagen); // Crear URL temporal de la imagen
+            // Renderizar imagen y botón usando HTML directo
+            const imgSrc = URL.createObjectURL(evidenciaImagen); // Crear URL temporal de la imagen
 
-          contenedorEvidenciaPreviaEntrada.innerHTML = `
+            contenedorEvidenciaPreviaEntrada.innerHTML = `
                     <div class="card mb-3 text-center">
                         <img src="${imgSrc}" class="card-img-top modal-img" alt="Evidencia" style="max-width: 500px;">
                         <div class="card-footer">
@@ -634,18 +681,22 @@ $(document).ready(async () => {
                         </div>
                     </div>
                 `;
-          //
-          const btnAbrirModalSidebarEntrada = $q("#btnAbrirModalSidebarEntrada")
-          btnAbrirModalSidebarEntrada.addEventListener("click", async () => {
-            console.log("clickeando dxdxdxd")
-            await abrirModalSidebar(iddiagnosticoGeneradoEntrada)
-          })
+            //
+            const btnAbrirModalSidebarEntrada = $q("#btnAbrirModalSidebarEntrada")
+            btnAbrirModalSidebarEntrada.addEventListener("click", async () => {
+              console.log("clickeando dxdxdxd")
+              await abrirModalSidebar(iddiagnosticoGeneradoEntrada)
+            })
 
-        } else {
-          showToast(subida.message, 'ERROR')
+          } else {
+            showToast(subida.message, 'ERROR')
+          }
+        } catch (error) {
+          console.error('Error en la petición:', error);
         }
-      } catch (error) {
-        console.error('Error en la petición:', error);
+      } else {
+        showToast(`Solo usuarios pueden añadir evidencias a la orden de trabajo.`, 'ERROR', 6000);
+        return;
       }
     }
   })
@@ -666,22 +717,23 @@ $(document).ready(async () => {
       }
 
       // Crear el objeto FormData y añadir los datos
-      const formEvidencia = new FormData();
-      formEvidencia.append("operation", "registrarEvidenciaDiagnostico")
-      formEvidencia.append("iddiagnostico", iddiagnosticoSalidaGenerado);
-      formEvidencia.append("evidencia", evidenciaImagen); // Aquí se añade el archivo de evidencia (imagen)
+      if (idrolusuario == 2) {
+        const formEvidencia = new FormData();
+        formEvidencia.append("operation", "registrarEvidenciaDiagnostico")
+        formEvidencia.append("iddiagnostico", iddiagnosticoSalidaGenerado);
+        formEvidencia.append("evidencia", evidenciaImagen); // Aquí se añade el archivo de evidencia (imagen)
 
-      try {
-        const Frespuesta = await fetch(`${host}diagnostico.controller.php`, { method: 'POST', body: formEvidencia })
-        const subida = await Frespuesta.json();
-        if (subida.guardado === 'success') {
-          showToast(subida.message, 'INFO')
-          //renderizar imagen
+        try {
+          const Frespuesta = await fetch(`${host}diagnostico.controller.php`, { method: 'POST', body: formEvidencia })
+          const subida = await Frespuesta.json();
+          if (subida.guardado === 'success') {
+            showToast(subida.message, 'INFO')
+            //renderizar imagen
 
-          // Renderizar imagen y botón usando HTML directo
-          const imgSrc = URL.createObjectURL(evidenciaImagen); // Crear URL temporal de la imagen
+            // Renderizar imagen y botón usando HTML directo
+            const imgSrc = URL.createObjectURL(evidenciaImagen); // Crear URL temporal de la imagen
 
-          contenedorEvidenciaPreviaSalida.innerHTML = `
+            contenedorEvidenciaPreviaSalida.innerHTML = `
                     <div class="card mb-3 text-center">
                         <img src="${imgSrc}" class="card-img-top modal-img" alt="Evidencia" style="max-width: 500px;">
                         <div class="card-footer">
@@ -691,40 +743,29 @@ $(document).ready(async () => {
                         </div>
                     </div>
                 `;
-          //
-          const btnAbrirModalSidebarSalida = $q("#btnAbrirModalSidebarSalida")
-          btnAbrirModalSidebarSalida.addEventListener("click", async () => {
-            console.log("clickeando dxdxdxd")
-            await abrirModalSidebar(iddiagnosticoSalidaGenerado)
-          })
+            //
+            const btnAbrirModalSidebarSalida = $q("#btnAbrirModalSidebarSalida")
+            btnAbrirModalSidebarSalida.addEventListener("click", async () => {
+              console.log("clickeando dxdxdxd")
+              await abrirModalSidebar(iddiagnosticoSalidaGenerado)
+            })
 
-        } else {
-          showToast(subida.message, 'ERROR')
+          } else {
+            showToast(subida.message, 'ERROR')
+          }
+        } catch (error) {
+          console.error('Error en la petición:', error);
         }
-      } catch (error) {
-        console.error('Error en la petición:', error);
+      } else {
+        showToast(`Solo usuarios pueden añadir evidencias a la orden de trabajo.`, 'ERROR', 6000);
+        return;
       }
     }
   })
 
   btnIniciar.addEventListener("click", async () => {
-    const activosPorTarea = await obtenerActivosPorTarea(idtarea); // Obtener los activos asignados a la tarea actual
-    let permitir = true;
-
-    // Verificar si algún activo de esta tarea ya está en mantenimiento en otra tarea
-    for (let e = 0; e < activosPorTarea.length; e++) {
-      const activo = activosPorTarea[e];
-
-      // Comprobar si el activo está en estado "en mantenimiento" (2) pero en otra tarea
-      if (activo.idestado === 2 && activo.idtarea !== idtarea) {
-        showToast(`El activo con ID ${activo.idactivo} está en mantenimiento en otra tarea y no se puede iniciar esta orden.`, 'ERROR', 6000);
-        permitir = false;
-        return; // Detener la ejecución si se encuentra un conflicto
-      }
-    }
-
-    // Si todos los activos están disponibles, procede
-    if (permitir) {
+    if (idrolusuario == 2) { //rol usuario
+      const activosPorTarea = await obtenerActivosPorTarea(idtarea);
       console.log("Iniciando orden...");
 
       const detalleOdt = await obtenerDetalleOdt();
@@ -760,94 +801,134 @@ $(document).ready(async () => {
       btnFinalizar.disabled = false;
       txtFechaFinal.innerText = "";
       txtTiempoEjecucion.innerText = "";
+      //const activosPorTarea = await obtenerActivosPorTarea(idtarea); // Obtener los activos asignados a la tarea actual
+      //let permitir = true;
+
+      // Verificar si algún activo de esta tarea ya está en mantenimiento en otra tarea
+      /* for (let e = 0; e < activosPorTarea.length; e++) {
+        const activo = activosPorTarea[e];
+  
+        // Comprobar si el activo está en estado "en mantenimiento" (2) pero en otra tarea
+        if (activo.idestado === 2 && activo.idtarea !== idtarea) {
+          showToast(`El activo con ID ${activo.idactivo} está en mantenimiento en otra tarea y no se puede iniciar esta orden.`, 'ERROR', 6000);
+          permitir = false;
+          return; // Detener la ejecución si se encuentra un conflicto
+        }
+      }
+  
+      // Si todos los activos están disponibles, procede
+      if (permitir) {
+        
+      } */
+    } else {
+      showToast(`Solo usuarios pueden ejecutar la orden de trabajo.`, 'ERROR', 6000);
+      return;
     }
 
   })
 
   btnGuardarDianogsticoEntrada.addEventListener("click", async () => {
-    const dEntradaActualizada = await actualizarDiagnosticoEntrada()
-    console.log("dEntradaActualizada: ", dEntradaActualizada)
+    if (idrolusuario == 2) {
+      const dEntradaActualizada = await actualizarDiagnosticoEntrada()
+      console.log("dEntradaActualizada: ", dEntradaActualizada)
+    } else {
+      showToast(`Solo usuarios pueden ejecutar la orden de trabajo.`, 'ERROR', 6000);
+      return;
+    }
   })
 
   btnGuardarDianogsticoSalida.addEventListener("click", async () => {
-    const actualizado = await actualizarDiagnosticoSalida()
-    console.log("actualizado diagnostico salida:? ", actualizado)
+    if (idrolusuario == 2) {
+      const actualizado = await actualizarDiagnosticoSalida()
+      console.log("actualizado diagnostico salida:? ", actualizado)
+    } else {
+      showToast(`Solo usuarios pueden ejecutar la orden de trabajo.`, 'ERROR', 6000);
+      return;
+    }
   })
 
   btnFinalizar.addEventListener("click", async () => {
     // Obtener el detalle ODT registrado
-    const detalleOdt = await obtenerDetalleOdt();
+    if (idrolusuario == 2) {
+      const detalleOdt = await obtenerDetalleOdt();
 
-    if (detalleOdt.length > 0) {
-      const ultimoDetalle = detalleOdt[detalleOdt.length - 1];
+      if (detalleOdt.length > 0) {
+        const ultimoDetalle = detalleOdt[detalleOdt.length - 1];
 
-      if (ultimoDetalle.intervalos_ejecutados >= intervalos) {
+        if (ultimoDetalle.intervalos_ejecutados >= intervalos) {
 
-        console.log("Se ha alcanzado el límite de intervalos ejecutados.");
-        btnFinalizar.disabled = true;
-        return;
-      }
-
-      const fechaFinal = new Date().toLocaleString('en-CA', { hour12: false }).replace(',', '').replace('/', '-').replace('/', '-');
-      console.log("FECHA FINAL OBTENIDA: ", fechaFinal);
-
-      const fechaInicial = new Date(ultimoDetalle.fecha_inicial);
-      const tiempoEjecucionMs = new Date(fechaFinal) - fechaInicial;
-
-      const tiempoEjecucionHoras = Math.floor(tiempoEjecucionMs / (1000 * 60 * 60));
-      const tiempoEjecucionMinutos = Math.floor((tiempoEjecucionMs % (1000 * 60 * 60)) / (1000 * 60));
-      const tiempoEjecucionSegundos = Math.floor((tiempoEjecucionMs % (1000 * 60)) / 1000);
-      const tiempoEjecucion = `${tiempoEjecucionHoras.toString().padStart(2, '0')}:${tiempoEjecucionMinutos.toString().padStart(2, '0')}:${tiempoEjecucionSegundos.toString().padStart(2, '0')}`;
-      console.log("Tiempo ejecutado (formato HH:MM:SS): ", tiempoEjecucion);
-
-      const nuevoIntervalo = ultimoDetalle.intervalos_ejecutados + 1;
-      const actualizado = await actualizarDetalleOdt(fechaFinal, tiempoEjecucion, nuevoIntervalo, 9);
-
-      console.log("DETALLE ODT ACTUALIZADO??? => ", actualizado);
-      if (actualizado.actualizado) {
-        const detalleActualizadoData = await obtenerDetalleOdt();
-        console.log("detalleActualizadoData: ", detalleActualizadoData);
-
-        txtFechaFinal.innerText = detalleActualizadoData[detalleActualizadoData.length - 1].fecha_final;
-        txtTiempoEjecucion.innerText = detalleActualizadoData[detalleActualizadoData.length - 1].tiempo_ejecucion;
-        txtIntervalosEjecutados.innerText = detalleActualizadoData[detalleActualizadoData.length - 1].intervalos_ejecutados;
-        btnIniciar.disabled = false
-        btnFinalizar.disabled = true
-        const detalleOdt = await obtenerDetalleOdt();
-        console.log("detalleOdt:_ ", detalleOdt);
-        if (detalleOdt[detalleOdt.length - 1]?.intervalos_ejecutados == intervalos) {
-          alert("ya ejecutaste todos los intervalos, esta completo");
-          btnIniciar.disabled = true;
-        }
-        if (nuevoIntervalo >= intervalos) {
-          const fechaFinal = new Date().toLocaleString('en-CA', { hour12: false }).replace(',', '').replace('/', '-').replace('/', '-');
-          console.log("FECHA FINAL OBTENIDA: ", fechaFinal);
-
-          const fechaInicial = new Date(ultimoDetalle.fecha_inicial);
-          const tiempoEjecucionMs = new Date(fechaFinal) - fechaInicial;
-
-          const tiempoEjecucionHoras = Math.floor(tiempoEjecucionMs / (1000 * 60 * 60));
-          const tiempoEjecucionMinutos = Math.floor((tiempoEjecucionMs % (1000 * 60 * 60)) / (1000 * 60));
-          const tiempoEjecucionSegundos = Math.floor((tiempoEjecucionMs % (1000 * 60)) / 1000);
-          const tiempoEjecucion = `${tiempoEjecucionHoras.toString().padStart(2, '0')}:${tiempoEjecucionMinutos.toString().padStart(2, '0')}:${tiempoEjecucionSegundos.toString().padStart(2, '0')}`;
-          console.log("Tiempo ejecutado (formato HH:MM:SS): ", tiempoEjecucion);
-
-          const nuevoIntervalo = ultimoDetalle.intervalos_ejecutados + 1;
-          const actualizado = await actualizarDetalleOdt(fechaFinal, tiempoEjecucion, nuevoIntervalo, 11);
-
-          const detalles = await obtenerDetalleOdt()
-
-
-          for (let i = 0; i < detalles.length; i++) {
-            const actualizadoDodt = await actualizarDetalleOdt(detalles[i].fecha_final, detalles[i].tiempo_ejecucion, detalles[i].intervalos_ejecutados, 11, detalles[i].iddetalleodt);
-            console.log("actualizadoDodt => ", actualizadoDodt)
-          }
-
-          console.log("DETALLE ODT ACTUALIZADO y detalle actualizado a clasificacion finalizada => ", actualizado);
-          btnFinalizar.disabled = true;
           console.log("Se ha alcanzado el límite de intervalos ejecutados.");
+          btnFinalizar.disabled = true;
+          return;
+        }
+
+        const fechaFinal = new Date().toLocaleString('en-CA', { hour12: false }).replace(',', '').replace('/', '-').replace('/', '-');
+        console.log("FECHA FINAL OBTENIDA: ", fechaFinal);
+
+        const fechaInicial = new Date(ultimoDetalle.fecha_inicial);
+        const tiempoEjecucionMs = new Date(fechaFinal) - fechaInicial;
+
+        const tiempoEjecucionHoras = Math.floor(tiempoEjecucionMs / (1000 * 60 * 60));
+        const tiempoEjecucionMinutos = Math.floor((tiempoEjecucionMs % (1000 * 60 * 60)) / (1000 * 60));
+        const tiempoEjecucionSegundos = Math.floor((tiempoEjecucionMs % (1000 * 60)) / 1000);
+        const tiempoEjecucion = `${tiempoEjecucionHoras.toString().padStart(2, '0')}:${tiempoEjecucionMinutos.toString().padStart(2, '0')}:${tiempoEjecucionSegundos.toString().padStart(2, '0')}`;
+        console.log("Tiempo ejecutado (formato HH:MM:SS): ", tiempoEjecucion);
+
+        const nuevoIntervalo = ultimoDetalle.intervalos_ejecutados + 1;
+        const actualizado = await actualizarDetalleOdt(fechaFinal, tiempoEjecucion, nuevoIntervalo, 9);
+
+        console.log("DETALLE ODT ACTUALIZADO??? => ", actualizado);
+        if (actualizado.actualizado) {
+          const detalleActualizadoData = await obtenerDetalleOdt();
+          console.log("detalleActualizadoData: ", detalleActualizadoData);
+
+          txtFechaFinal.innerText = detalleActualizadoData[detalleActualizadoData.length - 1].fecha_final;
+          txtTiempoEjecucion.innerText = detalleActualizadoData[detalleActualizadoData.length - 1].tiempo_ejecucion;
+          txtIntervalosEjecutados.innerText = detalleActualizadoData[detalleActualizadoData.length - 1].intervalos_ejecutados;
+          btnIniciar.disabled = false
+          btnFinalizar.disabled = true
+          const detalleOdt = await obtenerDetalleOdt();
+          console.log("detalleOdt:_ ", detalleOdt);
+          if (detalleOdt[detalleOdt.length - 1]?.intervalos_ejecutados == intervalos) {
+            alert("ya ejecutaste todos los intervalos, esta completo");
+            btnIniciar.disabled = true;
+          }
+          if (nuevoIntervalo >= intervalos) {
+            const fechaFinal = new Date().toLocaleString('en-CA', { hour12: false }).replace(',', '').replace('/', '-').replace('/', '-');
+            console.log("FECHA FINAL OBTENIDA: ", fechaFinal);
+            const horaFinal = fechaFinal.split(' ')[1];
+
+            const fechaInicial = new Date(ultimoDetalle.fecha_inicial);
+            const tiempoEjecucionMs = new Date(fechaFinal) - fechaInicial;
+
+            const tiempoEjecucionHoras = Math.floor(tiempoEjecucionMs / (1000 * 60 * 60));
+            const tiempoEjecucionMinutos = Math.floor((tiempoEjecucionMs % (1000 * 60 * 60)) / (1000 * 60));
+            const tiempoEjecucionSegundos = Math.floor((tiempoEjecucionMs % (1000 * 60)) / 1000);
+            const tiempoEjecucion = `${tiempoEjecucionHoras.toString().padStart(2, '0')}:${tiempoEjecucionMinutos.toString().padStart(2, '0')}:${tiempoEjecucionSegundos.toString().padStart(2, '0')}`;
+            console.log("Tiempo ejecutado (formato HH:MM:SS): ", tiempoEjecucion);
+
+            const nuevoIntervalo = ultimoDetalle.intervalos_ejecutados + 1;
+            const actualizado = await actualizarDetalleOdt(fechaFinal, tiempoEjecucion, nuevoIntervalo, 11);
+            const fechaFinalOdtAct = await actualizarFechaFinalOdt(idordengenerada, fechaFinal, horaFinal)
+            console.log("fechaFinalOdtAct: ", fechaFinalOdtAct)
+
+            const detalles = await obtenerDetalleOdt()
+
+
+            for (let i = 0; i < detalles.length; i++) {
+              const actualizadoDodt = await actualizarDetalleOdt(detalles[i].fecha_final, detalles[i].tiempo_ejecucion, detalles[i].intervalos_ejecutados, 11, detalles[i].iddetalleodt);
+              console.log("actualizadoDodt => ", actualizadoDodt)
+            }
+
+            console.log("DETALLE ODT ACTUALIZADO y detalle actualizado a clasificacion finalizada => ", actualizado);
+            btnFinalizar.disabled = true;
+            console.log("Se ha alcanzado el límite de intervalos ejecutados.");
+          }
         }
       }
+    } else {
+      showToast(`Solo usuarios pueden ejecutar la orden de trabajo.`, 'ERROR', 6000);
+      return;
     }
 
 
