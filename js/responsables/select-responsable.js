@@ -55,7 +55,13 @@ document.addEventListener("DOMContentLoaded", () => {
           const data = await filterUsuarios(idactivo);
           await showDataTable(data);
           await showDataActivo(idactivo);
-          await showUbicacion(idactivo);
+          const ubi = await showUbicacion(idactivo);
+
+          if(ubi.length===0){
+            selector("ubicacion").value="No ha sido asignado";
+          }else{
+            selector("ubicacion").value = ubi[0].ubicacion;
+          }
           //idactivo=0;
           //console.log(data);
         });
@@ -165,7 +171,19 @@ document.addEventListener("DOMContentLoaded", () => {
         const id = e.target.getAttribute("data-idresp");
         const {respuesta} = await addResponsable(id);
         console.log(respuesta);
-        alert("Has elegido al responsable principal");
+        
+        if(respuesta>0){
+          console.log(respuesta);
+          const notifi = await addNotificacion(id);
+          console.log("notifi",notifi);
+          if(notifi.respuesta>0){
+            const historial = await addHistorial(id);
+            console.log("historial", historial);
+            if(historial.mensaje>0){
+              alert("Has elegido al responsable principal");
+            }
+          }          
+        }
       }
     }
   }
@@ -216,13 +234,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const data = await getDatos(`${host}/historialactivo.controller.php`, params);
 
-    if(data.length===0){
-      selector("ubicacion").value="No ha sido asignado";
-    }else{
-      selector("ubicacion").value = data[0].ubicacion;
-    }
-    //console.log("ubi data",data);
-    
+    return data;
   }
 
   function showEspecificaciones(data){
@@ -240,4 +252,50 @@ document.addEventListener("DOMContentLoaded", () => {
 
   }
 
+  async function getIdUserLoged(){
+    const params = new URLSearchParams();
+    params.append("operation", "searchUser");
+    params.append("usuario", selector("nomuser").textContent);
+
+    const data = await getDatos(`${host}/usuarios.controller.php`, params);
+    return data;
+  }
+
+  async function addNotificacion(idactivo_resp){
+    const params = new FormData();
+    params.append("operation","add");
+    params.append("idactivo_resp", idactivo_resp);
+    params.append("tipo","Asignacion como responsable principal");
+    params.append("mensaje", "Te han asignado como responsable principal de un activo");
+    params.append("idactivo", idactivo);
+
+    const resp = await fetch(`${host}/notificacion.controller.php`,{
+      method:'POST',
+      body:params
+    });
+    const data = await resp.json();
+    return data;
+  }
+
+  async function addHistorial(idactivo_resp){
+    const user = await getIdUserLoged();
+    const ubi = await showUbicacion(idactivo);
+    console.log(user);
+    
+    const params = new FormData();
+    params.append("operation", "add");
+    params.append("idactivo_resp", idactivo_resp);
+    params.append("idubicacion", ubi[0].idubicacion);
+    params.append("accion", "Asignacion como responsable principal");
+    params.append("responsable_accion", user[0].id_usuario);
+    params.append("idactivo", "");
+
+    const resp = await fetch(`${host}/historialactivo.controller.php`,{
+      method:'POST',
+      body:params
+    });
+
+    const data = await resp.json();
+    return data;
+  }
 })

@@ -194,7 +194,7 @@ document.addEventListener("DOMContentLoaded", () => {
         
         const isUpdated = await addHistorial(globals.idRes, "Actualizar ubicacion");
 
-        if(isUpdated.mensaje==="Historial guardado"){
+        if(isUpdated.mensaje>0){
           //console.log(usuario);
           const addNotif = await addNotificacion(globals.idRes, 
             "Cambio de ubicacion", "Se ha cambiado de ubicacion un activo que te han asignado", globals.idactivo);
@@ -290,7 +290,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const {mensaje} = await addHistorial(data_resp[i], "Designacion de activo");
       console.log(mensaje);
       
-      if(isAdd>0 && updateAsg>0 && mensaje==="Historial guardado"){
+      if(isAdd>0 && updateAsg>0 && mensaje>0){
         cont++;
       }
     }
@@ -330,7 +330,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const isAdd = await addNotificacion(diferentRespRP[0], 
       "Cambio de responsable Principal", "Ya no eres responsable principal del activo", globals.idactivo);
     const {mensaje} = await addHistorial(diferentRespRP[0], "Designacion responsable principal");
-    if(isAdd>0 && resp.respuesta>0 && mensaje==="Historial guardado"){
+    if(isAdd>0 && resp.respuesta>0 && mensaje>0){
       isChange = true;
     }
     return isChange;
@@ -432,6 +432,7 @@ document.addEventListener("DOMContentLoaded", () => {
     params.append("idubicacion", parseInt(selector("ubicacion").value));
     params.append("accion", accion);
     params.append("responsable_accion", iduser);
+    params.append("idactivo", "");
 
     const data = await fetch(`${globals.host}historialactivo.controller.php`, {
       method: "POST",

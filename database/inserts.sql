@@ -18,7 +18,8 @@ INSERT INTO PERSONAS (idtipodoc, num_doc, apellidos, nombres, genero, telefono) 
 (1, '34567890', 'Sánchez', 'Pedro', 'M', '555-1314'),
 (2, '65432109', 'Ramírez', 'Marta', 'F', '555-1516'),
 (1, '45678901', 'Torres', 'Jorge', 'M', '555-1718'),
-(2, '54321098', 'Hernández', 'Lucía', 'F', '555-1920');
+(2, '54321098', 'Hernández', 'Lucía', 'F', '555-1920'),
+(1, '89239048', 'Valencia', 'Dilan', 'M', '934894556');
 
 INSERT INTO ROLES (rol) VALUES 
 ('Administrador'),
@@ -42,7 +43,7 @@ INSERT INTO USUARIOS (idpersona, idrol, usuario, contrasena) VALUES
 (1, 1, 'j.gonzalez', '$2y$10$TpMmHZcum7YJqXOqTrsDy.WheLpUnU98OZjc4WqLgPke9HlX6ZaJS'),
 (2, 2, 'a.smith', '$2y$10$HdD325QAWm7QpH7KXtRdROBKe39KwDQr6l4K83u2a0w5h/d6yNgau'),
 (3, 2, 'c.martinez', '$2y$10$x45pTq2wG/jFtZkOPhvsMe9hReDbWqjo7sv5U37MTL2g10BglS4jG'),
-(4,2,'pablo35a', '$2y$10$0xJpbL03XkLI5Zz/lCfyVu6HTYSDKKUpEfLF6BywNTBDJofh9YNlO'),
+(17,2,'dilan35a', '$2y$10$0xJpbL03XkLI5Zz/lCfyVu6HTYSDKKUpEfLF6BywNTBDJofh9YNlO'),
 (4, 2, 'r.avalos', '$2y$10$VrxeMCQteaNdX6LwxoZEYevp8BCwKTpIKTVebChbXcxnNX7BTIFaW'),
 (5, 1, 'p.avalos', '$2y$10$j1KccY6Iex7h19WR0pfMpumhp.dsjJkBCcFUbtVwbPCHw7hECJNyW'),
 (6, 1, 'garcia.juan', 'contrasena1'),

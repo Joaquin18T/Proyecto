@@ -28,13 +28,14 @@ if(isset($_POST['operation'])){
         'idactivo_resp'=>$_POST['idactivo_resp']==""?null:$_POST['idactivo_resp'],
         'idubicacion'=>$_POST['idubicacion'],
         'accion'=>$_POST['accion']==""?null:$_POST['accion'],
-        'responsable_accion'=>$_POST['responsable_accion']==""?null:$_POST['responsable_accion']
+        'responsable_accion'=>$_POST['responsable_accion']==""?null:$_POST['responsable_accion'],
+        'idactivo'=>$_POST['idactivo']==""?null:$_POST['idactivo'],
       ];
       $valor = $historialAc->add($enviarDatos);
-      if($valor){
-        $response['mensaje']="Historial guardado";
+      if($valor>0){
+        $response['mensaje']=$valor;
       }else{
-        $response['mensaje']="Hubo un error";
+        $response['mensaje']=-1;
       }
       echo json_encode($response);
       break;

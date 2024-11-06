@@ -204,7 +204,7 @@ BEGIN
     INNER JOIN personas PER ON USU.idpersona = PER.id_persona
     WHERE RES.idactivo = _idactivo AND RES.fecha_designacion IS NULL;
 END $$
--- CALL sp_users_by_activo(11);
+-- CALL sp_users_by_activo(3);
 
 DROP PROCEDURE IF EXISTS sp_search_activo_responsable;
 DELIMITER $$

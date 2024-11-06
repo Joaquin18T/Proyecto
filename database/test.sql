@@ -7,13 +7,13 @@ ALTER TABLE historial_activos AUTO_INCREMENT = 1;
 -- 8: tiene usuario pero no rp
 -- 9: ningun usuario
 -- 4: tiene usuarios y rp
-select* from activos_responsables where idactivo=9;
-select* from activos_responsables where idusuario=4;
-select*from historial_activos where idactivo_resp=3;
-select*from notificaciones_activos where idactivo_resp = 3;
-select*from activos where idactivo =26;
+select* from activos_responsables where idactivo=12;
+select* from activos_responsables where idusuario=5;
+select*from historial_activos where idactivo_resp=15;
+select*from notificaciones_activos where idactivo = 4;
+select*from activos where idactivo =22; -- V456IJDKJSDASDA
 select*from usuarios;
-select*from personas;
+select*from personas right join usuarios on personas.id_persona = usuarios.idpersona;
 select*from estados;
 select*from bajas_activo;
 select*from marcas;
@@ -21,11 +21,11 @@ select*from subcategorias;
 select*from ubicaciones;
 select*from especificacionesDefecto;
 
-DELETE FROM bajas_activo where idbaja_activo=51;
-DELETE FROM activos_responsables where idactivo_resp=25;
-DELETE FROM notificaciones_activos where idactivo_resp =5;
-DELETE FROM notificaciones_activos where idnotificacion_activo=33;
-DELETE FROM historial_activos where idhistorial_activo =64;
+DELETE FROM bajas_activo where idbaja_activo=59;
+DELETE FROM activos_responsables where idactivo_resp=22;
+DELETE FROM notificaciones_activos where idnotificacion_activo >53;
+DELETE FROM notificaciones_activos where idactivo_resp=22;
+DELETE FROM historial_activos where idhistorial_activo =94;
 DELETE FROM activos where idactivo >=47 and idactivo <53;
   
 ALTER TABLE detalles_marca_subcategoria AUTO_INCREMENT = 1;
@@ -42,18 +42,24 @@ SELECT * from activos_responsables where idactivo = 1;
 UPDATE activos SET idestado = 4 WHERE idactivo = 4;  
 DELETE FROM bajas_activo where idbaja_activo>=11;
 DELETE FROM historial_activos where idhistorial_activo >=47;
-DELETE FROM notificaciones_activos where idnotificacion_activo >=22;
+DELETE FROM notificaciones_activos where idnotificacion_activo =8;
 
 UPDATE activos SET idestado = 4 WHERE idactivo = 8;  
 DELETE FROM bajas_activo where idbaja_activo=44;
 DELETE FROM historial_activos where idhistorial_activo >=47;
 DELETE FROM notificaciones_activos where idactivo_resp >9;
 
-insert into bajas_activo(idactivo, motivo, ruta_doc, aprobacion) VALUES
-	(3, 'problemas frecuentes en su funcionamiento', 'C:/xampp/htdocs/CMMS/uploads/CAM123-Plan mantenimiento.pdf', 1);
+SELECT *
+FROM notificaciones_activos WHERE idactivo_resp = 4;
 
-insert into historial_activos(idactivo_resp, idubicacion) VALUES
-	(21, 3);
+SELECT* FROM historial_activos WHERE idactivo_resp = 4;
+        
+SELECT distinct *
+FROM notificaciones_activos NA
+INNER JOIN historial_activos HA ON NA.idactivo_resp = HA.idactivo_resp 
+WHERE HA.idactivo_resp = 4 ORDER BY HA.fecha_movimiento DESC;
+
+SELECT * FROM historial_activos;
 
 
 

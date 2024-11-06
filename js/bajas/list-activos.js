@@ -171,7 +171,7 @@ document.addEventListener("DOMContentLoaded", () => {
   //Muestra el SB
   async function btnMostrarSB(e) {
     globals.idactivo = parseInt(e.target.getAttribute("data-idactivo")); //almacena el id activo a dar de baja
-    //console.log("idactibo btn", globals.idactivo);
+    console.log("idactibo btn", globals.idactivo);
     
     //Datos a mostrar en el SB
     const valor = await getActivoById(globals.idactivo); //Obtiene datos del activo por la id
@@ -311,7 +311,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const addHis = await addHistorial(responP.idactivo_resp,dataUbi.idubicacion, "Baja de activo", iduser);
 
     console.log("historial baja", addHis);
-    if(addHis==="Historial guardado"){
+    if(addHis>0){
       const addNof = await addNotificacion(responP.idactivo_resp, globals.idactivo);
       if(addNof>0){
         allOkey = true;
@@ -355,7 +355,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const addHis = await addHistorial(idrespactivo, respIdUbi, "Baja de activo",iduser);
     console.log("add his no rp", addHis);
     
-    if(addHis==="Historial guardado"){
+    if(addHis>0){
       const addNof = await addNotificacion(idrespactivo, globals.idactivo);
       if(addNof>0){
         isOkey = true;
@@ -482,6 +482,7 @@ document.addEventListener("DOMContentLoaded", () => {
     params.append("idubicacion", idubi);
     params.append("accion", accion);
     params.append("responsable_accion", resp_accion);
+    params.append("idactivo", globals.idactivo);
 
     const data = await fetch(`${globals.host}historialactivo.controller.php`, {
       method: "POST",

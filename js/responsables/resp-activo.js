@@ -108,11 +108,14 @@ document.addEventListener("DOMContentLoaded", async () => {
           console.log("parent", e.target.parentNode);
           
           const parent = selector("imagePreview");
-          parent.removeChild(e.target.parentNode);   
+          parent.removeChild(e.target.parentNode);
+             
         }
 
         if(Object.keys(listImages).length===0){
           selector("show-sb-images").disabled = true;
+          selector("imageInput").value="";
+          contImages--;
           const sidebar = bootstrap.Offcanvas.getOrCreateInstance(selector("sb-imagenes"));
           sidebar.hide();
         }
@@ -195,7 +198,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const valor = await createNotification(x.idresp, idactivo);
         if (valor > 0) {
           const msg = await addHistorialActivo(x);
-          if (msg.mensaje != "") {
+          if (msg.mensaje >0) {
             isSaved = true;
             console.log(cont);
             
@@ -302,6 +305,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     params.append("idubicacion", selector("ubicacion").value);
     params.append("accion", "Nueva Asignacion");
     params.append("responsable_accion", iduser);
+    params.append("idactivo", "");
 
     const option = {
       method: "POST",
@@ -311,7 +315,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     return await data.json();
   }
 
-    /**
+  /**
    * Obtiene el idusuario segun el nombre del usuario
    * @param {*} user nombre del usuario
    * @returns El id del usuario
@@ -382,7 +386,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             //option.setAttribute("data-id", `${x.idsolicitud}`);
 
             option.addEventListener("click", async() => {
-              selector("activo").value = `${x.descripcion}`;
+              selector("activo").value = `${x.cod_identificacion} - ${x.descripcion}`;
               list.innerHTML = "";
               list.classList.remove('visible');
               idactivo = x.idactivo;

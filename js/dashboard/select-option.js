@@ -161,31 +161,43 @@ document.addEventListener("DOMContentLoaded", () => {
     return data;
   }
 
+  async function getDataUser(id){
+    const params = new URLSearchParams();
+    params.append("operation", "getUserById");
+    params.append("idusuario", id);
+
+    const data = await getDatos(`${host}usuarios.controller.php`, params);
+    return data;
+  }
+
   /**
    * Muestra los datos de la notificacion en el Modal
    */
-  function showModal(data) {
+  async function showModal(data) {
     selector("modal-body-notif").innerHTML = "";
     console.log("data modal", data);
 
+    const dataResponsable = await getDataUser(data[0].autorizacion);
     data.forEach((x) => {
+      
       selector("modal-body-notif").innerHTML = `
-                  <p>Activo Asignado: ${x.modelo} ${x.marca}</p>
-                  <p>Descripcion de la asig.: ${x.modelo}</p>
-                  <br>
-                  <p>Activo Solicitado:</p>
-                  <p>- Codigo: ${x.cod_identificacion}</p>
-                  <p>- Descripcion: ${x.descripcion}</p>
-                  <p>- Ubicacion: ${x.ubicacion}</p>
-                  <p>- Condicion del Equipo: ${replaceWords(
-                    x.condicion_equipo,
-                    ["<p>", "</p>"],
-                    ""
-                  )}</p>
-                  <p>- Fecha Asignacion : ${x.fecha_asignacion}</p>
-                  <br>
-                  <p>- Fecha Creacion : ${x.fecha_creacion}</p>
-              `;
+        <p>Activo Asignado: ${x.modelo} ${x.marca}</p>
+        <p>Descripcion de la asig.: ${x.des_responsable}</p>
+        <p>Responsable de la asig.: ${dataResponsable[0].dato} - ${dataResponsable[0].usuario}</p>
+        <br>
+        <p>Datos del activo:</p>
+        <p>- Codigo: ${x.cod_identificacion}</p>
+        <p>- Descripcion: ${x.descripcion}</p>
+        <p>- Ubicacion: ${x.ubicacion}</p>
+        <p>- Condicion del Equipo: ${replaceWords(
+          x.condicion_equipo,
+          ["<p>", "</p>"],
+          ""
+        )}</p>
+        <p>- Fecha Asignacion: ${x.fecha_asignacion}</p>
+        <br>
+        <p>- Fecha Creacion Notificacion: ${x.fecha_creacion}</p>
+    `;
     });
 
     const modalImg = new bootstrap.Modal(
@@ -257,7 +269,7 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       `;
       selector("sb-list-notificacion").innerHTML += element;
-      showDataWSidebar();
+      //showDataWSidebar();
     }
   }
 

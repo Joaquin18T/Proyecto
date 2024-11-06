@@ -3,21 +3,25 @@
 require_once 'ExecQuery.php';
 
 class HistorialActivo extends ExecQuery{
-  public function add($params=[]):bool{
+
+  public function add($params=[]):int{
     try{
-      $status=false;
-      $cmd = parent::execQ("INSERT INTO historial_activos(idactivo_resp, idubicacion, accion, responsable_accion) VALUES(?,?,?,?)");
-      $status = $cmd->execute(
+      $pdo = parent::getConexion();
+      $cmd = $pdo->prepare("CALL sp_add_historial_activo(@idhistorial,?,?,?,?,?)");
+      $cmd->execute(
         array(
           $params['idactivo_resp'],
           $params['idubicacion'],
           $params['accion'],
-          $params['responsable_accion']
+          $params['responsable_accion'],
+          $params['idactivo']
         )
       );
-      return $status;
+      $respuesta = $pdo->query("SELECT @idhistorial AS idhistorial")->fetch(PDO::FETCH_ASSOC);
+      return $respuesta['idhistorial'];
     }catch(Exception $e){
       die($e->getMessage());
+      return -1;
     }
 
   }
@@ -52,13 +56,18 @@ class HistorialActivo extends ExecQuery{
   }
 }
 
-// $hist = new HistorialActivo();
+//$hist = new HistorialActivo();
+
+// echo json_encode($hist->getUbicacionByOnlyActivo(['idactivo'=>4]));
 
 // echo json_encode($hist->ubicacionByActivo(['idactivo'=>4, 'idactivo_resp'=>5]));
 
-// echo json_encode($hist->add([
+// $data = $hist->add([
 //   'idactivo_resp'=>1,
 //   'idubicacion'=>3,
-//   'autorizacion'=>1,
-//   'solicitud'=>1
-// ]));
+//   'accion'=>'test',
+//   'responsable_accion'=>6,
+//   'idactivo'=>3
+// ]);
+
+// echo $data;

@@ -48,12 +48,6 @@ CREATE TABLE estados
     CONSTRAINT uk_nom_estado UNIQUE(nom_estado)
 )ENGINE=INNODB;
 
-CREATE TABLE frecuencias
-(
-	idfrecuencia	INT auto_increment primary key,
-    frecuencia		varchar(20) not null
-)ENGINE=INNODB;
-
 CREATE TABLE USUARIOS
 (
   id_usuario	int auto_increment primary key,
@@ -126,7 +120,7 @@ CREATE TABLE activos
     -- CONSTRAINT uk_activo UNIQUE(idsubcategoria, idmarca, modelo) -- 10/10
 )ENGINE=INNODB;
 
-CREATE TABLE especificacionesDefecto
+CREATE TABLE especificacionesdefecto
 (
 	idespecificacionD	INT AUTO_INCREMENT PRIMARY KEY,
     idsubcategoria		INT NOT NULL,
@@ -179,14 +173,15 @@ CREATE TABLE historial_activos
 	idhistorial_activo 	INT AUTO_INCREMENT PRIMARY KEY,
     idactivo_resp		INT NULL,
 	idubicacion			INT	NOT NULL,
-    accion 				VARCHAR(30) NULL,
+    accion 				VARCHAR(70) NULL,
     responsable_accion 	INT NULL,
+    idactivo 			INT NULL,
     fecha_movimiento 	DATETIME NOT NULL DEFAULT NOW(),
     CONSTRAINT fk_idactivo_resp FOREIGN KEY (idactivo_resp)REFERENCES activos_responsables(idactivo_resp),
 	CONSTRAINT fk_idubicacion	FOREIGN KEY(idubicacion) REFERENCES ubicaciones(idubicacion),
-    CONSTRAINT fk_usuario_his FOREIGN KEY(responsable_accion) REFERENCES usuarios (id_usuario)
+    CONSTRAINT fk_usuario_his FOREIGN KEY(responsable_accion) REFERENCES usuarios (id_usuario),
+    CONSTRAINT fk_idactivo_his_act FOREIGN KEY(idactivo) REFERENCES activos(idactivo)
 )ENGINE=INNODB;
-
 
 CREATE TABLE bajas_activo
 (
@@ -261,18 +256,16 @@ CREATE TABLE `tareas`
     descripcion			varchar(200)	not null,
     idsubcategoria		int				not null,
     intervalo			int				not null,
-    idfrecuencia 		int				not null,
+    frecuencia 			varchar(30)		not null,
 	idestado			int				not null,
     trabajado			boolean			not null default false,
-    pausado				boolean 		not null default false,
     create_at			datetime		not null default now(),
     update_at			datetime		null,
     CONSTRAINT	fk_idplantarea		foreign key (idplantarea) 		REFERENCES plandetareas (idplantarea) ON DELETE CASCADE,
     CONSTRAINT	fk_idtipo_prioridad	foreign key (idtipo_prioridad) 	REFERENCES tipo_prioridades (idtipo_prioridad),
     CONSTRAINT	fk_descripcion_tarea 		unique(descripcion),
 	CONSTRAINT	fk_idestado2		foreign key (idestado)			REFERENCES estados (idestado),
-	CONSTRAINT fk_idsubcategoria_plan FOREIGN KEY (idsubcategoria) references subcategorias (idsubcategoria),
-    CONSTRAINT fk_idfrecuencia FOREIGN KEY (idfrecuencia) references frecuencias (idfrecuencia)
+	CONSTRAINT fk_idsubcategoria_plan FOREIGN KEY (idsubcategoria) references subcategorias (idsubcategoria)
 )ENGINE=INNODB;
 
 DROP TABLE IF EXISTS `odt`;
@@ -282,7 +275,9 @@ CREATE TABLE `odt`
     idtarea				int	 	not null,
     creado_por			int		not null,
 	fecha_inicio		date		not null,
-    hora_inicio			time		not null,    
+    hora_inicio			time		not null,
+    fecha_vencimiento	date		not null,
+    hora_vencimiento	time		not null,
     idestado			int		null default 9,
     incompleto 		boolean		null default true,
     eliminado		boolean		null default false,
@@ -348,7 +343,6 @@ CREATE TABLE `detalle_odt`
     fecha_inicial		datetime	not null default now(),
     fecha_final 		datetime	null,
     tiempo_ejecucion	time		null,
-    intervalos_ejecutados int		not null,
     clasificacion		int			null,
 	CONSTRAINT			fk_orden_trabajo2	foreign key (idorden_trabajo) references odt (idorden_trabajo) ON DELETE CASCADE,
     CONSTRAINT			fk_clasificacion	foreign key (clasificacion) references estados (idestado)
