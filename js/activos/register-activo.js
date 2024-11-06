@@ -5,14 +5,21 @@ document.addEventListener("DOMContentLoaded",()=>{
     objTemporal:{}, //Objeto temporal para el almacenamientos de datos de los activos
     host: "http://localhost/CMMS/controllers/",
     variableActivos:[],
-    cantidadRegistrar:localStorage.getItem("cantidad")==null?1:localStorage.getItem("cantidad"),
+    cantidadRegistrar:localStorage.getItem("cantidad"),
     list_codes:[],
     contCodeInputs:0,
     contSave:0
   };
   (()=>{
     renderRegisters();
-    
+    if(parseInt(globals.cantidadRegistrar)===1){
+      //console.log(globals.cantidadRegistrar);
+      const btnDeleteB = allSelector("delete-block-activo");
+      btnDeleteB.forEach(x=>{x.disabled=true;});
+
+      const btnDeleteSB = allSelector("delete-input");
+      btnDeleteSB.forEach(x=>{x.disabled=true;});
+    }
   })();
 
   function selector(value) {
@@ -137,6 +144,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     verifierAllAddEspec();
     addInputsCode(globals.cantidadRegistrar);
     btnDeleteBlock();
+
   }
 
   selector("showSB").addEventListener("click",()=>{
@@ -237,6 +245,9 @@ document.addEventListener("DOMContentLoaded",()=>{
         btnDeleteSB.forEach(x=>{
           x.disabled = true;
         });
+
+        const btnDeleteB = allSelector("delete-block-activo");
+        btnDeleteB.forEach(x=>{x.disabled=true;});
       }
     });
   }
@@ -766,53 +777,69 @@ document.addEventListener("DOMContentLoaded",()=>{
     return dataBack;
   }
 
+  function validarFechas(){
+    let allValidate = false;
+    const curentDate = getDate();
+    const fieldsFecha = allSelector("fecha");
+    fieldsFecha.forEach(x=>{
+      if(x.value<=curentDate){
+        allValidate = true;
+      }
+    });
+    return allValidate;
+  }
+
   //Evento click del sidebar a la hora de registrar los datos de los activos
   selector("save").addEventListener("click",async()=>{
     const isValid = await validateAllCodes();
     let isEmpty = false;
     if(isValid){
-      if(confirm("¿Deseas registrar estos activos?")){
-
-        getAllCodesSB();
-        recorrerTodosActivos();
-        console.log(globals.list_codes);
-
-        const allActivos = selector("list-register-activos").childElementCount;
-        for (let i = 0; i < allActivos; i++) {
-          catchDataEspecificaciones(i);
-          isEmpty=false;
-          console.log(globals.variableActivos[i].valores);
-          const isSave = await saveActivos(globals.list_codes[i], globals.datosActivos[i].subcategoria, globals.datosActivos[i].marca,
-            globals.datosActivos[i].modelo, globals.datosActivos[i].fecha, globals.datosActivos[i].descripcion, globals.variableActivos[i].valores 
-          );
-          if(isSave>0){
-            globals.contSave++;
-          }else if(isSave===0){
-            isEmpty=true;
+      const validateAllFechas = validarFechas();
+      if(validateAllFechas){
+        if(confirm("¿Deseas registrar estos activos?")){
+          getAllCodesSB();
+          recorrerTodosActivos();
+          console.log(globals.list_codes);
+  
+          const allActivos = selector("list-register-activos").childElementCount;
+          for (let i = 0; i < allActivos; i++) {
+            catchDataEspecificaciones(i);
+            isEmpty=false;
+            console.log(globals.variableActivos[i].valores);
+            const isSave = await saveActivos(globals.list_codes[i], globals.datosActivos[i].subcategoria, globals.datosActivos[i].marca,
+              globals.datosActivos[i].modelo, globals.datosActivos[i].fecha, globals.datosActivos[i].descripcion, globals.variableActivos[i].valores 
+            );
+            if(isSave>0){
+              globals.contSave++;
+            }else if(isSave===0){
+              isEmpty=true;
+            }
           }
-        }
-        if(globals.contSave===allActivos){
-          alert("Se han guardado correctamente");
-          localStorage.removeItem("cantidad");
-          localStorage.removeItem("subcategoria");
-          localStorage.removeItem("marca");
-          resetUI();
-          const sidebar = bootstrap.Offcanvas.getOrCreateInstance(
-            selector("sb-code")
-          );
-          sidebar.hide();
-          window.location.href = "http://localhost/CMMS/views/activo";
-        }else{
-          if(isEmpty){
-            alert("Completa los campos");
-            globals.list_codes = [];
-            globals.datosActivos=[];
+          if(globals.contSave===allActivos){
+            alert("Se han guardado correctamente");
+            localStorage.removeItem("cantidad");
+            localStorage.removeItem("subcategoria");
+            localStorage.removeItem("marca");
+            resetUI();
+            const sidebar = bootstrap.Offcanvas.getOrCreateInstance(
+              selector("sb-code")
+            );
+            sidebar.hide();
+            window.location.href = "http://localhost/CMMS/views/activo";
           }else{
-            alert("Hubo un error al registrar");
+            if(isEmpty){
+              alert("Completa los campos");
+              globals.list_codes = [];
+              globals.datosActivos=[];
+            }else{
+              alert("Hubo un error al registrar");
+            }
+            globals.contSave=0;
           }
-          globals.contSave=0;
+          
         }
-        
+      }else{
+        alert("La fecha de adquisicion no debe ser posterior a la fecha actual");
       }
     }else{
       alert("El codigo de identificacion debe ser unico");
