@@ -139,14 +139,46 @@
 <!-- SIDEBAR PARA EL REGISTRO DE ACTIVOS -->
 <div class="offcanvas offcanvas-end" tabindex="-1" id="sbRegistrar" aria-labelledby="offcanvasRightLabel">
   <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="offcanvasRightLabel">Offcanvas right</h5>
+    <h5 class="offcanvas-title" id="offcanvasRightLabel">Datos por defecto para el registro</h5>
     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
   <div class="offcanvas-body">
-    <label for="cantidadEnviar">Cantidad de activos a registrar</label>
-    <input type="number" class="form-control w-25" id="cantidadEnviar">
+    <div class="row">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="number" class="form-control h-100" id="cantidadEnviar" min="0">
+            <label for="cantidadEnviar">Cantidad</label>
+          </div>
+        </div>
+      </div>
+      <div class="row mt-4">
+        <div class="col-md-9">
+          <div class="form-floating">
+            <select name="sb-subcategoria" id="sb-subcategoria" class="form-control filter">
+              <option value="">Selecciona</option>
+            </select>
+            <label for="sb-subcategoria" class="form-label">Subcategorias</label>
+          </div>
+        </div>
+      </div>
+      <div class="row mt-3">
+        <div class="col-md-9">
+          <div class="form-floating">
+            <select name="sb-marca" id="sb-marca" class="form-control filter">
+              <option value="">Selecciona</option>
+            </select>
+            <label for="sb-marca" class="form-label">Marcas</label>
+          </div>
+        </div>
+      </div>
+      <div class="row mt-3 d-flex justify-content-between">
+        <div class="text-end col-12">
+          <button type="button" class="btn btn-sm btn-primary mt-2" id="registerAceptar" disabled>Ir a registrar</button>
+        </div>
+      </div>
+    </div>
 
-    <button type="button" class="btn btn-primary" id="registerAceptar">Ir a registrar</button>
   </div>
 </div>
 <!-- ./SIDEBAR PARA EL REGISTRO DE ACTIVOS -->

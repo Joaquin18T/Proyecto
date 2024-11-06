@@ -19,13 +19,14 @@ select*from bajas_activo;
 select*from marcas;
 select*from subcategorias;
 select*from ubicaciones;
+select*from especificacionesDefecto;
 
 DELETE FROM bajas_activo where idbaja_activo=51;
 DELETE FROM activos_responsables where idactivo_resp=25;
 DELETE FROM notificaciones_activos where idactivo_resp =5;
 DELETE FROM notificaciones_activos where idnotificacion_activo=33;
 DELETE FROM historial_activos where idhistorial_activo =64;
-DELETE FROM activos where idactivo =29;
+DELETE FROM activos where idactivo >=47 and idactivo <53;
   
 ALTER TABLE detalles_marca_subcategoria AUTO_INCREMENT = 1;
 UPDATE activos SET idestado = 2 WHERE idactivo = 5;
