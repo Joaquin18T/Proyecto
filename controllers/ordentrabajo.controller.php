@@ -61,7 +61,21 @@ if (isset($_POST['operation'])) {
     case 'registrarHistorialOdt':
       $id = -1;
       $datosEnviar = [
-        "idodt"             => $_POST["idodt"]
+        "idodt"             => $_POST["idodt"],
+        "clasificacion"      => $_POST["clasificacion"],
+        "creador"            => $_POST["creador"],
+        "responsables"       => $_POST["responsables"],
+        "tiempo_ejecucion"   => $_POST["tiempo_ejecucion"],
+        "activos"            => $_POST["activos"],
+        "tarea"              => $_POST["tarea"],
+        "revisado_por"       => $_POST["revisado_por"],
+        "tipo_prioridad"     => $_POST["tipo_prioridad"],
+        "fecha_inicio"       => $_POST["fecha_inicio"],
+        "hora_inicio"        => $_POST["hora_inicio"],
+        "nom_estado"         => $_POST["nom_estado"],
+        "incompleto"         => $_POST["incompleto"],
+        "fecha_final"        => $_POST["fecha_final"],
+        "hora_final"         => $_POST["hora_final"]
       ];
 
       $id = $ordentrabajo->registrarHistorialOdt($datosEnviar);
@@ -112,7 +126,17 @@ if (isset($_POST['operation'])) {
       echo json_encode(["actualizado" => $actualizado]);
       break;
 
-    
+    case 'actualizarFechaFinalOdt':
+      $datosEnviar = [
+        "idodt"          => $_POST["idodt"],
+        "fechafinal"            => $_POST["fechafinal"],
+        "horafinal"       => $_POST["horafinal"]
+      ];
+
+      $actualizado = $ordentrabajo->actualizarFechaFinalOdt($datosEnviar);
+      echo json_encode(["actualizado" => $actualizado]);
+      break;
+
 
     case 'eliminarOdt':
       $path = isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : '/';

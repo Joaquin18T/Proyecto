@@ -20,6 +20,7 @@ $(document).ready(async () => {
     let tbResponsables = null
     let iddiagnosticoGenerado = -1
     let hayDiagnostico = false
+    let idrolusuario = -1
     //CONTAINERS DIV
     const contenedorRegistrarOdt = $q("#contenedor-registrar-odt")
     const previewContainer = $q("#preview-container")
@@ -42,6 +43,7 @@ $(document).ready(async () => {
     //await verificarFvencimiento()
     //await verificarDiagnosticoRegistrado()
     //await verificarIdsGenerados() // SI ESTO SUCEDE LO DEMAS EN GENERAL NO DEBERIA DE EJECUTAR
+    await verificarRolUsuario()
     await filtrarUsuariosList()
     await renderResponsablesOdt()
     //await verificarEvidenciasRegistradas()
@@ -49,6 +51,8 @@ $(document).ready(async () => {
     //sestadoBotonConfirmarAsignacion()
 
     // ************************************ FUNCIONES PARA OBTENER DATOS ************************************
+
+
     async function obtenerUsuarios() { // RENDERIZAR USUARIOS QUE SERIVIRA PARA ASIGNAR RESPONSABLES AL ODT
         const params = new URLSearchParams();
         params.append("operation", "filtrarUsuarios");
@@ -186,32 +190,37 @@ $(document).ready(async () => {
 
     // ******************************* EVENTOS *******************************************
     btnAgregarResponsable.addEventListener('click', async () => {
-        const checkboxes = $all(".usuario-checkbox") // DESMARCAR TODOS LOS CHECKVBOXES UNA VEZ AGREGADOS
-        await registrarResponsable()
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = false;
-        });
+        if (idrolusuario == 1) { //si es admin
+            const checkboxes = $all(".usuario-checkbox") // DESMARCAR TODOS LOS CHECKVBOXES UNA VEZ AGREGADOS
+            await registrarResponsable()
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
 
-        // Limpiar la lista de responsables asignados
-        console.log("CLICK A BTN AGREGAR REASPONSAB LE")
-        responsablesElegidos = [];
-        const responsablesAsignados = await obtenerResponsablesAsignados()
-        console.log("responsablesAsignados: ", responsablesAsignados)
-        if (responsablesAsignados.length > 0) {
+            // Limpiar la lista de responsables asignados
+            console.log("CLICK A BTN AGREGAR REASPONSAB LE")
+            responsablesElegidos = [];
+            const responsablesAsignados = await obtenerResponsablesAsignados()
+            console.log("responsablesAsignados: ", responsablesAsignados)
+            if (responsablesAsignados.length > 0) {
 
-            for (let i = 0; i < responsablesAsignados.length; i++) {
-                await actualizarAsignacionUsuario(responsablesAsignados[i].idresponsable, 6)
+                for (let i = 0; i < responsablesAsignados.length; i++) {
+                    await actualizarAsignacionUsuario(responsablesAsignados[i].idresponsable, 6)
+                }
+
+            } else {
+
+                for (let i = 0; i < responsablesAsignados.length; i++) {
+                    await actualizarAsignacionUsuario(responsablesAsignados[i].idresponsable, 7)
+                }
             }
-
+            await filtrarUsuariosList()
+            //await eliminarLiResponsable()
+            //estadoBotonConfirmarAsignacion()
         } else {
-
-            for (let i = 0; i < responsablesAsignados.length; i++) {
-                await actualizarAsignacionUsuario(responsablesAsignados[i].idresponsable, 7)
-            }
+            showToast(`Solo administradores pueden agregar responsables a la orden de trabajo.`, 'ERROR', 6000);
+            return;
         }
-        await filtrarUsuariosList()
-        //await eliminarLiResponsable()
-        //estadoBotonConfirmarAsignacion()
     });
 
     /* evidenciasInput.addEventListener('change', async (e) => {
@@ -377,6 +386,7 @@ $(document).ready(async () => {
         return responsableEliminado
     }
 
+    // ******************************** SECCION DE ACTUALIZACIONES ******************************************
 
     async function actualizarEstadoOdt() {
 
@@ -403,5 +413,24 @@ $(document).ready(async () => {
         const actualizado = await Factualizado.json()
         return actualizado
     }
-    // ******************************** SECCION DE ACTUALIZACIONES ******************************************
+    // ******************************** FIN SECCION DE ACTUALIZACIONES ******************************************
+
+
+    // ************************************ SECCION DE VERIFICACIONES ******************************
+    async function verificarRolUsuario() {
+        const usuario = await obtenerUsuario(idusuario)
+        console.log("usuario: ", usuario)
+        idrolusuario = usuario[0]?.idrol
+        if (idrolusuario == 2) {
+            contenedorRegistrarOdt.innerHTML = `        
+            <div class="container-fluid">
+                <div class="row">
+                    <h1 class="">Solo administradores pueden registrar una orden de trabajo.</h1>
+                </div>
+            </div>
+            `
+        }
+    }
+
+
 });

@@ -210,6 +210,8 @@ CREATE TABLE notificaciones_activos
     CONSTRAINT fk_idactivo_noti_activo FOREIGN KEY(idactivo) REFERENCES activos(idactivo)
 )ENGINE = INNODB;
 
+select * from notificaciones_mantenimiento;
+
 CREATE TABLE notificaciones_mantenimiento
 (
 	idnotificacion_mantenimiento	INT AUTO_INCREMENT PRIMARY KEY,
@@ -276,6 +278,8 @@ CREATE TABLE `odt`
     creado_por			int		not null,
 	fecha_inicio		date		not null,
     hora_inicio			time		not null,    
+    fecha_final			date		null,
+    hora_final			time		null,
     idestado			int		null default 9,
     incompleto 		boolean		null default true,
     eliminado		boolean		null default false,
@@ -354,14 +358,30 @@ CREATE TABLE `comentarios_odt`
     idorden_trabajo		int			 	not null,   
     comentario			varchar(300) 	null,
     revisadoPor			int		 		not null,
+    created_at			DATETIME		not null default now(),
+    update_at			DATETIME		null,
     CONSTRAINT 			fk_idorden_trabajo	foreign key (idorden_trabajo) references odt (idorden_trabajo) ON DELETE CASCADE,
     CONSTRAINT 			fk_revisadoPor		foreign key (revisadoPor) references usuarios (id_usuario)
 )ENGINE=INNODB;
 
-DROP TABLE IF EXISTS `historial_odt`;
-CREATE TABLE `historial_odt`
+DROP TABLE IF EXISTS historial_odt;
+CREATE TABLE historial_odt
 (
 	idhistorial			int		auto_increment primary key,
 	idorden_trabajo		int 	not null,
-    constraint fk_idodt_hist foreign key (idorden_trabajo) references odt (idorden_trabajo)
+    clasificacion		int		not null,
+    creador				varchar(100) not null,
+    responsables		longtext	not null,
+    tiempo_ejecucion	varchar(20) not null,
+    activos				longtext	not null,
+    tarea				varchar(100)	not null,
+    revisado_por		varchar(100)	not null,
+	tipo_prioridad		varchar(20)		not null,
+    fecha_inicio		varchar(20)		not null,    
+    hora_inicio			varchar(20)		not null,
+    nom_estado			varchar(15) 	not null,
+    incompleto			int				not null,
+    fecha_final			varchar(20)		not null,
+    hora_final			varchar(20)		not null,
+	CONSTRAINT			fk_clasificacion2	foreign key (clasificacion) references estados (idestado)    
 )ENGINE=INNODB;

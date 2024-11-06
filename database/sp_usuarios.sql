@@ -118,6 +118,7 @@ BEGIN
     VALUES (_idpersona, _idrol, _usuario, _contrasena);
 END $$
 
+
 -- CALL sp_register_user(4,2,'pablo35a', '$2y$10$x45pTq2wG/jFtZkOPhvsMe9hReDbWqjo7sv5U37MTL2g10BglS4jG');
 
 DROP PROCEDURE IF EXISTS sp_search_user;
@@ -137,7 +138,7 @@ CREATE PROCEDURE sp_getUser_by_id
 	IN _idusuario INT
 )
 BEGIN
-	SELECT U.id_usuario, U.usuario, CONCAT(P.apellidos, ' ', P.nombres) as dato 
+	SELECT U.id_usuario, U.usuario, CONCAT(P.apellidos, ' ', P.nombres) as dato, U.idrol
     FROM usuarios U
     INNER JOIN personas P ON U.idpersona = P.id_persona
     WHERE U.id_usuario = _idusuario;
@@ -203,6 +204,7 @@ BEGIN
     contrasena = _contrasena
     WHERE id_usuario = _idusuario;
 END $$
+
 
 DROP PROCEDURE IF EXISTS sp_get_user_persona;
 DELIMITER $$

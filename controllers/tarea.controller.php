@@ -63,6 +63,15 @@ if (isset($_POST['operation'])) {
             echo json_encode(["actualizado" => $actualizado]);
             break;
 
+        case 'actualizarTareaEstadoPausado':
+            $datosEnviar = [
+                "idtarea"  => $_POST["idtarea"],
+                "pausado" => $_POST["pausado"]
+            ];
+            $actualizado = $tarea->actualizarTareaEstadoPausado($datosEnviar);
+            echo json_encode(["actualizado" => $actualizado]);
+            break;
+
         case 'actualizarTarea':
             $datosEnviar = [
                 "idtarea"           => $_POST["idtarea"],

@@ -83,7 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
           x.fecha_creacion,
           x.idnotificacion_activo,
           x.idactivo,
-          2
+          223
         );
       });
     }

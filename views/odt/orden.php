@@ -1,6 +1,6 @@
 <?php require_once '../header.php' ?>
 
-<div class="row container-fluid">
+<div class="row container-fluid" id="contenedor-orden">
     <div class="row">
         <h1>Ejecución</h1>
         <a href="http://localhost/CMMS/views/odt/" class="btn btn-primary">Volver</a>
