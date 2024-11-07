@@ -34,6 +34,18 @@ BEGIN
         ORDER BY NA.fecha_creacion asc;
 END $$
 -- CALL sp_list_notificacion(5);
+DROP PROCEDURE IF EXISTS sp_list_notificacion_mantenimiento;
+DELIMITER $$
+CREATE PROCEDURE sp_list_notificacion_mantenimiento
+(
+	IN _idusuario INT
+)
+BEGIN
+	SELECT
+		*
+		FROM notificaciones_mantenimiento
+        WHERE idresp = _idusuario;
+END $$
 
 DROP PROCEDURE IF EXISTS sp_responsable_notificacion;
 DELIMITER $$

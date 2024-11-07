@@ -47,13 +47,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 
-  // async function listNotificationsMantenimiento(idusu) {
-  //   const params = new URLSearchParams();
-  //   params.append("operation", "listNotificationsMantenimiento");
-  //   params.append("idusuario", idusu);
-  //   const data = await getDatos(`${host}notificacion.controller.php`, params);
-  //   return data
-  // }
+   async function listNotificationsMantenimiento(idusu) {
+     const params = new URLSearchParams();
+     params.append("operation", "listNotificationsMantenimiento");
+     params.append("idusuario", idusu);
+     const data = await getDatos(`${host}notificacion.controller.php`, params);
+     return data
+   }
 
   (async () => {
     const id = await getIdUser();
@@ -63,8 +63,8 @@ document.addEventListener("DOMContentLoaded", () => {
     params.append("idnotificacion", "");
 
     const data = await getDatos(`${host}notificacion.controller.php`, params);
-    //const notisMantenimiento = await listNotificationsMantenimiento(id)
-    //console.log("notisMantenimiento: ", notisMantenimiento)
+    const notisMantenimiento = await listNotificationsMantenimiento(id)
+    console.log("notisMantenimiento: ", notisMantenimiento)
     console.log("notify", data);
     if (data.length > 0) {
       const dataResp = await dataRespNof(data[0].idusuario);
@@ -98,30 +98,30 @@ document.addEventListener("DOMContentLoaded", () => {
         );
       });
     }
-    // if (notisMantenimiento.length > 0) {
-    //   notisMantenimiento.forEach((x, i) => {
-    //     if (i < 4) {
-    //       createNotificacion(
-    //         0,
-    //         x.mensaje,
-    //         "Asignacion a orden de trabajo.",
-    //         x.fecha_creacion,
-    //         x.idnotificacion_mantenimiento,
-    //         0,
-    //         1
-    //       )
-    //     }
-    //     createNotificacion(
-    //       0,
-    //       x.mensaje,
-    //       "Asignacion a orden de trabajo.",
-    //       x.fecha_creacion,
-    //       x.idnotificacion_mantenimiento,
-    //       0,
-    //       2
-    //     )
-    //   })
-    // }
+     if (notisMantenimiento.length > 0) {
+       notisMantenimiento.forEach((x, i) => {
+         if (i < 4) {
+           createNotificacion(
+             0,
+             x.mensaje,
+             "Asignacion a orden de trabajo.",
+             x.fecha_creacion,
+             x.idnotificacion_mantenimiento,
+             0,
+             1
+           )
+         }
+         createNotificacion(
+           0,
+           x.mensaje,
+           "Asignacion a orden de trabajo.",
+           x.fecha_creacion,
+           x.idnotificacion_mantenimiento,
+           0,
+           2
+         )
+       })
+     }
     showPreviewDetailt();
 
   })();

@@ -191,7 +191,7 @@ $(document).ready(async () => {
                                 const actualizado = await actualizarEstadoOdt(10, tareaOdtSeleccionada.idorden_trabajo)
                                 console.log("actualizado ODT A REVISION?: ", actualizado)
                                 //window.location.href = `http://localhost/CMMS/views/odt/revisar-odt.php`
-                                showToast(`La orden de trabajo ha sido completada y enviada para revisión por un administrador.`, 'ERROR', 6000);
+                                showToast(`La orden de trabajo ha sido completada y enviada para revisión por un administrador.`, 'SUCCESS', 3000);
                                 break;
                             }
                         } else if (tareaOdtSeleccionada && tareaOdtSeleccionada.nom_estado === "pendientes") {
@@ -391,18 +391,19 @@ $(document).ready(async () => {
         //ESTO FUNCIONA PARA PODER ENTRAR A REALIZAR LA ORDEN UNA VEZ CREADA - SOLO PUEDEN INGRESAR USUARIOS
         $all('.tarea-odt').forEach(kanbanItem => {
             kanbanItem.addEventListener('click', async function (event) {
-                if (idrolusuario == 2) { //ESTE ROL ES DE USUARio
-                    const cardId = kanbanItem.getAttribute('data-id'); // Obtener el ID de la tarjeta
-                    console.log('Hiciste clic en la tarjeta con ID: ' + cardId);
-                    const targetElement = event.target; // El elemento donde ocurrió el clic
-                    console.log("targetElement: ", targetElement);
 
-                    const tareasOdt = await obtenerTareasOdt(); // Llama a la función para obtener tareas
-                    console.log("tareasOdt: ", tareasOdt);
-                    const tareaOdtSeleccionada = tareasOdt.find(t => t.idorden_trabajo == cardId);
-                    console.log("Tarea odt seleccionada: ", tareaOdtSeleccionada);
+                const cardId = kanbanItem.getAttribute('data-id'); // Obtener el ID de la tarjeta
+                console.log('Hiciste clic en la tarjeta con ID: ' + cardId);
+                const targetElement = event.target; // El elemento donde ocurrió el clic
+                console.log("targetElement: ", targetElement);
 
-                    if (tareaOdtSeleccionada && tareaOdtSeleccionada.nom_estado === "proceso") {
+                const tareasOdt = await obtenerTareasOdt(); // Llama a la función para obtener tareas
+                console.log("tareasOdt: ", tareasOdt);
+                const tareaOdtSeleccionada = tareasOdt.find(t => t.idorden_trabajo == cardId);
+                console.log("Tarea odt seleccionada: ", tareaOdtSeleccionada);
+
+                if (tareaOdtSeleccionada && tareaOdtSeleccionada.nom_estado === "proceso") {
+                    if (idrolusuario == 2) { //ESTE ROL ES DE USUARio
                         if (tareaOdtSeleccionada.incompleto === 1) {
                             alert("LA TAREA ODT ESTA INCOMPLETA NO PUEDES TRABAJARLA");
                         } else if (tareaOdtSeleccionada.incompleto === 0) {
@@ -412,21 +413,28 @@ $(document).ready(async () => {
                             window.localStorage.setItem('idtarea', tareaOdtSeleccionada.idtarea)
                             window.location.href = `http://localhost/CMMS/views/odt/orden.php`;
                         }
-                    } else if (tareaOdtSeleccionada && tareaOdtSeleccionada.nom_estado === "revision") {
+                    } else {
+                        showToast(`Solo usuarios pueden realizar la orden de trabajo.`, 'ERROR', 6000);
+                        return
+                    }
+                } else if (tareaOdtSeleccionada && tareaOdtSeleccionada.nom_estado === "revision") {
+                    if (idrolusuario == 1) {
                         window.localStorage.clear();
                         window.localStorage.setItem("idodt", tareaOdtSeleccionada.idorden_trabajo);
                         window.localStorage.setItem('idtarea', tareaOdtSeleccionada.idtarea)
                         const actualizado = await actualizarEstadoOdt(10, tareaOdtSeleccionada.idorden_trabajo);
                         console.log("actualizado ODT A REVISION?: ", actualizado);
                         window.location.href = `http://localhost/CMMS/views/odt/revisar-odt.php`;
-                    } else {
-                        // No redirigir si la tarea no está en proceso
-                        alert("Solo las tareas en proceso pueden ser redirigidas.");
+                    }
+                    else {
+                        showToast(`Solo administradores pueden revisar la orden de trabajo.`, 'ERROR', 6000);
+                        return
                     }
                 } else {
-                    showToast(`Solo usuarios pueden realizar la orden de trabajo.`, 'ERROR', 6000);
-                    return
+                    // No redirigir si la tarea no está en proceso
+                    alert("Solo las tareas en proceso pueden ser redirigidas.");
                 }
+
             });
         });
 
@@ -468,7 +476,9 @@ $(document).ready(async () => {
                             window.localStorage.setItem('idodt', liRevision);
                             const actualizado = await actualizarEstadoOdt(10, liRevision); // liRevision = idodt
                             console.log("Actualizado ODT a revisión?: ", actualizado);
-                            window.location.href = `http://localhost/CMMS/views/odt/revisar-odt.php`;
+                            //window.location.href = `http://localhost/CMMS/views/odt/revisar-odt.php`;
+                            showToast(`La orden de trabajo ha sido completada y enviada para revisión por un administrador.`, 'SUCCESS', 3000);
+                            return
                         }
                     } else if (tareaOdtSeleccionada && tareaOdtSeleccionada.nom_estado === "pendientes") {
                         alert("Esta orden está en pendientes, primero procésala.");
