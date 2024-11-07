@@ -67,25 +67,27 @@ VALUES
 -- DROP TABLE permisos;
 INSERT INTO categorias(categoria)
 	VALUES
-    ('Tecnologia'),
-    ('Equipo Pesado'),
-    ('Equipo de Produccion'),
-    ('Transporte');
-    
+	('Equipos de computo'),
+    ('Vehiculos'),
+    ('Inmobiliario de oficina'),
+    ('Equipos de redes y conectividad');
 
 INSERT INTO subcategorias(idcategoria, subcategoria)
 	VALUES
-		(1, 'Computadora'),
-		(1, 'Laptop'),
-		(2, 'Maquinaria Industrial'),
-		(2, 'Generador'),
-		(4, 'Auto'),
-		(4, 'Camioneta'),
-		(3, 'Equipo de Fabricacion'),
-		(3, 'Robot Industrial'),
-		(1, 'Impresora'),
-		(1, 'Monitor'),
-		(1, 'Teclado');
+		(1, 'Cpu'),
+		(1, 'Laptops'),
+        (1, 'Impresoras'),
+        (1, 'Monitores'),
+		(1, 'Teclados'),
+		(2, 'Camiones'),
+        (2, 'Camionetas'),
+        (2,	'Motocicletas'),
+        (3, 'Asientos ergonomicos'),
+        (3, 'Mamparas'),
+        (3, 'Muebles'),
+        (4, 'Medidores de cableado'),
+		(4, 'Routers'),
+        (4, 'Switches');        
 
 
 INSERT INTO marcas(marca)

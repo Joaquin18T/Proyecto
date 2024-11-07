@@ -122,6 +122,17 @@ class Tarea extends ExecQuery
       die($e->getMessage());
     }
   } // INTEGRADO ✔
+  
+  public function obtenerTareasSinActivos(): array
+  {
+    try {
+      $sp = parent::execQ("CALL obtenerTareasSinActivos");
+      $sp->execute();
+      return $sp->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+      die($e->getMessage());
+    }
+  } // INTEGRADO ✔
 
   public function actualizarTareaEstado($params = []): bool
   {

@@ -153,6 +153,28 @@ class ResponsableAct extends ExecQuery{
       error_log("Error: ".$e->getMessage());
     }
   }
+  
+  public function filtrarActivosResponsablesAsignados($params=[]):array{
+    try{
+      $defaultParams=[
+        'idsubcategoria'=>null,
+        'idubicacion'=>null,
+        'cod_identificacion'=>null
+      ];
+      $realArray = array_merge($defaultParams, $params);
+      $cmd = parent::execQ("CALL sp_filtrar_activos_responsables_asignados(?,?,?)");
+      $cmd->execute(
+        array(
+          $realArray['idsubcategoria'],
+          $realArray['idubicacion'],
+          $realArray['cod_identificacion']
+        )
+      );
+      return $cmd->fetchAll(PDO::FETCH_ASSOC);
+    }catch(Exception $e){
+      error_log("Error: ".$e->getMessage());
+    }
+  }
 
   public function listResp_activo(){
     return parent::getData("sp_list_resp_activo");

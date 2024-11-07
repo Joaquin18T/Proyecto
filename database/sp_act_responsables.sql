@@ -256,6 +256,57 @@ BEGIN
 END $$
 -- CALL sp_search_activo_responsable(null, null, null);
 
+DROP PROCEDURE IF EXISTS `sp_filtrar_activos_responsables_asignados`;
+DELIMITER $$
+CREATE PROCEDURE `sp_filtrar_activos_responsables_asignados`
+(
+    IN _idsubcategoria INT,
+    IN _idubicacion INT,
+    IN _cod_identificacion CHAR(40)
+)
+BEGIN
+    SELECT 
+        RES.idactivo_resp,
+        ACT.cod_identificacion,
+        ACT.idactivo,
+        ACT.descripcion,
+        SUB.subcategoria,
+        ACT.modelo,
+        MAR.marca,
+        UBI.ubicacion,
+        EST.nom_estado,
+        RES.autorizacion,
+        RES.es_responsable,
+        USU.id_usuario
+    FROM activos_responsables RES
+    INNER JOIN activos ACT ON RES.idactivo = ACT.idactivo
+    INNER JOIN marcas MAR ON ACT.idmarca = MAR.idmarca
+    INNER JOIN usuarios USU ON RES.idusuario = USU.id_usuario
+    INNER JOIN subcategorias SUB ON ACT.idsubcategoria = SUB.idsubcategoria
+    INNER JOIN estados EST ON ACT.idestado = EST.idestado
+    INNER JOIN (
+        SELECT H1.idactivo_resp, UBI1.ubicacion, UBI1.idubicacion
+        FROM historial_activos H1
+        INNER JOIN ubicaciones UBI1 ON H1.idubicacion = UBI1.idubicacion
+        WHERE H1.fecha_movimiento = (
+            SELECT MAX(H2.fecha_movimiento)
+            FROM historial_activos H2
+            WHERE H2.idactivo_resp = H1.idactivo_resp 
+        )
+    ) UBI ON UBI.idactivo_resp = RES.idactivo_resp
+    WHERE 
+        (SUB.idsubcategoria = _idsubcategoria OR _idsubcategoria IS NULL) AND
+        (UBI.idubicacion = _idubicacion OR _idubicacion IS NULL) AND
+        (ACT.cod_identificacion LIKE CONCAT('%', _cod_identificacion, '%') OR _cod_identificacion IS NULL) AND
+        ACT.idestado BETWEEN 1 AND 2 AND
+        RES.es_responsable = 1
+    GROUP BY ACT.idactivo
+    ORDER BY RES.idactivo_resp ASC;
+END $$
+DELIMITER ;
+-- CALL sp_filtrar_activos_responsables_asignados(2, null, null);
+select * from subcategorias;
+
 DROP PROCEDURE IF EXISTS sp_list_resp_activo;
 DELIMITER $$
 CREATE PROCEDURE sp_list_resp_activo

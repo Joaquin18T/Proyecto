@@ -29,7 +29,8 @@ if (isset($_POST['operation'])) {
         case 'add':
             $id = -1;
             $datosEnviar = [
-                "descripcion"               => $_POST["descripcion"]
+                "descripcion"               => $_POST["descripcion"],
+                "idcategoria"               => $_POST["idcategoria"]
             ];
             $id = $plandetarea->add($datosEnviar);
             echo json_encode(["id" => $id]);

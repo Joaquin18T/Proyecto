@@ -29,6 +29,33 @@ BEGIN
 END //
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS `obtenerTareasSinActivos`;
+DELIMITER //
+CREATE PROCEDURE `obtenerTareasSinActivos`()
+BEGIN 
+    SELECT 
+        TAR.idtarea,
+        PT.descripcion AS plantarea,
+        TAR.descripcion,
+        TAR.pausado,
+        GROUP_CONCAT(ACT.idactivo SEPARATOR ', ') AS ids_activos,
+        GROUP_CONCAT(ACT.descripcion SEPARATOR ', ') AS activos, -- Concatenar activos
+        TP.tipo_prioridad AS prioridad,
+        TAR.intervalo,
+        FRE.frecuencia,
+        EST.nom_estado,
+        PT.eliminado,
+        PT.incompleto
+    FROM tareas TAR
+    INNER JOIN plandetareas PT ON PT.idplantarea = TAR.idplantarea
+    LEFT JOIN activos_vinculados_tarea AVT ON AVT.idtarea = TAR.idtarea
+    LEFT JOIN activos ACT ON ACT.idactivo = AVT.idactivo
+    INNER JOIN tipo_prioridades TP ON TP.idtipo_prioridad = TAR.idtipo_prioridad
+    INNER JOIN estados EST ON EST.idestado = TAR.idestado
+    INNER JOIN frecuencias FRE ON FRE.idfrecuencia = TAR.idfrecuencia
+    GROUP BY TAR.idtarea; -- Agrupar por tarea
+END //
+DELIMITER ;
 
 select * from tareas;
 -- call obtenerTareas()

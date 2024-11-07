@@ -1,5 +1,5 @@
 <?php
-
+/* 
 require_once '../models/Categoria.php';
 
 $categoria = new Categoria();
@@ -12,3 +12,6 @@ if (isset($_GET['operation'])) {
     
   }
 }
+ */
+
+// ESTE CONTROLLER NO SE USA

@@ -13,6 +13,11 @@
         <div class="row text-end">
             <div class="input-group mb-3 ">
                 <input type="text" class="form-control" id="txtDescripcionPlanTarea" pattern="[a-zA-Z\s]+" title="Solo se permiten letras y espacios" placeholder="Descripcion" aria-label="Descripcion" required autocomplete="off">
+                <div class="form-floating w-25">
+                    <select class="form-select rounded-0" id="elegirCategoria">
+                    </select>
+                    <label for="elegirCategoria" class="form-label">Categoria</label>
+                </div>
                 <button class="btn btn-primary" type="button" id="btnGuardarPlanTarea">Guardar Plan</button>
             </div>
         </div>
