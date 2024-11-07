@@ -28,8 +28,25 @@ class SubCategoria extends ExecQuery{
       return [];
     }
   }
+
+  public function getSubcategoriaById($params=[]):array{
+    try{
+      $cmd = parent::execQ("SELECT subcategoria FROM subcategorias WHERE idsubcategoria=?");
+      $cmd->execute(
+        array(
+          $params['idsubcategoria']
+        )
+      );
+      return $cmd->fetchAll(PDO::FETCH_ASSOC);
+    }catch(Exception $e){
+      die($e->getMessage());
+      return [];
+    }
+  }
 }
 
-// $sub = new SubCategoria();
+//  $sub = new SubCategoria();
+
+//  echo json_encode($sub->getSubcategoriaById(['idsubcategoria'=>2]));
 
 // echo json_encode($sub->getAll());

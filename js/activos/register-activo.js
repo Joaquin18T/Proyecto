@@ -19,7 +19,9 @@ document.addEventListener("DOMContentLoaded",()=>{
 
       const btnDeleteSB = allSelector("delete-input");
       btnDeleteSB.forEach(x=>{x.disabled=true;});
+
     }
+    listModelos();
   })();
 
   function selector(value) {
@@ -82,7 +84,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       x.appendChild(element);
     });
   }
-  //FIN MARCAS
+  //FIN SUBCATEGORIAS
 
   //MARCAS
   async function selectSubCategoria(){
@@ -115,9 +117,61 @@ document.addEventListener("DOMContentLoaded",()=>{
       const option = createOption(x.idmarca, x.marca);
       element.appendChild(option);
     });
-
+    selectMarca();
   }
+
+  // function selectMarca(){
+  //   const allMarcas = allSelector("marcas");
+  //   allMarcas.forEach(x=>{
+  //     x.addEventListener("change",()=>{
+  //       listModelos();
+  //     });
+  //   });
+  // }
   //FIN MARCAS
+
+  async function getSubCategoria(id){
+    const params = new URLSearchParams();
+    params.append("operation", "getByIdSubcategoria");
+    params.append("idsubcategoria", id);
+
+    const data = await getDatos(`${globals.host}subcategoria.controller.php`, params);
+    return data;
+  }
+  async function getMarca(id){
+    const params = new URLSearchParams();
+    params.append("operation", "getIdByMarca");
+    params.append("idmarca", id);
+
+    const data = await getDatos(`${globals.host}marca.controller.php`, params);
+    return data;
+  }
+
+  function listModelos(){
+    const fieldsModelo = allSelector("modelo");
+    fieldsModelo.forEach((x, i)=>{
+      x.addEventListener("blur",()=>{
+        if(x.value!==""){
+          writeDescripcion(i);
+        }
+      });
+    });
+  }
+
+
+  async function writeDescripcion(i){
+    const allDescripcion = allSelector("descripcion");
+
+    const allSubcategorias = allSelector("subcategoria");
+    const allMarcas = allSelector("marca");
+    const allModelos = allSelector("modelo");
+
+    const dataSubcategoria = await getSubCategoria(allSubcategorias[i].value);
+    const dataMarca = await getMarca(allMarcas[i].value);
+    
+    //console.log(`${dataSubcategoria[0].subcategoria}`);
+    allDescripcion[i].value = `${dataSubcategoria[0].subcategoria} ${dataMarca[0].marca} ${allModelos[i].value}`;
+  }
 
   //Funcion que renderiza dinamicamente la cantidad de activos a registrar
   function renderRegisters(){

@@ -68,3 +68,30 @@ if (isset($_POST['operation'])) {
       break;
   }
 }
+
+// $clearData = [
+//   'idnotificacion' => $notificacion->limpiarCadena($_GET['idnotificacion'])
+// ];
+// echo json_encode($notificacion->NotifDesignacionDetalle($clearData));
+// break;
+
+
+// $clearData = [
+//   'idnotificacion' => $notificacion->limpiarCadena($_GET['idnotificacion'])
+// ];
+// echo json_encode($notificacion->NotifiDetalleBajaActivo($clearData));
+// break;
+
+
+// $clearData = [
+//   'accion_responsable' => $notificacion->limpiarCadena($_GET['accion_responsable'])
+// ];
+// echo json_encode($notificacion->listNof_wh_IdactivoResp($clearData));
+// break;
+
+
+// $clearData = [
+//   'idnotificacion' => $notificacion->limpiarCadena($_GET['idnotificacion'])
+// ];
+// echo json_encode($notificacion->detalleNof_wh_IdactivoResp($clearData));
+// break;

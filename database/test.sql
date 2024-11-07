@@ -7,11 +7,12 @@ ALTER TABLE historial_activos AUTO_INCREMENT = 1;
 -- 8: tiene usuario pero no rp
 -- 9: ningun usuario
 -- 4: tiene usuarios y rp
-select* from activos_responsables where idactivo=12;
+select* from activos_responsables where idactivo=57;
 select* from activos_responsables where idusuario=5;
 select*from historial_activos where idactivo_resp=15;
-select*from notificaciones_activos where idactivo = 4;
+select*from notificaciones_activos where idactivo = 57;
 select*from activos where idactivo =22; -- V456IJDKJSDASDA
+select*from activos where cod_identificacion ='DASYU435BMADASD'; -- DASYU435BMADASD 
 select*from usuarios;
 select*from personas right join usuarios on personas.id_persona = usuarios.idpersona;
 select*from estados;

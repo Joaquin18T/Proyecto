@@ -225,7 +225,7 @@ document.addEventListener("DOMContentLoaded",()=>{
           <strong>Apellidos: </strong>${x.apellidos}<br>
           <strong>Nombres: </strong>${x.nombres}<br>
           <strong>Fecha asig.: </strong>${x.fecha_asignacion}<br>
-          <strong>Tipo Asig.: </strong>${parseInt(x.es_responsable)===0?'Colaborador':'Responsable Principal'}<br>
+          <strong>Tipo Asig.: </strong>${parseInt(x.es_responsable)===0?'Inactivo':'Responsable Principal'}<br>
         `;
         list.appendChild(li);
       });

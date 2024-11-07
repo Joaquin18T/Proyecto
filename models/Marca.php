@@ -12,7 +12,21 @@ class Marca extends ExecQuery{
       die($e->getMessage());
     }
   }
+
+  public function getMarcaById($params=[]):array{
+    try{
+      $cmd = parent::execQ("SELECT marca FROM marcas WHERE idmarca = ?");
+      $cmd->execute(array(
+        $params['idmarca']
+      ));
+      return $cmd->fetchAll(PDO::FETCH_ASSOC);
+    }catch(Exception $e){
+      die($e->getMessage());
+    }
+  }
 }
 
-// $marca = new Marca();
+//  $marca = new Marca();
+
+//  echo json_encode($marca->getMarcaById(['idmarca'=>4]));
 // echo json_encode($marca->getAll());
