@@ -8,9 +8,11 @@ document.addEventListener("DOMContentLoaded",()=>{
     cantidadRegistrar:localStorage.getItem("cantidad"),
     list_codes:[],
     contCodeInputs:0,
-    contSave:0
+    contSave:0,
+    numBlock:-1,
+    deleteBlock:false
   };
-  (()=>{
+  (async()=>{
     renderRegisters();
     if(parseInt(globals.cantidadRegistrar)===1){
       //console.log(globals.cantidadRegistrar);
@@ -21,7 +23,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       btnDeleteSB.forEach(x=>{x.disabled=true;});
 
     }
-    listModelos();
+    
   })();
 
   function selector(value) {
@@ -75,6 +77,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       chargerData(allCategorias, x.idsubcategoria, x.subcategoria);
     });
     await selectSubCategoria();
+    focusModelo();
   })();
 
   //Funcion a cargar las opciones en todos los select
@@ -90,13 +93,14 @@ document.addEventListener("DOMContentLoaded",()=>{
   async function selectSubCategoria(){
     const AllSubcategorias = allSelector("subcategoria");
     AllSubcategorias.forEach((x,i)=>{
-      x.addEventListener("change",()=>{
+      x.addEventListener("change",async()=>{
         const elements = document.getElementsByClassName(`activo-${i+1}`);
         const id = x.value;
         renderDataMarcas(elements[1], parseInt(id));
       });
     });
     await dataByDefault();
+    getDescripcionDefecto();
   }
 
   //Renderiza las opciones en el select categoria segun el numero del activo
@@ -120,14 +124,14 @@ document.addEventListener("DOMContentLoaded",()=>{
     selectMarca();
   }
 
-  // function selectMarca(){
-  //   const allMarcas = allSelector("marcas");
-  //   allMarcas.forEach(x=>{
-  //     x.addEventListener("change",()=>{
-  //       listModelos();
-  //     });
-  //   });
-  // }
+  function selectMarca(){
+    const allMarcas = allSelector("marca");
+    allMarcas.forEach((x,i)=>{
+      x.addEventListener("change",async()=>{
+        await dataActivoToDescription("marca", i);
+      });
+    });
+  }
   //FIN MARCAS
 
   async function getSubCategoria(id){
@@ -147,30 +151,60 @@ document.addEventListener("DOMContentLoaded",()=>{
     return data;
   }
 
-  function listModelos(){
-    const fieldsModelo = allSelector("modelo");
-    fieldsModelo.forEach((x, i)=>{
-      x.addEventListener("blur",()=>{
-        if(x.value!==""){
-          writeDescripcion(i);
-        }
+  //Funcion donde se autocompleta la descripcion mediante el modelo
+  function focusModelo(){
+    const allModelos = allSelector("modelo");
+    console.log("block modelo", globals.numBlock);
+    
+    allModelos.forEach((x,i)=>{
+      x.addEventListener("keyup",async()=>{
+        console.log("click modelo");
+        
+        await dataActivoToDescription("modelo", i);
       });
-    });
+    })
   }
-
-
-  async function writeDescripcion(i){
-    const allDescripcion = allSelector("descripcion");
-
+  
+  /**
+   * Funcion que muestra datos de subcategoria, marca, modelo en el campo descripcion 
+   */
+  async function dataActivoToDescription(field, i){
+    const fieldParam = allSelector(field);
+    console.log("data activo descp",i);
+    
     const allSubcategorias = allSelector("subcategoria");
     const allMarcas = allSelector("marca");
     const allModelos = allSelector("modelo");
-
+    
     const dataSubcategoria = await getSubCategoria(allSubcategorias[i].value);
     const dataMarca = await getMarca(allMarcas[i].value);
+    const dataModelo = allModelos[i]?.value;
+
+    const datosDescripcion = [allSubcategorias[i]?.value, allMarcas[i]?.value, dataModelo];
+    const isValid = datosDescripcion.every(x=>x!=undefined);
+    console.log("datos", datosDescripcion);
     
-    //console.log(`${dataSubcategoria[0].subcategoria}`);
-    allDescripcion[i].value = `${dataSubcategoria[0].subcategoria} ${dataMarca[0].marca} ${allModelos[i].value}`;
+    console.log(isValid);
+
+    if(isValid){
+      console.log("validado");
+      
+      fieldParam.forEach((x, i)=>{
+        x.addEventListener("blur",()=>{
+          writeDescripcion(i, dataSubcategoria[0].subcategoria, dataMarca[0].marca, dataModelo);
+        });
+      });
+
+    }
+  }
+
+  //Muestra los datos en el campo descripcion
+  function writeDescripcion(i, subcategoria, marca, modelo){
+    const allDescripcion = allSelector("descripcion");
+
+    allDescripcion[i].value = `${subcategoria} ${marca} ${modelo}`;
+    console.log(allDescripcion[i].value);
+    
   }
 
   //Funcion que renderiza dinamicamente la cantidad de activos a registrar
@@ -198,7 +232,6 @@ document.addEventListener("DOMContentLoaded",()=>{
     verifierAllAddEspec();
     addInputsCode(globals.cantidadRegistrar);
     btnDeleteBlock();
-
   }
 
   selector("showSB").addEventListener("click",()=>{
@@ -449,10 +482,11 @@ document.addEventListener("DOMContentLoaded",()=>{
     const btnDeleteB = allSelector("delete-block-activo"); //referencia al boton de eliminar un bloque de registro
     btnDeleteB.forEach((x,i)=>{
       x.addEventListener("click",()=>{
+        globals.cantidadRegistrar -=1;
         deleteBlockRegistrar(i+1);
+        globals.deleteBlock=true;
       });
     });
-    
 
   }
 
@@ -929,10 +963,22 @@ document.addEventListener("DOMContentLoaded",()=>{
     console.log("global", globals.datosActivos);
   }
 
-  //MOSTRAR LOS DATOS ELEGIDOS EN TODOS LOS BLOQUES EN SB DEL INDEX
+  //MOSTRAR LOS DATOS ELEGIDOS EN TODOS LOS BLOQUES EN SB DEL INDEX (datos pasados mediante LocalStorage)
+
+  //Funciona que obtiene el valor del modelo por defecto del localStorage
+  function getValorModeloDefault(){
+    const allModelos = allSelector("modelo");
+    const modeloDefault = localStorage.getItem("modelo");
+    //console.log(modeloDefault);
+    allModelos.forEach(x=>{
+      x.value = modeloDefault;
+    });
+  }
 
   //Funcion que selecciona a la subcategoria
   async function dataByDefault(){
+    getValorModeloDefault();
+    
     const idsubcategoria = parseInt(localStorage.getItem("subcategoria"));
     const allCategorias = allSelector("subcategoria");
     
@@ -975,6 +1021,23 @@ document.addEventListener("DOMContentLoaded",()=>{
       element.value = idmarca;
     }
   }
+
+  async function getDescripcionDefecto(){
+    const activoRegistrar = selector("list-register-activos").childElementCount;
+
+    const allDescripcion = allSelector("descripcion");
+    const allSubCategorias = allSelector("subcategoria");
+    const allMarcas = allSelector("marca");
+    const allModelos = allSelector("modelo");
+
+    
+    for (let i = 0; i < activoRegistrar; i++) {
+      const dataSubcategoria = await getSubCategoria(allSubCategorias[i].value);
+      const dataMarca = await getMarca(allMarcas[i].value);
+      allDescripcion[i].value = `${dataSubcategoria[0].subcategoria} ${dataMarca[0].marca} ${allModelos[i].value}`;
+    }
+  }
+  //./MOSTRAR LOS DATOS ELEGIDOS EN TODOS LOS BLOQUES EN SB DEL INDEX
 
   async function getEspecificacionesDefecto(idsubcategoria=0){
     const params = new URLSearchParams();

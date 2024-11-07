@@ -155,7 +155,7 @@
       <div class="row mt-4">
         <div class="col-md-9">
           <div class="form-floating">
-            <select name="sb-subcategoria" id="sb-subcategoria" class="form-control filter">
+            <select name="sb-subcategoria" id="sb-subcategoria" class="form-control">
               <option value="">Selecciona</option>
             </select>
             <label for="sb-subcategoria" class="form-label">Subcategorias</label>
@@ -165,10 +165,18 @@
       <div class="row mt-3">
         <div class="col-md-9">
           <div class="form-floating">
-            <select name="sb-marca" id="sb-marca" class="form-control filter">
+            <select name="sb-marca" id="sb-marca" class="form-control">
               <option value="">Selecciona</option>
             </select>
             <label for="sb-marca" class="form-label">Marcas</label>
+          </div>
+        </div>
+      </div>
+      <div class="row mt-3">
+        <div class="col-md-9">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="sb-modelo">
+            <label for="sb-modelo" class="form-label">Modelo</label>
           </div>
         </div>
       </div>

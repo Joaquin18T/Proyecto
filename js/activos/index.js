@@ -54,14 +54,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  $selector("#sb-marca").addEventListener("change",()=>{
-    let valorMarca = $selector("#sb-marca").value;
-    if(valorMarca!==""){
-      $selector("#registerAceptar").disabled = false;
-    }else{
-      $selector("#registerAceptar").disabled = true;
-    }
-  });
 
   (async () => {
     const params = new URLSearchParams();
@@ -350,6 +342,15 @@ document.addEventListener("DOMContentLoaded", () => {
     return data[0].descripcion;
   }
 
+  $selector("#sb-modelo").addEventListener("keyup",()=>{
+    let valorModelo = $selector("#sb-modelo").value;
+    if(valorModelo.trim().length>3){
+      $selector("#registerAceptar").disabled = false;
+    }else{
+      $selector("#registerAceptar").disabled = true;
+    }
+  });
+
   //Datos a enviar a la vista registrar (cantidad de activos a registrar)
   $selector("#toRegistrar").addEventListener("click",()=>{
     //href="<?= $host ?>views/activo/register-activo"
@@ -366,6 +367,7 @@ document.addEventListener("DOMContentLoaded", () => {
       localStorage.setItem("cantidad", value);
       localStorage.setItem("subcategoria", $selector("#sb-subcategoria").value);
       localStorage.setItem("marca", $selector("#sb-marca").value);
+      localStorage.setItem("modelo", $selector("#sb-modelo").value);
       $selector("#cantidadEnviar").value = 0;
       window.location.href = "http://localhost/CMMS/views/activo/register-activo";
       
