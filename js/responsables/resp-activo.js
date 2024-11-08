@@ -150,7 +150,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   * @param {*} remTo 'palabra por la cual vas a reemplazar'
   * @returns 
   */
-    function replaceWords(word, rem=[], remTo){
+    function replaceWords(word, remTo){
+      const rem =['<p>','</p>','<strong>','</strong>','<em>','</em>','<u>','</u>',
+        '<del>','</del>', '<span>','</span>'];
       for (let i = 0; i < rem.length; i++) {
         //const rgx = new RegExp(rem[i], 'g');
         word = word.replace(rem[i], remTo);
@@ -180,7 +182,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       //console.log(listImages);
       
       //const desp = replaceWords(selector("descripcion").value,['<p>','</p>'],'');
-      params.append("condicion_equipo", replaceWords(condicion,['<p>','</p>'],'').trim());
+      params.append("condicion_equipo", replaceWords(condicion,'').trim());
       params.append("imagenes", JSON.stringify(listImages));
       params.append("descripcion", selector("descripcion").value);
       params.append("autorizacion", valor[0].id_usuario);

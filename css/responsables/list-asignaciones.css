@@ -5,3 +5,11 @@
 .dataTable-selector{
   width: 60px;
 }
+
+.scrollable-div {
+  max-height: 500px;       /* Define la altura del div */
+  overflow-y: auto;    /* Activa el scroll solo si el contenido es más alto que el div */
+  border: 1px solid #b3b3b3; /* Opcional: agregar un borde para visualizar mejor el contenedor */
+  padding: 10px;       /* Opcional: agrega un padding para espacio interno */
+  border-radius: 5px;
+}

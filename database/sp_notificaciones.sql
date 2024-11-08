@@ -23,17 +23,33 @@ CREATE PROCEDURE sp_list_notificacion
 	IN _idusuario INT
 )
 BEGIN
-	SELECT
-		NA.idactivo_resp, NA.idnotificacion_activo, NA.tipo, NA.visto, NA.mensaje, NA.fecha_creacion,
-        ACT.idactivo, ACT.descripcion as descripcion_activo,
-		RES.descripcion
-		FROM notificaciones_activos NA
-		inner JOIN activos_responsables RES ON NA.idactivo_resp = RES.idactivo_resp
-		INNER JOIN activos ACT ON RES.idactivo = ACT.idactivo
-        WHERE RES.idusuario = _idusuario
-        ORDER BY NA.fecha_creacion asc;
+	SELECT 
+		NA.idnotificacion_activo AS idnotificacion, 
+		NA.tipo AS tipo_notificacion, NA.mensaje, NA.fecha_creacion, NA.visto,
+		A.descripcion AS descripcion_activo,
+		U.usuario AS usuario_nombre
+	FROM 
+		notificaciones_activos NA
+	INNER JOIN activos_responsables AR ON NA.idactivo_resp = AR.idactivo_resp
+	INNER JOIN activos A ON AR.idactivo = A.idactivo
+	INNER JOIN usuarios U ON AR.idusuario = U.id_usuario
+	WHERE U.id_usuario = _idusuario  -- Especifica aquí el usuario
+
+	UNION ALL
+
+	SELECT 
+		NM.idnotificacion_mantenimiento AS idnotificacion, 
+		'Mantenimiento' AS tipo_notificacion,  -- Etiqueta fija para diferenciar el tipo
+		NM.mensaje, NM.fecha_creacion, NM.visto, NM.activos AS descripcion_activo, 
+		U.usuario AS usuario_nombre
+	FROM notificaciones_mantenimiento NM
+	INNER JOIN activos_responsables AR ON NM.idresp = AR.idactivo_resp
+	INNER JOIN usuarios U ON AR.idusuario = U.id_usuario
+	WHERE U.id_usuario = _idusuario -- Especifica aquí el mismo usuario
+	ORDER BY fecha_creacion DESC;
 END $$
--- CALL sp_list_notificacion(5);
+-- CALL sp_list_notificacion(2);
+
 DROP PROCEDURE IF EXISTS sp_list_notificacion_mantenimiento;
 DELIMITER $$
 CREATE PROCEDURE sp_list_notificacion_mantenimiento
@@ -110,9 +126,9 @@ BEGIN
 END $$
 
 -- ASIGNACION 
-DROP PROCEDURE IF EXISTS sp_detalle_notificacion_activo;
+DROP PROCEDURE IF EXISTS sp_detalle_asignacion_notificacion;
 DELIMITER $$
-CREATE PROCEDURE sp_detalle_notificacion_activo (
+CREATE PROCEDURE sp_detalle_asignacion_notificacion (
     IN _idnotificacion_activo INT
 )
 BEGIN
@@ -121,6 +137,7 @@ BEGIN
         RES.idactivo_resp, RES.descripcion as des_responsable,RES.condicion_equipo,RES.fecha_asignacion,RES.autorizacion,
         NA.fecha_creacion,
         MAR.marca,
+        SUB.subcategoria,
         UBI.ubicacion
     FROM historial_activos HIS
     INNER JOIN ubicaciones UBI ON HIS.idubicacion = UBI.idubicacion
@@ -128,12 +145,13 @@ BEGIN
     INNER JOIN notificaciones_activos NA ON RES.idactivo_resp = NA.idactivo_resp
     INNER JOIN activos ACT ON RES.idactivo = ACT.idactivo
     INNER JOIN marcas MAR ON ACT.idmarca = MAR.idmarca
+    INNER JOIN subcategorias SUB ON ACT.idsubcategoria = SUB.idsubcategoria
     WHERE NA.idnotificacion_activo =_idnotificacion_activo
     ORDER BY HIS.fecha_movimiento DESC
     LIMIT 1;
 END $$
 
--- CALL sp_detalle_notificacion_activo(48);
+-- CALL sp_detalle_asignacion_notificacion(48);
 
 -- DESIGNACION
 DROP PROCEDURE IF EXISTS sp_notificacion_designacion_detalle;
@@ -144,7 +162,7 @@ CREATE PROCEDURE sp_notificacion_designacion_detalle
 )
 BEGIN
 	SELECT
-		NA.idnotificacion_activo,
+		NA.idnotificacion_activo, NA.fecha_creacion,
         ACT.cod_identificacion, ACT.modelo, ACT.descripcion, ACT.idactivo,
         RES.fecha_designacion, RES.es_responsable, RES.idactivo_resp,
         UBI.ubicacion
@@ -158,26 +176,6 @@ BEGIN
 END $$
 -- CALL sp_notificacion_designacion_detalle(1);
 
-DROP PROCEDURE IF EXISTS sp_notificacion_baja_lista;
-DELIMITER $$
-CREATE PROCEDURE sp_notificacion_baja_lista
-(
-	IN _idusuario INT
-)
-BEGIN
-		SELECT
-		NA.idactivo_resp,
-		NA.idnotificacion_activo,
-		NA.tipo,
-		NA.visto,
-		NA.mensaje
-        FROM notificaciones_activos NA
-        INNER JOIN activos_responsables RES ON NA.idactivo_resp = RES.idactivo_resp
-        INNER JOIN usuarios U ON RES.idusuario = U.id_usuario
-        WHERE U.id_usuario = _idusuario
-        ORDER BY NA.fecha_creacion DESC;
-END $$
-
 DROP PROCEDURE IF EXISTS sp_notificacion_baja_detalle;
 DELIMITER $$
 CREATE PROCEDURE sp_notificacion_baja_detalle
@@ -190,7 +188,8 @@ BEGIN
 		ACT.cod_identificacion, ACT.modelo, ACT.descripcion, ACT.idactivo,
         MAR.marca,
         BA.fecha_baja, BA.motivo, BA.aprobacion, BA.coment_adicionales,
-        UBI.ubicacion
+        UBI.ubicacion,
+        NA.fecha_creacion
         FROM historial_activos HA
         INNER JOIN activos_responsables RES ON HA.idactivo_resp = RES.idactivo_resp
         INNER JOIN ubicaciones UBI ON HA.idubicacion = UBI.idubicacion
@@ -204,6 +203,58 @@ BEGIN
         LIMIT 1; -- probar cuando el usuario no es responsable p 
 END $$
 -- CALL sp_notificacion_baja_detalle(31);
+
+DROP PROCEDURE IF EXISTS sp_detalle_ubicacion_notificacion;
+DELIMITER $$
+CREATE PROCEDURE sp_detalle_ubicacion_notificacion
+(
+	IN _idnotificacion_activo INT
+)
+BEGIN 
+		SELECT 
+			ACT.cod_identificacion, ACT.modelo, ACT.descripcion, ACT.idactivo,
+			MAR.marca,
+            SUB.subcategoria,
+            U.ubicacion,
+            HA.fecha_movimiento, HA.responsable_accion,
+            NA.fecha_creacion
+            FROM historial_activos HA
+            INNER JOIN ubicaciones U ON HA.idubicacion = U.idubicacion
+            INNER JOIN activos_responsables AR ON HA.idactivo_resp = AR.idactivo_resp
+            INNER JOIN activos ACT ON AR.idactivo = ACT.idactivo
+            INNER JOIN marcas MAR ON ACT.idmarca = MAR.idmarca
+            INNER JOIN subcategorias SUB ON ACT.idsubcategoria = SUB.idsubcategoria
+            INNER JOIN notificaciones_activos NA ON AR.idactivo_resp = NA.idactivo_resp
+            
+            WHERE NA.idnotificacion_activo = _idnotificacion_activo
+            ORDER BY HA.fecha_movimiento DESC
+            LIMIT 1;
+END $$
+
+DROP PROCEDURE IF EXISTS sp_responsable_principal_detalle_notificacion;
+DELIMITER $$
+CREATE PROCEDURE sp_responsable_principal_detalle_notificacion
+(
+	IN _idnotificacion_activo INT
+)
+BEGIN
+	SELECT
+		ACT.cod_identificacion, ACT.modelo, ACT.descripcion, ACT.idactivo,
+		MAR.marca,
+		SUB.subcategoria,
+        HA.fecha_movimiento, HA.responsable_accion,
+        NA.fecha_creacion,
+        AR.fecha_asignacion
+        FROM historial_activos HA
+		INNER JOIN activos_responsables AR ON HA.idactivo_resp = AR.idactivo_resp
+		INNER JOIN activos ACT ON AR.idactivo = ACT.idactivo
+		INNER JOIN marcas MAR ON ACT.idmarca = MAR.idmarca
+		INNER JOIN subcategorias SUB ON ACT.idsubcategoria = SUB.idsubcategoria
+		INNER JOIN notificaciones_activos NA ON AR.idactivo_resp = NA.idactivo_resp
+        WHERE NA.idnotificacion_activo = _idnotificacion_activo
+        ORDER BY HA.fecha_movimiento DESC
+        LIMIT 1;
+END $$
 
 
 DROP PROCEDURE IF EXISTS sp_list_notificacion_wh_idactivo_resp;

@@ -1,366 +1,182 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // if (document.getElementById("options-sidebar")) {
-  //   const sidebarList = document.getElementById("options-sidebar");
-
-  //   sidebarList.addEventListener("click", (e) => {
-  //     if (e.target && e.target.matches("a.nav-link")) {
-  //       const aElement = document.querySelectorAll(".nav-link");
-  //       aElement.forEach((x) => {
-  //         x.addEventListener("click", (e) => {
-  //           e.preventDefault();
-  //           const hrefValue = enlace.href;
-  //           window.location.href = hrefValue;
-  //         });
-  //       });
-
-  //       let items = sidebarList.querySelectorAll("li");
-  //       items.forEach((item) => item.classList.remove("active"));
-
-  //       // Añadir la clase active al li seleccionado
-  //       e.target.parentElement.classList.add("active");
-  //     }
-  //   });
-  // }
-
-  //CONSTANTES
-
-  const host = "http://localhost/CMMS/controllers/";
-  let idusuario = 0;
+  const globals = {
+    host: "http://localhost/CMMS/controllers/",
+    idusuario: 0,
+  };
 
   //FUNCIONES
-  function selector(value) {
-    return document.querySelector(`#${value}`);
-  }
+    function selector(value) {
+      return document.querySelector(`#${value}`);
+    }
 
-  async function getDatos(link, params) {
-    let data = await fetch(`${link}?${params}`);
-    return data.json();
-  }
+    async function getDatos(link, params) {
+      let data = await fetch(`${link}?${params}`);
+      return data.json();
+    }
 
-  async function getIdUser() {
-    const params = new URLSearchParams();
-    params.append("operation", "searchUser");
-    params.append("usuario", selector("nomuser").textContent);
-    const data = await getDatos(`${host}/usuarios.controller.php`, params);
-    return data[0].id_usuario;
-    //console.log(idusuario);
-  }
+    async function getIdUser() {
+      const params = new URLSearchParams();
+      params.append("operation", "searchUser");
+      params.append("usuario", selector("nomuser").textContent);
+      const data = await getDatos(`${globals.host}/usuarios.controller.php`, params);
+      return data[0].id_usuario;
+      //console.log(idusuario);
+    }
+  //./FUNCIONES
 
-
-   async function listNotificationsMantenimiento(idusu) {
-     const params = new URLSearchParams();
-     params.append("operation", "listNotificationsMantenimiento");
-     params.append("idusuario", idusu);
-     const data = await getDatos(`${host}notificacion.controller.php`, params);
-     return data
-   }
-
-  (async () => {
+  //Obtiene las notificaciones desde DB
+  (async()=>{
     const id = await getIdUser();
     const params = new URLSearchParams();
     params.append("operation", "listNotf");
     params.append("idusuario", id);
-    params.append("idnotificacion", "");
 
-    const data = await getDatos(`${host}notificacion.controller.php`, params);
-    const notisMantenimiento = await listNotificationsMantenimiento(id)
-    console.log("notisMantenimiento: ", notisMantenimiento)
-    console.log("notify", data);
-    if (data.length > 0) {
-      const dataResp = await dataRespNof(data[0].idusuario);
-      idusuario = await getIdUser();
-      //console.log("resp", dataResp);
-      const newArray = avoidRepeats(data);
-      //const dataCombined = matchList(data, dataResp);
-      //console.log("combined", dataCombined);
-      console.log("list nof", data);
-
-      data.forEach((x, i) => {
-        if (i < 4) {
-          createNotificacion(
-            x.idactivo_resp,
-            x.mensaje,
-            x.descripcion,
-            x.fecha_creacion,
-            x.idnotificacion_activo,
-            x.idactivo,
-            1
-          );
-        }
-        createNotificacion(
-          x.idactivo_resp,
-          x.mensaje,
-          x.descripcion,
-          x.fecha_creacion,
-          x.idnotificacion_activo,
-          x.idactivo,
-          2
-        );
-      });
-    }
-     if (notisMantenimiento.length > 0) {
-       notisMantenimiento.forEach((x, i) => {
-         if (i < 4) {
-           createNotificacion(
-             0,
-             x.mensaje,
-             "Asignacion a orden de trabajo.",
-             x.fecha_creacion,
-             x.idnotificacion_mantenimiento,
-             0,
-             1
-           )
-         }
-         createNotificacion(
-           0,
-           x.mensaje,
-           "Asignacion a orden de trabajo.",
-           x.fecha_creacion,
-           x.idnotificacion_mantenimiento,
-           0,
-           2
-         )
-       })
-     }
-    showPreviewDetailt();
-
-  })();
-
-  /**
-   * Combina dos arrays de objetos segun su posicion
-   * @param {*} arr1 Primer array a combinar
-   * @param {*} arr2 Segundo array a combinar
-   * @returns Retorna la combinacion de los dos array de objetos
-   */
-  function matchList(arr1 = [], arr2 = []) {
-    const combinar = arr1.map((x, i) => {
-      return { ...x, ...arr2[i] };
-    });
-    return combinar;
-  }
-
-  function avoidRepeats(list = []) {
-    const idDuplicates = new Set();
-    const newArray = [];
-    list.forEach((x) => {
-      if (!idDuplicates.has(x.idnotificacion)) {
-        newArray.push(x);
-        idDuplicates.add(x.idnotificacion);
-      }
-    });
-    console.log(newArray);
-    return newArray;
-  }
-
-  /*
-   * Muestra datos importantes de la notificacion
-   */
-  function showPreviewDetailt() {
-    const notfs = document.querySelectorAll(".item-notifi");
-    notfs.forEach((x) => {
-      x.addEventListener("click", async (e) => {
-        console.log("id", e.target.dataset.idnofact);
-        console.log("iduser", idusuario);
-
-        const detail = await showDetail(e.target.dataset.idnofact);
-        console.log("detalle nof", detail);
-        showModal(detail);
-      });
-    });
-  }
-
-  /**
-   * devuelve datos de la asignacion
-   * @param {*} iduser id del usuario
-   * @returns Descripciones de su asignacion
-   */
-  async function dataRespNof(iduser) {
-    const params = new URLSearchParams();
-    params.append("operation", "dataRespNotf");
-    params.append("idusuario", parseInt(iduser));
-
-    const data = await getDatos(`${host}notificacion.controller.php`, params);
-    return data;
-  }
-
-  /**
-   * Muestra los detalles de la notificacion
-   */
-  async function showDetail(id) {
-    const params = new URLSearchParams();
-    params.append("operation", "detalleNotf");
-    params.append("idnotificacion", id);
-    //console.log(id);
-
-    const data = await getDatos(`${host}notificacion.controller.php`, params);
+    const data = await getDatos(`${globals.host}notificacion.controller.php`, params);
     //console.log(data);
-    return data;
-  }
-
-  async function getDataUser(id){
-    const params = new URLSearchParams();
-    params.append("operation", "getUserById");
-    params.append("idusuario", id);
-
-    const data = await getDatos(`${host}usuarios.controller.php`, params);
-    return data;
-  }
-
-  /**
-   * Muestra los datos de la notificacion en el Modal
-   */
-  async function showModal(data) {
-    selector("modal-body-notif").innerHTML = "";
-    console.log("data modal", data);
-
-    const dataResponsable = await getDataUser(data[0].autorizacion);
-    data.forEach((x) => {
-      selector("modal-body-notif").innerHTML = `
-        <p>Activo Asignado: ${x.modelo} ${x.marca}</p>
-        <p>Descripcion de la asig.: ${x.des_responsable}</p>
-        <p>Responsable de la asig.: ${dataResponsable[0].dato} - ${dataResponsable[0].usuario}</p>
-        <br>
-        <p>Datos del activo:</p>
-        <p>- Codigo: ${x.cod_identificacion}</p>
-        <p>- Descripcion: ${x.descripcion}</p>
-        <p>- Ubicacion: ${x.ubicacion}</p>
-        <p>- Condicion del Equipo: ${replaceWords(
-          x.condicion_equipo,
-          ["<p>", "</p>"],
-          ""
-        )}</p>
-        <p>- Fecha Asignacion: ${x.fecha_asignacion}</p>
-        <br>
-        <p>- Fecha Creacion Notificacion: ${x.fecha_creacion}</p>`
-      });
-
-    const modalImg = new bootstrap.Modal(
-      selector("modal-detalle-notificacion")
-    );
-    modalImg.show();
-  }
-
-  /**
-   * Reemplaza una cadena
-   * @param {*} word 'variable que contiene la cadena'
-   * @param {*} rem 'array de elementos que quieres reemplazar'
-   * @param {*} remTo 'palabra por la cual vas a reemplazar'
-   * @returns
-   */
-  function replaceWords(word, rem = [], remTo) {
-    let newWord = word;
-    for (let i = 0; i < rem.length; i++) {
-      //const rgx = new RegExp(rem[i], 'g');
-      newWord = newWord.replace(rem[i], remTo);
-    }
-    return newWord;
-  }
-
-  //Crea las notificaciones en la lista como en el SB
-  async function createNotificacion(
-    id,
-    mensaje,
-    descripcion,
-    fecha,
-    idnof_activo,
-    idactivo,
-    type
-  ) {
-    let element = "";
-    if (type === 1) {
-      element = `
-      <a href="#" class="list-group-item list-group-item-action border-bottom item-notifi" data-idnofact=${idnof_activo}>
-          <div class="row align-items-center " style="pointer-events:none;">
-            <div class="col ps-0 ms-2">
-              <div class="d-flex justify-content-between align-items-center">
-                <div>
-                  <h4 class="h6 mb-0 text-small">${mensaje}</h4>
-                </div>
-                <div class="text-end">
-                  <small class="text-danger">${fecha}</small>
-                </div>
-              </div>
-              <p class="font-small mt-1 mb-0">
-                Des. Activo: ${descripcion}
-              </p>
-            </div>
-          </div>
-          </a>
-        `;
-      selector("list-notificaciones").innerHTML += element;
-    } else if (type === 2) {
-      const dataActivo = await getDataActivo(idactivo);
-      //console.log(dataActivo);
-      element = `
-        <div class="card sb-idnotificacion mb-3" data-idnof_activo=${idnof_activo}>
-          <div class="card-body">
-            <h5 class="card-title">${mensaje}</h5>
-            <h6 class="card-subtitle mb-2 text-body-secondary">Desc Act: ${descripcion}</h6>
-            <p class="card-text">
-              <strong>Fech. Creacion: <small class="text-danger">${fecha}</small></strong>
-            </p>
-          </div>
-        </div>
-      `;
-      selector("sb-list-notificacion").innerHTML += element;
-      //showDataWSidebar();
-    }
-  }
-
-  function removeExtraBackdrops() {
-    // Selecciona todas las capas de sombra (modal-backdrop y offcanvas-backdrop)
-    const backdrops = document.querySelectorAll(
-      ".modal-backdrop, .offcanvas-backdrop"
-    );
-
-    // Si hay más de una capa de sombra, eliminamos las duplicadas
-    if (backdrops.length > 1) {
-      backdrops.forEach((backdrop, index) => {
-        if (index > 0) {
-          backdrop.remove();
+    
+    if(data.length>0){
+      data.forEach((x,i)=>{
+        if(i<3){
+          renderListNotificacion(x.idnotificacion, x.tipo_notificacion, x.mensaje, x.fecha_creacion, x.descripcion_activo);
         }
+        renderSBNotificacion(x.idnotificacion, x.tipo_notificacion, x.mensaje, x.fecha_creacion, x.descripcion_activo);
       });
     }
+    showNotificationDetail();
+  })();
+  
+  function renderListNotificacion(idnof_activo, tipo, mensaje, fecha, descripcion){
+    let notificacion = "";
+    notificacion = `
+    <a class="list-group-item list-group-item-action border-bottom item-notifi" data-idnofact=${idnof_activo} data-type=${tipo}>
+      <div class="d-flex justify-content-between align-items-center containe-data-nof" style="pointer-events:none;">
+        <div>
+          <h4 class="h5 text-small">${tipo}</h4>
+          <h4 class="h6 mb-0 text-small">${mensaje}</h4>
+          <p class="font-small mt-1 mb-0">${descripcion}</p>
+        </div>
+        <div class="text-end pb-5">
+          <small class="text-danger ">${fecha}</small>
+        </div>
+      </div>
+    </a>
+    `;
+
+    selector("list-notificaciones").innerHTML += notificacion;
   }
-  $("#modal-update, #activo-baja-detalle").on(
-    "shown.bs.modal shown.bs.offcanvas",
-    function () {
-      removeExtraBackdrops();
-    }
-  );
 
-  //Obtiene los datos del activo mediante una id
-  async function getDataActivo(idactivo) {
-    const params = new URLSearchParams();
-    params.append("operation", "getById");
-    params.append("idactivo", idactivo);
+  function renderSBNotificacion(idnof_activo, tipo, mensaje, fecha, descripcion){
+    let element = "";
+    element=`
+      <div class="card sb-idnotificacion mb-3" data-idnof_activo=${idnof_activo}>
+        <div class="card-body">
+          <h5 class="card-title">${tipo}</h5>
+          <h6 class="mt-3">${mensaje}</h6>
+          <h6 class="card-subtitle mb-2 mt-2 text-body-secondary">${descripcion}</h6>
+          <p class="card-text">
+            <strong>Fech. Creacion: <small class="text-danger">${fecha}</small></strong>
+          </p>
+        </div>
+      </div>
+    `;
 
-    const data = await getDatos(`${host}activo.controller.php`, params);
-    return data[0];
+    selector("sb-list-notificacion").innerHTML+=element;
   }
 
-  //MOSTRAR NOTIFICACIONES EN EL SIDEBAR
-  selector("show-all-notificaciones").addEventListener("click", () => {
+  selector("show-all-notificaciones").addEventListener("click",()=>{
     const sidebar = selector("sb-notificacion");
     const offCanvas = new bootstrap.Offcanvas(sidebar);
     offCanvas.show();
   });
 
-  function showDataWSidebar() {
-    const datanofSB = document.querySelectorAll(".sb-idnotificacion");
-    datanofSB.forEach(x => {
-      x.addEventListener("click", async () => {
-        const idnof = parseInt(x.getAttribute("data-idnof_activo"));
-        //console.log("id nof SB", idnof);
+  function showNotificationDetail(){
+    const NoftElements = document.querySelectorAll(".item-notifi");
+    NoftElements.forEach(x=>{
+      x.addEventListener("click",async()=>{
+        let idnoft = x.getAttribute("data-idnofact"); //idnotificacion 
+        let type = x.getAttribute("data-type"); //tipo de notificacion
+        
+        const op = typeOfDetails(type);
 
-        const detail = await showDetail(idnof);
-        console.log("detalle nof sb", detail);
-        const sidebar = bootstrap.Offcanvas.getOrCreateInstance(
-          selector("sb-notificacion")
-        );
-        sidebar.hide();
-        showModal(detail);
+        const details = await getDataDeatailNotification(idnoft, op);
+        console.log("datalles", details);
+
+        const fields = validateFieldsByTipo(type, details);
+        console.log("fields", fields);
+        
+        
       });
     });
+  }
+
+  async function getDataDeatailNotification(id, operation){
+    const params = new URLSearchParams();
+    params.append("operation", operation);
+    params.append("idnotificacion", parseInt(id));
+
+    const data = await getDatos(`${globals.host}notificacion.controller.php`, params);
+    return data[0];
+  }
+
+  function typeOfDetails(type){
+    let nameOperation = "";
+    switch(type){
+      case 'Asignacion':
+        nameOperation = "detalleAsignacion";
+        break;
+      case 'Designacion':
+        nameOperation = "detalleDesignacion";
+        break;
+      case 'Baja':
+        nameOperation = "detalleBajaActivo";
+        break;
+      case 'Cambio de ubicacion':
+        nameOperation = "detalleUbicacion";
+        break;
+      case 'Cambio de responsable Principal':
+        nameOperation = "detalleResponsableP";
+        break;
+      case 'Asignacion como responsable principal':
+        nameOperation = "detalleResponsableP";
+        break;
+      //Falta la lista de los activos que no tienen asignaciones, ni en el historial
+    }
+    return nameOperation;
+  }
+
+  function validateFieldsByTipo(tipo, data={}){
+    let fields = "";
+
+    switch(tipo){
+      case 'Asignacion':
+        fields = `
+        <p>Activo Asignado: ${data.descripcion}</p>
+        <p>Descripcion de la asig.: ${data.des_responsable}</p>
+        <p>Responsable de la asig.: ${data.autorizacion}</p>
+        <br>
+        <p><strong>Datos del activo:</strong></p>
+        <p>Codigo: ${data.cod_identificacion}</p>
+        <p>Subcategoria: ${data.subcategoria}</p>
+        <p>Marca: ${data.marca}</p>
+        <p>Modelo: ${data.modelo}</p>
+        <p>Ubicacion: ${data.ubicacion}</p>
+        <p>Condicion del activo:${data.condicion_equipo}</p>
+        <br>
+        <p>Fecha Asignacion: ${data.fecha_asignacion}</p>
+        <p>Fecha Creacion Notificacion: ${data.fecha_creacion}</p>`;
+        break;
+      case 'Designacion':
+        break;
+      case 'Baja':
+        break;
+      case 'Cambio de ubicacion':
+        break;
+      case 'Cambio de responsable Principal':
+        break;
+      case 'Asignacion como responsable principal':
+        break;
+      //Falta la lista de los activos que no tienen asignaciones, ni en el historial
+    }
+    return fields;
   }
 });

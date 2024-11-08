@@ -122,9 +122,11 @@ require_once '../header.php';
         </div>
       </div>
     </div>
-    <ul class="list-group mt-2" id="list-users">
-
-    </ul>
+    <div class="scrollable-div mt-3">
+      <ul class="list-group" id="list-users">
+  
+      </ul>
+    </div>
   </div>
 </div>
 <!-- ./SIDEBAR DE USUARIOS ASIGNADOS A UN ACTIVO -->

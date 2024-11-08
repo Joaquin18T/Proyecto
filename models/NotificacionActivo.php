@@ -36,10 +36,10 @@ class Notificacion extends ExecQuery
     }
   }
 
-  public function detalleNotificaciones($params = []): array
+  public function detalleAsignacionNotf($params = []): array
   {
     try {
-      $cmd = parent::execQ('CALL sp_detalle_notificacion_activo(?)');
+      $cmd = parent::execQ('CALL sp_detalle_asignacion_notificacion(?)');
       $cmd->execute(
         array(
           $params['idnotificacion']
@@ -198,9 +198,42 @@ class Notificacion extends ExecQuery
     }
   }
  
+  public function detalleUbicacionNoft($params=[]):array{
+    try{
+      $cmd = parent::execQ("CALL sp_detalle_ubicacion_notificacion(?)");
+      $cmd->execute(
+        array(
+          $params['idnotificacion']
+        )
+      );
+      return $cmd->fetchAll(PDO::FETCH_ASSOC);
+    }catch(Exception $e){
+      die($e->getMessage());
+      return [];
+    }
+  }
+
+  public function detalleResponsablePNoft($params=[]):array{
+    try{
+      $cmd = parent::execQ("CALL sp_responsable_principal_detalle_notificacion(?)");
+      $cmd->execute(
+        array(
+          $params['idnotificacion']
+        )
+      );
+      return $cmd->fetchAll(PDO::FETCH_ASSOC);
+    }catch(Exception $e){
+      die($e->getMessage());
+      return [];
+    }
+  }
 }
 
 //$not = new Notificacion();
+
+//echo json_encode($not->detalleUbicacionNoft(['idnotificacion'=>4]));
+
+//echo json_encode($not->detalleResponsablePNoft(['idnotificacion'=>4]));
 
 // echo json_encode($not->dataRespNotificacion(['idusuario'=>12]));
 
