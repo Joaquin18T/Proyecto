@@ -6,7 +6,8 @@ DROP PROCEDURE IF EXISTS `insertarPlanDeTareas`
 DELIMITER $$
 CREATE PROCEDURE `insertarPlanDeTareas`(
 	OUT _idplantarea INT,
-	IN _descripcion VARCHAR(30)
+	IN _descripcion VARCHAR(30),
+    IN _idcategoria	INT
 )
 BEGIN
     DECLARE existe_error INT DEFAULT 0;
@@ -17,8 +18,8 @@ BEGIN
         SET existe_error = 1;
 	END;
     
-    INSERT INTO plandetareas (descripcion, incompleto)
-    VALUES (_descripcion, true);
+    INSERT INTO plandetareas (descripcion, idcategoria)
+    VALUES (_descripcion, _idcategoria);
     
     IF existe_error = 1 THEN
 		SET _idplantarea = -1;

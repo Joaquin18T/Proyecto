@@ -22,6 +22,10 @@ if (isset($_GET['operation'])) {
         case 'obtenerFrecuencias':
             echo json_encode($tarea->obtenerFrecuencias());
             break;
+
+        case 'obtenerTareasSinActivos':
+            echo json_encode($tarea->obtenerTareasSinActivos());
+            break;
     }
 }
 

@@ -21,10 +21,11 @@ class PlanDeTarea extends ExecQuery
     public function add($params = []): int
     {
         try {
-            $sp = parent::execQ("CALL insertarPlanDeTareas(@idplantarea,?)");
+            $sp = parent::execQ("CALL insertarPlanDeTareas(@idplantarea,?,?)");
             $sp->execute(
                 array(
-                    $params['descripcion']
+                    $params['descripcion'],
+                    $params['idcategoria']
                 )
             );
             $response = parent::execQuerySimple("SELECT @idplantarea as idplantarea")->fetch(PDO::FETCH_ASSOC);

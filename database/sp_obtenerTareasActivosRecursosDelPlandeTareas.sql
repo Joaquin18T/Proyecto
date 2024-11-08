@@ -33,10 +33,12 @@ BEGIN
 	SELECT 
         idplantarea, 
         descripcion,
-        incompleto
+        incompleto,
+        idcategoria
     FROM plandetareas
     WHERE idplantarea = _idplantarea;
 END $$
+call obtenerPlanTareaPorId(33)
 
 -- PROCEDIMIENTOS ALMACENADOS PLAN DE TAREA Y TAREAS
 DROP PROCEDURE IF EXISTS `obtenerPlantareasDetalles`
@@ -110,7 +112,7 @@ BEGIN
 		INNER JOIN frecuencias FRE ON FRE.idfrecuencia = TAR.idfrecuencia
 		LEFT JOIN activos_vinculados_tarea AVT ON AVT.idtarea = TAR.idtarea
 		LEFT JOIN activos ACT ON ACT.idactivo = AVT.idactivo
-        WHERE TAR.idtarea = 1;
+        WHERE TAR.idtarea = _idtarea;
 END $$
 
 DROP PROCEDURE IF EXISTS `obtenerTareasPorPlanTarea`

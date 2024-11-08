@@ -16,6 +16,7 @@ $(document).ready(async () => {
     let tbActivos = null
     let idplantarea_generado = -1;
     let idtarea_generado = -1;
+    let idcategoria = -1
     const btnGuardarPlanTarea = $q("#btnGuardarPlanTarea");
     const filters = $all(".filter")
     //TABLAS
@@ -25,6 +26,8 @@ $(document).ready(async () => {
     const ulTareasAgregadas = $q(".listaTareasAgregadas");
     // LISTAS
     let activosElegidos = []
+    //SELECT - PLAN
+    const selectCategoria = $q("#elegirCategoria")
     //SELECT - Tarea
     const selectSubCategoriaTarea = $q("#elegirSubCategoriaTarea")
     //SELECTS -activos
@@ -37,7 +40,7 @@ $(document).ready(async () => {
     const btnGuardarTarea = $q("#btnGuardarTarea")
     const btnsTareaAcciones = $q("#btnsTareaAcciones") // esto en realidad es un div pero guardara botones
 
-    await renderSubCategorias()
+    await renderCategorias()
     await filtrarActivosList()
 
     function habilitarCamposTarea(habilitado = true) {
@@ -66,8 +69,10 @@ $(document).ready(async () => {
     async function loadFunctions() {
         await renderPrioridades()
         await renderFrecuencias()
+        await renderSubCategorias(idcategoria)
     }
 
+    // ***************************** seccion de renderizado *******************************************
 
     async function renderTareasSelect() { // ESTO RENDERIZARA LAS TAREAS EN EL SELECT
         const params = new URLSearchParams()
@@ -121,15 +126,14 @@ $(document).ready(async () => {
         }
     }
 
-    async function renderSubCategorias() {
-        const data = await getDatos(`${host}subcategoria.controller.php`, `operation=getSubCategoria`)
-
+    async function renderSubCategorias(idcategoria) {
+        const subcategorias = await obtenerSubCategoriaPorCategoria(idcategoria)
         selectSubCategoriaTarea.innerHTML = `<option selected value="-1">Sub Categoria</option>`
 
         //selectSubCategoria.innerHTML = `<option selected value="-1">Sub Categoria</option>`
-        for (let i = 0; i < data.length; i++) {
+        for (let i = 0; i < subcategorias.length; i++) {
             selectSubCategoriaTarea.innerHTML += `
-                <option value="${data[i].idsubcategoria}">${data[i].subcategoria}</option>
+                <option value="${subcategorias[i].idsubcategoria}">${subcategorias[i].subcategoria}</option>
             `
 
             //selectSubCategoria.innerHTML += `
@@ -149,7 +153,7 @@ $(document).ready(async () => {
               `;
         }
     }
-    
+
     async function renderFrecuencias() {
         const frecuencia = await obtenerFrecuencias()
         //selects de prioridades
@@ -197,12 +201,12 @@ $(document).ready(async () => {
         const tarea = await obtenerTareaPorId(selectElegirTareaParaActivo.value.trim())
         console.log("tarea obtenida con filter: ", tarea)
         const params = new URLSearchParams()
-        params.append("operation", "searchActivoResponsable")
+        params.append("operation", "filtrarActivosResponsablesAsignados")
         params.append("idsubcategoria", (tarea[0]?.idsubcategoria === "" || tarea[0]?.idsubcategoria == -1) ? "" : tarea[0]?.idsubcategoria) //
         params.append("idubicacion", (selectUbicacion.value.trim() === "" || selectUbicacion.value == -1) ? "" : selectUbicacion.value) //
         params.append("cod_identificacion", "")
 
-        const data = await getDatos(`${host}activo.controller.php`, params)
+        const data = await getDatos(`${host}respActivo.controller.php`, params)
         activosList.innerHTML = "";
         console.log("activos fitlrados", data);
         for (let i = 0; i < data.length; i++) {
@@ -257,7 +261,19 @@ $(document).ready(async () => {
 
     }
 
+    async function renderCategorias() {
+        const categorias = await obtenerCategorias()
+        selectCategoria.innerHTML = `<option selected value="-1">Sub Categoria</option>`
+        for (let i = 0; i < categorias.length; i++) {
+            selectCategoria.innerHTML += `
+                <option value="${categorias[i].idcategoria}">${categorias[i].categoria}</option>
+            `
+        }
+    }
 
+    // **************************************** FIN SECCION DE RENDERIZADO **************************
+
+    // ************************************ SECCION DE OBTENER DATOS ********************************
 
     async function obtenerTareas() {
         const paramsTareasSearch = new URLSearchParams()
@@ -288,6 +304,20 @@ $(document).ready(async () => {
         paramsFrecuencia.append("operation", "obtenerFrecuencias")
         const frecuencias = await getDatos(`${host}tarea.controller.php`, paramsFrecuencia)
         return frecuencias
+    }
+
+    async function obtenerSubCategoriaPorCategoria(idcategoria) {
+        const paramsObtenerSub = new URLSearchParams()
+        paramsObtenerSub.append("operation", "getSubcategoriaByCategoria")
+        paramsObtenerSub.append("idcategoria", idcategoria)
+        const data = await getDatos(`${host}subcategoria.controller.php`, paramsObtenerSub)
+        return data
+    }
+
+    async function obtenerCategorias() {
+        const categorias = await getDatos(`${host}categoria.controller.php`, `operation=getCategoria`)
+        console.log("categorias: ",categorias)
+        return categorias
     }
     /* ********************************************* EVENTOS *************************************************** */
 
@@ -339,7 +369,7 @@ $(document).ready(async () => {
         let permitir = true
         let sintareas = false;
         const formtarea = $q("#form-tarea");
-        const tareasExistentes = await getDatos(`${host}tarea.controller.php`, `operation=obtenerTareas`)
+        const tareasExistentes = await getDatos(`${host}tarea.controller.php`, `operation=obtenerTareasSinActivos`)
         console.log("tareasExistentes: ", tareasExistentes)
         for (let i = 0; i < tareasExistentes.length; i++) {
             if ($q("#txtDescripcionTarea").value == tareasExistentes[i].descripcion) {
@@ -369,7 +399,7 @@ $(document).ready(async () => {
             formtarea.reset()
             habilitarCamposActivo(false) // esto habilita los campos para agregar los activos vinculados a tarea
             await renderTareasSelect()
-            await renderSubCategorias()
+            await renderSubCategorias(idcategoria)
             await renderUbicacion()
             const tareasObtenidasAntesDeEliminar = await obtenerTareas()
 
@@ -466,6 +496,8 @@ $(document).ready(async () => {
                             formtarea.reset()
                             btnGuardarTarea.style.display = 'block'
                             btnsTareaAcciones.innerHTML = ""
+                            $q("#elegirSubCategoriaTarea").disabled = false
+
                         })
 
                         $q("#btnActualizarTarea").addEventListener("click", async () => {
@@ -538,6 +570,8 @@ $(document).ready(async () => {
                             formtarea.reset()
                             btnGuardarTarea.style.display = 'block'
                             btnsTareaAcciones.innerHTML = ""
+                            $q("#elegirSubCategoriaTarea").disabled = false
+
                         })
                     })
                 })
@@ -595,13 +629,16 @@ $(document).ready(async () => {
             const formPlan = new FormData()
             formPlan.append("operation", "add")
             formPlan.append("descripcion", descripcionPlanTarea.value)
+            formPlan.append("idcategoria", selectCategoria.value)
             const fregistro = await fetch(`${host}plandetarea.controller.php`, { method: 'POST', body: formPlan })
             const registro = await fregistro.json()
             console.log("registro: ", registro)
+            idcategoria = selectCategoria.value
             idplantarea_generado = registro.id ? registro.id : -1; //EL IDPLANTAREA GENERADO DESPUES DE CREAR EL PLAN SE ASIGNARA A ESA VARIABLE PARA PDOER VINCULAR LAS NEUVAS TAREAS AGREGADAS A ESE PLAN, SI NO ESTA CREADA ENTONCES TOMARA -1 EL CUAL SI INTENTAMOS AGREGAR UNA TAREA PUES NO SE PODRA CON -1
             console.log("idplantarea_generado: ", idplantarea_generado);
             await loadFunctions();
             habilitarCamposTarea(false);
+            selectCategoria.disabled = true
             btnTerminarPlan.disabled = false
         }
     });
