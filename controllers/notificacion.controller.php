@@ -12,11 +12,11 @@ if (isset($_GET['operation'])) {
       ];
       echo json_encode($notificacion->listNotifications($cleanData));
       break;
-    case 'detalleNotf':
+    case 'detalleAsignacion':
       $clearData = [
         'idnotificacion' => $notificacion->limpiarCadena($_GET['idnotificacion'])
       ];
-      echo json_encode($notificacion->detalleNotificaciones($clearData));
+      echo json_encode($notificacion->detalleAsignacionNotf($clearData));
       break;
     case 'dataRespNotf':
       $cleanData = $notificacion->limpiarCadena($_GET['idusuario']);
@@ -28,10 +28,33 @@ if (isset($_GET['operation'])) {
       echo json_encode($notificacion->buscarNotificacionPorOdt(['idodt' => $cleanData]));
       break;
 
-
     case 'listNotificationsMantenimiento':
       $cleanData = $notificacion->limpiarCadena($_GET['idusuario']);
       echo json_encode($notificacion->listNotificationsMantenimiento(['idusuario' => $cleanData]));
+      break;
+    case 'detalleBajaActivo':
+      $clearData = [
+        'idnotificacion' => $notificacion->limpiarCadena($_GET['idnotificacion'])
+      ];
+      echo json_encode($notificacion->NotifiDetalleBajaActivo($clearData));
+      break;
+    case 'detalleDesignacion':
+      $clearData = [
+        'idnotificacion' => $notificacion->limpiarCadena($_GET['idnotificacion'])
+      ];
+      echo json_encode($notificacion->detalleAsignacionNotf($clearData));
+      break;
+    case 'detalleUbicacion':
+      $clearData = [
+        'idnotificacion' => $notificacion->limpiarCadena($_GET['idnotificacion'])
+      ];
+      echo json_encode($notificacion->detalleUbicacionNoft($clearData));
+      break;
+    case 'detalleResponsableP':
+      $clearData = [
+        'idnotificacion' => $notificacion->limpiarCadena($_GET['idnotificacion'])
+      ];
+      echo json_encode($notificacion->detalleResponsablePNoft($clearData));
       break;
   }
 }
@@ -69,11 +92,7 @@ if (isset($_POST['operation'])) {
   }
 }
 
-// $clearData = [
-//   'idnotificacion' => $notificacion->limpiarCadena($_GET['idnotificacion'])
-// ];
-// echo json_encode($notificacion->NotifDesignacionDetalle($clearData));
-// break;
+
 
 
 // $clearData = [

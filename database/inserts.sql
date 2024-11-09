@@ -49,7 +49,7 @@ INSERT INTO USUARIOS (idpersona, idrol, usuario, contrasena) VALUES
 (6, 1, 'garcia.juan', 'contrasena1'),
 (7, 2, 'perez.ana', 'contrasena2'),
 (8, 1, 'lopez.carlos', 'contrasena3'),
-(9, 2, 'martinez.laura', 'contrasena4'),
+(9, 2, 'martinez.laura', '$2y$10$GHYdqNqBJiv1Dh6WqNH5b.YFIU59bf5sdMGrAil9XiZVmPL36WqBC'),
 (10, 1, 'sanchez.pedro', 'contrasena5'),
 (11, 2, 'ramirez.marta', 'contrasena6'),
 (12, 1, 'torres.jorge', 'contrasena7'),

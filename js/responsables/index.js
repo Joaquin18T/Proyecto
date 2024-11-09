@@ -225,6 +225,9 @@ document.addEventListener("DOMContentLoaded",()=>{
           <strong>Apellidos: </strong>${x.apellidos}<br>
           <strong>Nombres: </strong>${x.nombres}<br>
           <strong>Fecha asig.: </strong>${x.fecha_asignacion}<br>
+          ${
+            x.fecha_designacion !=null?`<strong>Fecha desig.: </strong>${x.fecha_designacion}<br>`: ""
+          }
           <strong>Tipo Asig.: </strong>${parseInt(x.es_responsable)===0?'Inactivo':'Responsable Principal'}<br>
         `;
         list.appendChild(li);

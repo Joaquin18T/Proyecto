@@ -80,7 +80,7 @@ require_once '../header.php'; ?>
           <div class="row g-1 mb-3 mt-4">
             <div class="col-md-12">
               <h4>Condicion del Activo</h4>
-              <textarea name="condicion" id="condicion" class="w-100 form-control" style="text-decoration: none; resize:none" autocomplete="off" cols="15" rows="5" required>
+              <textarea name="condicion" id="condicion" class="w-100 form-control" style="text-decoration: none; resize:none" autocomplete="off" cols="15" rows="5">
               </textarea>
             </div>
           </div>

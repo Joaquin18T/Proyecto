@@ -24,9 +24,13 @@ document.addEventListener("DOMContentLoaded", () => {
     );
     //console.log(data);
     data.forEach((x) => {
-      const element = createOption(x.idsubcategoria, x.subcategoria);
-      $selector("#subcategoria").appendChild(element);
+      let element = createOption(x.idsubcategoria, x.subcategoria);
       $selector("#sb-subcategoria").appendChild(element);
+      
+    });
+    data.forEach((x) => {
+      let element = createOption(x.idsubcategoria, x.subcategoria);
+      $selector("#subcategoria").appendChild(element);
     });
   })();
 

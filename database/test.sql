@@ -7,10 +7,11 @@ ALTER TABLE historial_activos AUTO_INCREMENT = 1;
 -- 8: tiene usuario pero no rp
 -- 9: ningun usuario
 -- 4: tiene usuarios y rp
-select* from activos_responsables where idactivo=57;
+select* from activos_responsables where idactivo=6;
 select* from activos_responsables where idusuario=5;
 select*from historial_activos where idactivo_resp=15;
 select*from notificaciones_activos where idactivo = 57;
+select*from notificaciones_mantenimiento where idactivo = 57;
 select*from activos where idactivo =22; -- V456IJDKJSDASDA
 select*from activos where cod_identificacion ='DASYU435BMADASD'; -- DASYU435BMADASD 
 select*from usuarios;
@@ -50,17 +51,46 @@ DELETE FROM bajas_activo where idbaja_activo=44;
 DELETE FROM historial_activos where idhistorial_activo >=47;
 DELETE FROM notificaciones_activos where idactivo_resp >9;
 
-SELECT *
-FROM notificaciones_activos WHERE idactivo_resp = 4;
 
-SELECT* FROM historial_activos WHERE idactivo_resp = 4;
-        
-SELECT distinct *
-FROM notificaciones_activos NA
-INNER JOIN historial_activos HA ON NA.idactivo_resp = HA.idactivo_resp 
-WHERE HA.idactivo_resp = 4 ORDER BY HA.fecha_movimiento DESC;
+SELECT * FROM tareas;
+SELECT * FROM odt;
+SELECT*FROM notificaciones_mantenimiento;
 
-SELECT * FROM historial_activos;
+INSERT INTO odt (idtarea, creado_por) VALUES
+	(1, 1);
+
+INSERT INTO notificaciones_mantenimiento (idorden_trabajo, tarea, activos, idresp, mensaje) VALUES
+	(1, 'Cambio de rodillos', 'Impresora DR 5, Impresora HP 5T',20, 'Se ha creado una tarea a un activo asignado');
 
 
+SELECT 
+    NA.idnotificacion_activo AS idnotificacion, 
+    NA.tipo AS tipo_notificacion, NA.mensaje, NA.fecha_creacion, NA.visto,
+    A.descripcion AS descripcion_activo,
+    U.usuario AS usuario_nombre
+FROM 
+    notificaciones_activos NA
+INNER JOIN 
+    activos_responsables AR ON NA.idactivo_resp = AR.idactivo_resp
+INNER JOIN 
+    activos A ON AR.idactivo = A.idactivo
+INNER JOIN 
+    usuarios U ON AR.idusuario = U.id_usuario
+-- WHERE U.id_usuario = ?  -- Especifica aquí el usuario
+
+UNION ALL
+
+SELECT 
+    NM.idnotificacion_mantenimiento AS idnotificacion, 
+    'Mantenimiento' AS tipo_notificacion,  -- Etiqueta fija para diferenciar el tipo
+    NM.mensaje, NM.fecha_creacion, NM.visto, NM.activos AS descripcion_activo, 
+    U.usuario AS usuario_nombre
+FROM 
+    notificaciones_mantenimiento NM
+INNER JOIN 
+    activos_responsables AR ON NM.idresp = AR.idactivo_resp
+INNER JOIN 
+    usuarios U ON AR.idusuario = U.id_usuario
+-- WHERE U.id_usuario = ? -- Especifica aquí el mismo usuario
+ORDER BY fecha_creacion DESC;
 
