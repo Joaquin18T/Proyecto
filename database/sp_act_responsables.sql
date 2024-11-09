@@ -308,21 +308,31 @@ DELIMITER ;
 DROP PROCEDURE IF EXISTS listarActivosResponsables; 
 DELIMITER $$
 CREATE PROCEDURE listarActivosResponsables
-(IN _idsubcategoria INT)
+(IN _idsubcategoria INT, IN _idubicacion INT)
 BEGIN
-	select
-*
-        from historial_activos HA
-	LEFT JOIN activos_responsables AR ON HA.idactivo_resp = AR.idactivo_resp
+	SELECT DISTINCT
+		AR.idactivo_resp,
+		AR.idactivo,
+		ACT.descripcion,
+		ACT.modelo,
+		MAR.marca,
+		EST.nom_estado,
+		HA.idubicacion
+	FROM activos_responsables AR
 	INNER JOIN activos ACT ON AR.idactivo = ACT.idactivo
-    INNER JOIN marcas MAR ON ACT.idmarca = MAR.idmarca
-    INNER JOIN usuarios USU ON AR.idusuario = USU.id_usuario
-    INNER JOIN subcategorias SUB ON ACT.idsubcategoria = SUB.idsubcategoria
-    INNER JOIN estados EST ON ACT.idestado = EST.idestado        
-    where AR.es_responsable = 1 AND SUB.idsubcategoria = 3;
+	INNER JOIN marcas MAR ON ACT.idmarca = MAR.idmarca
+	INNER JOIN usuarios USU ON AR.idusuario = USU.id_usuario
+	INNER JOIN subcategorias SUB ON ACT.idsubcategoria = SUB.idsubcategoria
+	INNER JOIN estados EST ON ACT.idestado = EST.idestado
+	INNER JOIN historial_activos HA ON HA.idactivo_resp = AR.idactivo_resp
+	INNER JOIN ubicaciones UBI ON UBI.idubicacion = HA.idubicacion
+	where AR.es_responsable = 1 
+		AND (SUB.idsubcategoria = _idsubcategoria OR _idsubcategoria IS NULL)
+			AND (UBI.idubicacion = _idubicacion OR _idubicacion IS NULL);
+
 END $$
 
-SELECT * FROM historial_activos
+call listarActivosResponsables(3,5)
 
 DROP PROCEDURE IF EXISTS sp_list_resp_activo;
 DELIMITER $$
