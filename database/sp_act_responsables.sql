@@ -183,7 +183,7 @@ BEGIN
     ORDER BY HIS.fecha_movimiento desc
     LIMIT 1;
 END $$
--- CALL sp_ubicacion_activo(8,9)
+-- CALL sp_ubicacion_activo(6,20)
 DROP PROCEDURE IF EXISTS sp_users_by_activo;
 DELIMITER $$
 CREATE PROCEDURE sp_users_by_activo
@@ -208,6 +208,33 @@ BEGIN
     -- AND RES.fecha_designacion IS NULL
 END $$
 -- CALL sp_users_by_activo(6);
+
+-- El SP es casi lo mismo que el de arriba pero en este caso filtra por los usuarios
+-- que estan asignados actualmente
+DROP PROCEDURE IF EXISTS sp_users_by_activo_v2;
+DELIMITER $$
+CREATE PROCEDURE sp_users_by_activo_v2
+(
+	IN _idactivo INT
+)
+BEGIN
+	SELECT
+    USU.id_usuario,
+	USU.usuario,
+    PER.apellidos,
+    RES.idactivo_resp,
+    RES.fecha_asignacion,
+    RES.fecha_designacion,
+    PER.nombres,
+    RES.es_responsable
+    FROM activos_responsables RES
+    INNER JOIN usuarios USU ON RES.idusuario = USU.id_usuario
+    INNER JOIN personas PER ON USU.idpersona = PER.id_persona
+    WHERE RES.idactivo = _idactivo
+    AND RES.fecha_designacion IS NULL
+    ORDER BY RES.fecha_asignacion DESC;
+END $$ 
+-- CALL sp_users_by_activo_v2(6);
 
 DROP PROCEDURE IF EXISTS sp_search_activo_responsable;
 DELIMITER $$

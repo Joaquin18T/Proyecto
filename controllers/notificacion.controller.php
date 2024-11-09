@@ -23,9 +23,9 @@ if (isset($_GET['operation'])) {
       echo json_encode($notificacion->dataRespNotificacion(['idusuario' => $cleanData]));
       break;
 
-    case 'buscarNotificacionPorOdt':
-      $cleanData = $notificacion->limpiarCadena($_GET['idodt']);
-      echo json_encode($notificacion->buscarNotificacionPorOdt(['idodt' => $cleanData]));
+    case 'detallesNoftMantenimiento':
+      $cleanData = $notificacion->limpiarCadena($_GET['idnotificacion']);
+      echo json_encode($notificacion->detallesNoftMantenimiento(['idnotificacion' => $cleanData]));
       break;
 
     case 'listNotificationsMantenimiento':
@@ -42,7 +42,7 @@ if (isset($_GET['operation'])) {
       $clearData = [
         'idnotificacion' => $notificacion->limpiarCadena($_GET['idnotificacion'])
       ];
-      echo json_encode($notificacion->detalleAsignacionNotf($clearData));
+      echo json_encode($notificacion->NotifDesignacionDetalle($clearData));
       break;
     case 'detalleUbicacion':
       $clearData = [
@@ -55,6 +55,12 @@ if (isset($_GET['operation'])) {
         'idnotificacion' => $notificacion->limpiarCadena($_GET['idnotificacion'])
       ];
       echo json_encode($notificacion->detalleResponsablePNoft($clearData));
+      break;
+    case 'detalleWhResponsable':
+      $clearData = [
+        'idnotificacion' => $notificacion->limpiarCadena($_GET['idnotificacion'])
+      ];
+      echo json_encode($notificacion->detalleNof_wh_IdactivoResp($clearData));
       break;
   }
 }
@@ -95,22 +101,3 @@ if (isset($_POST['operation'])) {
 
 
 
-// $clearData = [
-//   'idnotificacion' => $notificacion->limpiarCadena($_GET['idnotificacion'])
-// ];
-// echo json_encode($notificacion->NotifiDetalleBajaActivo($clearData));
-// break;
-
-
-// $clearData = [
-//   'accion_responsable' => $notificacion->limpiarCadena($_GET['accion_responsable'])
-// ];
-// echo json_encode($notificacion->listNof_wh_IdactivoResp($clearData));
-// break;
-
-
-// $clearData = [
-//   'idnotificacion' => $notificacion->limpiarCadena($_GET['idnotificacion'])
-// ];
-// echo json_encode($notificacion->detalleNof_wh_IdactivoResp($clearData));
-// break;

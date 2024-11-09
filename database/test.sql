@@ -8,11 +8,11 @@ ALTER TABLE historial_activos AUTO_INCREMENT = 1;
 -- 9: ningun usuario
 -- 4: tiene usuarios y rp
 select* from activos_responsables where idactivo=6;
-select* from activos_responsables where idusuario=5;
+select* from activos_responsables where idusuario=8;
 select*from historial_activos where idactivo_resp=15;
 select*from notificaciones_activos where idactivo = 57;
 select*from notificaciones_mantenimiento where idactivo = 57;
-select*from activos where idactivo =22; -- V456IJDKJSDASDA
+select*from activos where idactivo =8; -- V456IJDKJSDASDA
 select*from activos where cod_identificacion ='DASYU435BMADASD'; -- DASYU435BMADASD 
 select*from usuarios;
 select*from personas right join usuarios on personas.id_persona = usuarios.idpersona;
@@ -51,46 +51,16 @@ DELETE FROM bajas_activo where idbaja_activo=44;
 DELETE FROM historial_activos where idhistorial_activo >=47;
 DELETE FROM notificaciones_activos where idactivo_resp >9;
 
-
-SELECT * FROM tareas;
+select*from plandetareas;
+SELECT * FROM tareas inner join estados ON tareas.idestado=estados.idestado;
 SELECT * FROM odt;
 SELECT*FROM notificaciones_mantenimiento;
 
-INSERT INTO odt (idtarea, creado_por) VALUES
-	(1, 1);
+-- INSERT INTO odt (idtarea, creado_por) VALUES
+-- 	(1, 1);
 
-INSERT INTO notificaciones_mantenimiento (idorden_trabajo, tarea, activos, idresp, mensaje) VALUES
-	(1, 'Cambio de rodillos', 'Impresora DR 5, Impresora HP 5T',20, 'Se ha creado una tarea a un activo asignado');
+-- INSERT INTO notificaciones_mantenimiento (idorden_trabajo, tarea, activos, idresp, mensaje) VALUES
+-- 	(1, 'Cambio de rodillos', 'Impresora DR 5, Impresora HP 5T',20, 'Se ha creado una tarea a un activo asignado');
 
 
-SELECT 
-    NA.idnotificacion_activo AS idnotificacion, 
-    NA.tipo AS tipo_notificacion, NA.mensaje, NA.fecha_creacion, NA.visto,
-    A.descripcion AS descripcion_activo,
-    U.usuario AS usuario_nombre
-FROM 
-    notificaciones_activos NA
-INNER JOIN 
-    activos_responsables AR ON NA.idactivo_resp = AR.idactivo_resp
-INNER JOIN 
-    activos A ON AR.idactivo = A.idactivo
-INNER JOIN 
-    usuarios U ON AR.idusuario = U.id_usuario
--- WHERE U.id_usuario = ?  -- Especifica aquí el usuario
-
-UNION ALL
-
-SELECT 
-    NM.idnotificacion_mantenimiento AS idnotificacion, 
-    'Mantenimiento' AS tipo_notificacion,  -- Etiqueta fija para diferenciar el tipo
-    NM.mensaje, NM.fecha_creacion, NM.visto, NM.activos AS descripcion_activo, 
-    U.usuario AS usuario_nombre
-FROM 
-    notificaciones_mantenimiento NM
-INNER JOIN 
-    activos_responsables AR ON NM.idresp = AR.idactivo_resp
-INNER JOIN 
-    usuarios U ON AR.idusuario = U.id_usuario
--- WHERE U.id_usuario = ? -- Especifica aquí el mismo usuario
-ORDER BY fecha_creacion DESC;
 

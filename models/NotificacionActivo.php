@@ -90,14 +90,14 @@ class Notificacion extends ExecQuery
     }
   }
 
-  public function buscarNotificacionPorOdt($params = []): array
+  public function detallesNoftMantenimiento($params = []): array
   {
     try {
 
-      $cmd = parent::execQ('CALL buscarNotificacionPorOdt(?)');
+      $cmd = parent::execQ('CALL sp_detalle_orden_trabajo(?)');
       $cmd->execute(
         array(
-          $params['idodt']
+          $params['idnotificacion']
         )
       );
       return $cmd->fetchAll(PDO::FETCH_ASSOC);
@@ -168,20 +168,6 @@ class Notificacion extends ExecQuery
     }
   }
 
-  public function listNof_wh_IdactivoResp($params=[]):array{
-    try{
-      $cmd = parent::execQ("CALL sp_list_notificacion_wh_idactivo_resp(?)");
-      $cmd->execute(
-        array(
-          $params['accion_responsable']
-        )
-      );
-      return $cmd->fetchAll(PDO::FETCH_ASSOC);
-    }catch(Exception $e){
-      die($e->getMessage());
-      return [];
-    }
-  }
 
   public function detalleNof_wh_IdactivoResp($params=[]):array{
     try{
@@ -229,7 +215,9 @@ class Notificacion extends ExecQuery
   }
 }
 
-//$not = new Notificacion();
+// $not = new Notificacion();
+
+// echo json_encode($not->detalleNof_wh_IdactivoResp(['idnotificacion'=>58]));
 
 //echo json_encode($not->detalleUbicacionNoft(['idnotificacion'=>4]));
 

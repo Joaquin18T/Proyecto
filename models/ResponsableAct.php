@@ -324,6 +324,19 @@ class ResponsableAct extends ExecQuery
       error_log("Error: " . $e->getMessage());
     }
   }
+
+  //Filtra por los usuarios que solo estan asignados 
+  public function getUsersByActivoV2($params=[]):array{
+    try{
+      $cmd = parent::execQ("CALL sp_users_by_activo_v2(?)");
+      $cmd->execute(
+        array($params['idactivo'])
+      );
+      return $cmd->fetchAll(PDO::FETCH_ASSOC);
+    }catch(Exception $e){
+      error_log("Error: ".$e->getMessage());
+    }
+  }
 }
 
 // $resp = new ResponsableAct();
