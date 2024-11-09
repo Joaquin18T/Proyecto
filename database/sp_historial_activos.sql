@@ -27,5 +27,5 @@ BEGIN
 	END IF;
 END $$
 
-CALL sp_add_historial_activo(@idhis, 4,2,'Cambio de ubicacion', 1,null);
-SELECT @idhis as idhis;
+-- CALL sp_add_historial_activo(@idhis, 20,2,'Cambio de ubicacion', 1,6);
+-- SELECT @idhis as idhis;

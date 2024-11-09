@@ -80,6 +80,9 @@ if (isset($_GET['operation'])) {
     case 'getAnyIdUbicacion':
       echo json_encode($respAct->getAnyIdUbicacion(['idactivo_resp' => $_GET['idactivo_resp']]));
       break;
+    case 'getUsersActivoV2':
+      echo json_encode($respAct->getUsersByActivoV2(['idactivo'=>$_GET['idactivo']]));
+      break;
   }
 }
 

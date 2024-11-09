@@ -12,7 +12,8 @@ document.addEventListener("DOMContentLoaded", () => {
     contIdResDes:0,
     idRes:0
   };
-  //console.log(globals.idRes);
+  console.log("idresp",globals.idRes);
+  console.log("idactivo", globals.idactivo);
   
   function selector(value) {
     return document.querySelector(`#${value}`);
@@ -51,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function usersByActivo(){
     const params = new URLSearchParams();
-    params.append("operation", "usersByActivo");
+    params.append("operation", "getUsersActivoV2");
     params.append("idactivo", globals.idactivo);
 
     const data = await getDatos(`${globals.host}respActivo.controller.php`, params);
@@ -63,16 +64,21 @@ document.addEventListener("DOMContentLoaded", () => {
   //   globals.idRes = idactivo_resp;
   // })();
 
+  //Listar todas las ubicaciones
   (async () => {
     const {idactivo_resp} = await getResPrincipal(globals.id, globals.idactivo);
+    
     globals.idRes = idactivo_resp;
+    //console.log("id resp",globals.idRes);
     const data = await getDatos("http://localhost/CMMS/controllers/ubicacion.controller.php", "operation=getAll");
+    console.log(data);
     data.forEach(x => {
-      //console.log(x);
       const element = createOption(x.idubicacion, x.ubicacion);
       selector("ubicacion").appendChild(element);
     });
-    const id = await getUbicacion();
+    const id = await getUbicacion(idactivo_resp);
+    console.log("ubicacion", id);
+    
     selector("ubicacion").value = id.idubicacion;
   })();
 
@@ -179,7 +185,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const verifyRP = isSameChks(globals.contResP, chkEsResP);
       
     
-      const {idubicacion} = await getUbicacion();
+      const {idubicacion} = await getUbicacion(globals.idRes);
       let isUpUbi = false;
       if(parseInt(idubicacion)!==parseInt(selector("ubicacion").value)){
                 
@@ -384,17 +390,19 @@ document.addEventListener("DOMContentLoaded", () => {
     params.append("idactivo", idactivo);
 
     const data = await getDatos(`${globals.host}respActivo.controller.php`, params);
+    //console.log("resp princ", data);
+    
     return data[0];
   }
 
   /**
    * obtiene la ubicacion actual y lo muestra en el select
    */
-  async function getUbicacion(){
+  async function getUbicacion(idresp){
     const params = new URLSearchParams();
     params.append("operation", "ubiByActivo");
     params.append("idactivo", globals.idactivo);
-    params.append("idactivo_resp", globals.idRes);
+    params.append("idactivo_resp", idresp);
 
     const data = await getDatos(`${globals.host}historialactivo.controller.php`, params);
     
