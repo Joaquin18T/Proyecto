@@ -125,17 +125,19 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <table id="tablaActivos" class="stripe row-border order-column nowrap table-hover" style="width:100%">
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th>Activo</th>
-                                <th>Modelo</th>
-                                <th>Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody id="activosBodyTable"></tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table id="tablaActivos" class="stripe row-border order-column nowrap table-hover" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Activo</th>
+                                    <th>Modelo</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="activosBodyTable"></tbody>
+                        </table>
+                    </div>
                 </div>
                 <div class="card-footer">
                     <button type="button" class="btn btn-primary" id="btnAgregarActivos" disabled>Agregar</button>
