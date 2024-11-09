@@ -332,14 +332,12 @@ BEGIN
 END $$
 DELIMITER ;
 -- CALL sp_filtrar_activos_responsables_asignados(2, null, null);
--- select * from subcategorias;
+select * from subcategorias;
 
 DROP PROCEDURE IF EXISTS sp_list_resp_activo;
 DELIMITER $$
 CREATE PROCEDURE sp_list_resp_activo
-(
-
-)
+()
 BEGIN
 	SELECT R.idactivo_resp, A.descripcion
     FROM activos_responsables R

@@ -16,11 +16,13 @@ $(document).ready(async () => {
 
     //variables
     let idrolusuario = -1;
-    let redirigir = false
+    let redirigir = false;
+    const tbodyTareas = $q("#tb-tarpendientes tbody")
     const host = "http://localhost/CMMS/controllers/";
     await verificarRolUsuario()
     await verificarTerminadoOdt()
     await obtenerHistorialOdt()
+    await renderTablaInfoTareaPendiente()
     // **************************** SECCION DE OBTENER DATOS ****************************************************
     async function obtenerUsuario() {
         const paramsUsuario = new URLSearchParams()
@@ -64,6 +66,22 @@ $(document).ready(async () => {
         return activo
     }
 
+    async function obtenerTareasPorId(idtarea) {
+        const paramsObtener = new URLSearchParams()
+        paramsObtener.append("operation", "mostrarTareasEnTablaPorIdTarea")
+        paramsObtener.append("idtarea", idtarea)
+        const tareas = await getDatos(`${host}tarea.controller.php`, paramsObtener)
+        return tareas
+    }
+
+
+    async function obtenerIdsUsuariosOdt() {
+        const paramsObtener = new URLSearchParams()
+        paramsObtener.append("operation", "obtenerIdsUsuariosOdt")
+        const idsusuariosodt = await getDatos(`${host}ordentrabajo.controller.php`, paramsObtener)
+        return idsusuariosodt
+    }
+
     var kanban = new jKanban({
         element: '#kanban-container', // ID del contenedor
         boards: [
@@ -103,6 +121,7 @@ $(document).ready(async () => {
 
             const tareasOdt = await obtenerTareasOdt();
             const tareas = await obtenerTareas();
+
             console.log("tareasOdt: ", tareasOdt);
             console.log("tareas: ", tareas);
 
@@ -131,7 +150,6 @@ $(document).ready(async () => {
                             const fechaInicioTarea = now.toISOString().split("T")[0]; // Fecha en formato YYYY-MM-DD
                             const horaInicioTarea = now.toTimeString().split(" ")[0].substring(0, 5); // Hora en formato HH:MM
                             //let fechaHoraInicio = new Date(`${fechaInicioTarea}T${horaInicioTarea}:00-05:00`);
-
                             console.log("tareaSeleccionada: ", tareaSeleccionada)
                             // SI LA TAREA ESTÁ EN PENDIENTE, REDIRIGIR
                             console.log("activoObtenidoPorTarea: ", activoObtenidoPorTarea)
@@ -149,15 +167,55 @@ $(document).ready(async () => {
                             }
 
                             if (permitir) {
-                                const idOdt = await registrarOdt(cardId, fechaInicioTarea, horaInicioTarea);
-                                console.log(idOdt);
-                                window.localStorage.clear()
-                                window.localStorage.setItem("idtarea", cardId);
-                                window.localStorage.setItem("idodt", idOdt.id);
-                                const actualizado = await actualizarTareaEstado(cardId, 9)
-                                console.log("actualizado?: ", actualizado)
-                                console.log("redirigiendo ....")
-                                window.location.href = `http://localhost/CMMS/views/odt/registrar-odt.php`;
+                                const activosPorTarea = await obtenerActivosPorTarea(cardId);
+                                console.log("Iniciando orden...");
+                                const tareasMostrarTabla = await obtenerTareasPorId(cardId) //ESTO ES PARA MOSTRAR LA TAREA EN LA TABLA DE VISTA PREVIA
+                                console.log("tareasMostrarTabla_>", tareasMostrarTabla)
+                                //const btnCancelarCreacionOdt = $q("") //botones para crear y cancelar la orden
+                                tbodyTareas.innerHTML = ''
+                                for (let i = 0; i < tareasMostrarTabla.length; i++) {
+                                    tbodyTareas.innerHTML += `
+                                        <tr>
+                                            <th>${tareasMostrarTabla[i].descripcion}</th>
+                                            <td>${tareasMostrarTabla[i].prioridad}</td>
+                                            <td>${tareasMostrarTabla[i].frecuencia}</td>                                            
+                                            <td>${tareasMostrarTabla[i].nombres} ${tareasMostrarTabla[i].apellidos}</td>                                            
+                                            <td>${tareasMostrarTabla[i].activo}</td>
+                                            <td>${tareasMostrarTabla[i].nom_estado}</td>
+                                        </tr>
+                                    `;
+                                }
+                                $(".btnCancelarCreacionOdt").click(function (e) {
+                                    e.preventDefault();
+                                    tbodyTareas.innerHTML = ''
+                                });
+                                $(".btnCrearOdt").click(async function (e) {
+                                    e.preventDefault();
+                                    const idOdt = await registrarOdt(cardId, fechaInicioTarea, horaInicioTarea);
+                                    console.log(idOdt);
+                                    //window.localStorage.clear()
+                                    //window.localStorage.setItem("idtarea", cardId);
+                                    //window.localStorage.setItem("idodt", idOdt.id);
+                                    const actualizado = await actualizarTareaEstado(cardId, 9)
+                                    console.log("actualizado?: ", actualizado)
+                                    if (actualizado.actualizado) {
+                                        showToast("Orden de trabajo creado exitosamente.", 'SUCCESS', 3000)
+                                        tbodyTareas.innerHTML = ''
+                                        for (let o = 0; o < activosPorTarea.length; o++) {
+                                            const activo = activosPorTarea[o];
+
+                                            // Cambiar el estado del activo a "en mantenimiento" solo si no está ya en estado "2" en esta tarea
+                                            if (activo.idestado !== 2) {
+                                                await actualizarEstadoActivo(activo.idactivo, 2); // Cambiar estado a "en mantenimiento"
+                                                console.log(`Estado actualizado del activo ${activo.idactivo} a 'en mantenimiento'`);
+                                            }
+                                        }
+                                    }
+                                });
+
+
+                                //console.log("redirigiendo ....")
+                                //window.location.href = `http://localhost/CMMS/views/odt/registrar-odt.php`;
                             }
 
 
@@ -217,15 +275,64 @@ $(document).ready(async () => {
 
     });
 
+    async function renderTablaInfoTareaPendiente() {
+        if (idrolusuario == 1) {
+            $('#tb-tarpendientes').DataTable({
+                paging: true,
+                searching: false,
+                lengthMenu: [5, 10, 15, 20],
+                pageLength: 5,
+                language: {
+                    lengthMenu: "Mostrar _MENU_ filas por página",
+                    paginate: {
+                        previous: "Anterior",
+                        next: "Siguiente"
+                    },
+                    emptyTable: "No hay datos disponibles",
+                    search: "Buscar:",
+                    info: "Mostrando _START_ a _END_ de _TOTAL_ registros"
+                }
+            });
+        } else {
+            $q(".contenedor-tabla-creacion-odt").innerHTML = ''
+        }
+    }
+
     // ************************** SECCION DE RENDERIZADO DE DATOS E INTERFAZ ********************
     await renderTareasPendiente()
 
     async function renderTareasPendiente() {
-        const tareas = await obtenerTareas() //PENDIENTES
-        const tareasOdt = await obtenerTareasOdt() //EN PROCESO
-        const historialOdt = await obtenerHistorialOdt() //FINALIZADAS
-        tareas.forEach(tarea => {
-            const tareaHTML = `
+        let idsodt = [];
+        let idsusuarios = [];
+
+        const idsusuariosOdt = await obtenerIdsUsuariosOdt(); //esto solo contiene los id's de los usuarios, por ejemplo, ahorita tiene 3 elementos, y sus valores son idusuario: 1
+        console.log("idsusuariosOdt", idsusuariosOdt);
+        const tareas = await obtenerTareas(); // PENDIENTES
+        const tareasOdt = await obtenerTareasOdt(); // EN PROCESO
+        console.log("EL GORROOPTERO: ", tareasOdt);
+        const historialOdt = await obtenerHistorialOdt(); // FINALIZADAS
+
+        // Agrupar las tareas por idtarea y concatenar los activos
+        const tareasAgrupadas = tareas.reduce((acc, tarea) => {
+            if (!acc[tarea.idtarea]) {
+                // Si el idtarea no está en el acumulador, lo agregamos con un array de activos
+                acc[tarea.idtarea] = {
+                    ...tarea,
+                    activos: [tarea.activo]
+                };
+            } else {
+                // Si ya existe, concatenamos el activo actual al array de activos
+                acc[tarea.idtarea].activos.push(tarea.activo);
+            }
+            return acc;
+        }, {});
+
+        // Crear las tarjetas a partir de las tareas agrupadas
+        if (idrolusuario == 1) {
+            Object.values(tareasAgrupadas).forEach(tarea => {
+                const activosConcatenados = tarea.activos.join(', '); // Unir los activos en un solo string
+
+                const tareaHTML = `
                 <h3 class="card-title">${tarea.descripcion}</h3>                   
                 <div class="row">
                     <div class="col-md-6">
@@ -236,92 +343,203 @@ $(document).ready(async () => {
                     </div>
                 </div>                
                 <p class="card-text"><strong>Plan de tarea: </strong>${tarea.plantarea}</p>
-                <p><strong>Activos: </strong>${tarea.activos}</p>
+                <p><strong>Activos: </strong>${activosConcatenados}</p>
                 <hr>
-                <p><strong>Prioridad: </strong>${tarea.prioridad}</p>
-                                             
+                <p><strong>Prioridad: </strong>${tarea.prioridad}</p>                                             
             `;
 
-            // Asignar las tareas a diferentes boards según su estado
-            switch (tarea.nom_estado) {
-                case 'pendiente':
-                    kanban.addElement('b-pendientes', {
-                        id: tarea.idtarea, // Usamos el idtarea como id de la tarjeta
-                        title: tareaHTML // Usamos el HTML que hemos creado
-                    });
-                    break;
-            }
-        });
+                // Asignar las tareas a diferentes boards según su estado
+                switch (tarea.nom_estado) {
+                    case 'pendiente':
+                        kanban.addElement('b-pendientes', {
+                            id: tarea.idtarea, // Usamos el idtarea como id de la tarjeta
+                            title: tareaHTML // Usamos el HTML que hemos creado
+                        });
+                        break;
+                }
+            });
+        }
 
-        tareasOdt.forEach(todt => {
-            const verificarEstadoClasificacion =
-                (todt.nom_estado === "proceso" && (todt.clasificacion === 9 || todt.clasificacion === 11 || todt.clasificacion == null));
-            const badgeClasificacion =
-                (todt.clasificacion === 11 && todt.nom_estado === "finalizado")
-                    ? `<span class="badge bg-primary">Terminado</span>`
-                    : (todt.nom_estado === "finalizado" && (todt.clasificacion === 9 || todt.clasificacion === null))
-                        ? `<span class="badge bg-warning">No terminado/Vencido</span>`
-                        : '';
-            const tareaOdtHTML = `         
+        for (let r = 0; r < idsusuariosOdt.length; r++) {
+            idsodt.push(idsusuariosOdt[r].idorden_trabajo);
+            idsusuarios.push(idsusuariosOdt[r].idusuario);
+        }
+        console.log("idsodt aaaaa: ", idsodt);
 
-                <div class="mb-3" >                    
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h3 class="card-title">${todt.tarea}</h3>
-                        ${badgeClasificacion}
-                        ${verificarEstadoClasificacion ? `
-                            <div class="btn-group dropstart">
-                                <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" data-id="dropdown">
-                                    ⋮
-                                </button>
-                                <ul class="dropdown-menu">
-                                    ${(todt.nom_estado !== "finalizado" && todt.nom_estado !== "revision" && (todt.clasificacion === 9 || todt.clasificacion == null)) ? `<li class="dropdown-item li-editar" data-id="${todt.idorden_trabajo}" data-tarea-id="${todt.idtarea}">Editar</li>` : ''}
-                                    ${(todt.nom_estado === "proceso" && todt.clasificacion === 11) ? `<li class="dropdown-item li-revision" data-id="${todt.idorden_trabajo}">Enviar a revision</li>` : ''}                                                                
-                                </ul>
+        if (idrolusuario == 2) {
+            tareasOdt.forEach(todt => {
+                // Verificar si el idorden_trabajo de la tarea está en las claves de idsUsuariosOdt
+                if (idsodt.includes(todt.idorden_trabajo)) {
+                    // Asegurarse de que responsables_ids sea una cadena válida
+                    if (todt.responsables_ids && typeof todt.responsables_ids === 'string') {
+                        // Convertir responsables_ids en un array de IDs de usuarios
+                        const responsablesIdsArray = todt.responsables_ids
+                            .split(',')                          // Separa por comas
+                            .map(id => {
+                                const parsedId = parseInt(id.trim(), 10);
+                                console.log("ID parsed ->", parsedId); // Depuración de cada ID después de parsear
+                                return parsedId;
+                            })
+                            .filter(id => !isNaN(id));           // Filtra valores no numéricos
+
+                        // Muestra el array de IDs de responsables y el usuario logeado para depuración
+                        console.log("responsablesIdsArray ->>>> ", responsablesIdsArray);
+                        console.log("idusuario logeado ->> ", idusuario, " (tipo:", typeof idusuario, ")");
+
+                        // Asegúrate de que idusuario también sea un número
+                        const idUsuarioNumero = parseInt(idusuario, 10);
+                        console.log("idUsuarioNumero (parseado) ->>", idUsuarioNumero, " (tipo:", typeof idUsuarioNumero, ")");
+
+                        // Verifica si el usuario logeado está en el array de responsables
+                        const isUserResponsible = responsablesIdsArray.includes(idUsuarioNumero);
+                        console.log("¿Coincide el usuario? -> ", isUserResponsible); // Comparar si el idusuario está en el array
+                        console.log("coinicde? -> ", isUserResponsible)
+                        if (isUserResponsible) {
+                            console.log("El usuario logueado es responsable de esta tarea", idusuario);
+                            // Aquí puedes continuar con la lógica de la tarea si el usuario logueado es responsable
+                        } else {
+                            console.log("El usuario logueado no es responsable de esta tarea");
+                        }
+
+                        responsablesIdsArray.forEach(responsableId => {
+                            console.log("responsableId ->>>> ", responsableId);
+                            // Aquí puedes continuar con la lógica de la tarea si el usuario corresponde
+                        });
+                    } else {
+                        console.log("responsables_ids no es válido: ", todt.responsables_ids);
+                    }
+
+                    const verificarEstadoClasificacion =
+                        (todt.nom_estado === "proceso" && (todt.clasificacion === 9 || todt.clasificacion === 11 || todt.clasificacion == null));
+                    const badgeClasificacion =
+                        (todt.clasificacion === 11 && todt.nom_estado === "finalizado")
+                            ? `<span class="badge bg-primary">Terminado</span>`
+                            : (todt.nom_estado === "finalizado" && (todt.clasificacion === 9 || todt.clasificacion === null))
+                                ? `<span class="badge bg-warning">No terminado/Vencido</span>`
+                                : '';
+
+                    const tareaOdtHTML = `
+                    <div class="mb-3">                    
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h3 class="card-title">${todt.tarea}</h3>
+                            ${badgeClasificacion}
+                            ${verificarEstadoClasificacion ? ` 
+                                <div class="btn-group dropstart">
+                                    <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" data-id="dropdown">
+                                        ⋮
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        ${(todt.nom_estado !== "finalizado" && todt.nom_estado !== "revision" && (todt.clasificacion === 9 || todt.clasificacion == null)) ? `<li class="dropdown-item li-editar" data-id="${todt.idorden_trabajo}" data-tarea-id="${todt.idtarea}">Editar</li>` : ''}
+                                        ${(todt.nom_estado === "proceso" && todt.clasificacion === 11) ? `<li class="dropdown-item li-revision" data-id="${todt.idorden_trabajo}">Enviar a revision</li>` : ''}                                                                
+                                    </ul>
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="tarea-odt" data-id="${todt.idorden_trabajo}">
+                            <div class="d-flex align-items-center mb-3">
+                                <img src="https://www.iconpacks.net/icons/1/free-user-group-icon-296-thumb.png" class="rounded-circle me-2" alt="Responsables" width="40" height="40"/>
+                                <p class="mb-0">${todt.responsables}</p>
                             </div>
-                        ` : ''}
-                        
+                            <p class="text-muted"><strong>Inició el:</strong> ${todt.fecha_inicio}</p>
+                            ${todt.revisado_por ? `<p class="text-muted">Revisado por ${todt.revisado_por}</p>` : ''}
+                            <p class="text-muted"><strong>Creada por:</strong> ${todt.creador}</p>
+                            <p><strong>Activos:</strong> ${todt.activos}</p>
+                            <div class="progress mb-2">
+                                <div class="progress-bar ${todt.clasificacion === 11 ? 'bg-success' : todt.clasificacion === 9 ? 'bg-warning' : 'bg-danger'}" 
+                                    role="progressbar" 
+                                    style="width: ${todt.clasificacion === 11 ? '100' : todt.clasificacion === 9 ? '50' : '0'}%" 
+                                    aria-valuenow="${todt.clasificacion === 11 ? '100' : todt.clasificacion === 9 ? '50' : '0'}" 
+                                    aria-valuemin="0" 
+                                    aria-valuemax="100">
+                                </div>
+                            </div>
+                            <p class="text-center">${todt.clasificacion === 11 ? '100' : todt.clasificacion === 9 ? '50' : '0'}%</p>                       
+                        </div>                                        
                     </div>
-                    <div class="tarea-odt" data-id="${todt.idorden_trabajo}" >
-                        <div class="d-flex align-items-center mb-3">
-                            <img src="https://www.iconpacks.net/icons/1/free-user-group-icon-296-thumb.png" class="rounded-circle me-2" alt="Responsables" width="40" height="40"/>
-                            <p class="mb-0">${todt.responsables}</p>
-                        </div>
-                        <p class="text-muted"><strong>Inició el:</strong> ${todt.fecha_inicio}</p>
-                        ${todt.revisado_por ? `<p class="text-muted">Revisado por ${todt.revisado_por}</p>` : ''}
-                        <p class="text-muted"><strong>Creada por:</strong> ${todt.creador}</p>
-                        <p><strong>Activos:</strong> ${todt.activos}</p>
-                        <div class="progress mb-2">
-                            <div class="progress-bar ${todt.clasificacion === 11 ? 'bg-success' : todt.clasificacion === 9 ? 'bg-warning' : 'bg-danger'}" 
-                                role="progressbar" 
-                                style="width: ${todt.clasificacion === 11 ? '100' : todt.clasificacion === 9 ? '50' : '0'}%" 
-                                aria-valuenow="${todt.clasificacion === 11 ? '100' : todt.clasificacion === 9 ? '50' : '0'}" 
-                                aria-valuemin="0" 
-                                aria-valuemax="100">
+                `;
+
+                    // Aquí es donde asignamos la tarea al kanban basado en su estado
+                    switch (todt.nom_estado) {
+                        case 'proceso':
+                            kanban.addElement('b-proceso', {
+                                id: todt.idorden_trabajo,
+                                title: tareaOdtHTML
+                            });
+                            break;
+                    }
+                }
+            });
+        } else if (idrolusuario == 1) {
+            tareasOdt.forEach(todt => {
+                const verificarEstadoClasificacion =
+                    (todt.nom_estado === "proceso" && (todt.clasificacion === 9 || todt.clasificacion === 11 || todt.clasificacion == null));
+                const badgeClasificacion =
+                    (todt.clasificacion === 11 && todt.nom_estado === "finalizado")
+                        ? `<span class="badge bg-primary">Terminado</span>`
+                        : (todt.nom_estado === "finalizado" && (todt.clasificacion === 9 || todt.clasificacion === null))
+                            ? `<span class="badge bg-warning">No terminado/Vencido</span>`
+                            : '';
+
+                const tareaOdtHTML = `
+                        <div class="mb-3">                    
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h3 class="card-title">${todt.tarea}</h3>
+                                ${badgeClasificacion}
+                                ${verificarEstadoClasificacion ? ` 
+                                    <div class="btn-group dropstart">
+                                        <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" data-id="dropdown">
+                                            ⋮
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            ${(todt.nom_estado !== "finalizado" && todt.nom_estado !== "revision" && (todt.clasificacion === 9 || todt.clasificacion == null)) ? `<li class="dropdown-item li-editar" data-id="${todt.idorden_trabajo}" data-tarea-id="${todt.idtarea}">Editar</li>` : ''}
+                                            ${(todt.nom_estado === "proceso" && todt.clasificacion === 11) ? `<li class="dropdown-item li-revision" data-id="${todt.idorden_trabajo}">Enviar a revision</li>` : ''}                                                                
+                                        </ul>
+                                    </div>
+                                ` : ''}
                             </div>
+                            <div class="tarea-odt" data-id="${todt.idorden_trabajo}">
+                                <div class="d-flex align-items-center mb-3">
+                                    <img src="https://www.iconpacks.net/icons/1/free-user-group-icon-296-thumb.png" class="rounded-circle me-2" alt="Responsables" width="40" height="40"/>
+                                    <p class="mb-0">${todt.responsables}</p>
+                                </div>
+                                <p class="text-muted"><strong>Inició el:</strong> ${todt.fecha_inicio}</p>
+                                ${todt.revisado_por ? `<p class="text-muted">Revisado por ${todt.revisado_por}</p>` : ''}
+                                <p class="text-muted"><strong>Creada por:</strong> ${todt.creador}</p>
+                                <p><strong>Activos:</strong> ${todt.activos}</p>
+                                <div class="progress mb-2">
+                                    <div class="progress-bar ${todt.clasificacion === 11 ? 'bg-success' : todt.clasificacion === 9 ? 'bg-warning' : 'bg-danger'}" 
+                                        role="progressbar" 
+                                        style="width: ${todt.clasificacion === 11 ? '100' : todt.clasificacion === 9 ? '50' : '0'}%" 
+                                        aria-valuenow="${todt.clasificacion === 11 ? '100' : todt.clasificacion === 9 ? '50' : '0'}" 
+                                        aria-valuemin="0" 
+                                        aria-valuemax="100">
+                                    </div>
+                                </div>
+                                <p class="text-center">${todt.clasificacion === 11 ? '100' : todt.clasificacion === 9 ? '50' : '0'}%</p>                       
+                            </div>                                        
                         </div>
-                        <p class="text-center">${todt.clasificacion === 11 ? '100' : todt.clasificacion === 9 ? '50' : '0'}%</p>                       
-                    </div>                                        
-                </div>
-            `
+                    `;
 
-            switch (todt.nom_estado) {
-                case 'proceso':
-                    kanban.addElement('b-proceso', {
-                        id: todt.idorden_trabajo,
-                        title: tareaOdtHTML
-                    });
-                    break;
+                // Aquí es donde asignamos la tarea al kanban basado en su estado
+                switch (todt.nom_estado) {
+                    case 'proceso':
+                        kanban.addElement('b-proceso', {
+                            id: todt.idorden_trabajo,
+                            title: tareaOdtHTML
+                        });
+                        break;
 
-                case 'revision':
-                    kanban.addElement('b-revision', {
-                        id: todt.idorden_trabajo,
-                        title: tareaOdtHTML
-                    })
-                    break;
+                    case 'revision':
+                        kanban.addElement('b-revision', {
+                            id: todt.idorden_trabajo,
+                            title: tareaOdtHTML
+                        });
+                        break;
 
-                // QUITADO FINALIZADO
-            }
-        })
+                    // Aquí puedes añadir más casos si es necesario
+                }
+            });
+        }
 
         historialOdt.forEach(historial => {
             const verificarEstadoClasificacion =

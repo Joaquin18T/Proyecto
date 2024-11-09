@@ -61,6 +61,17 @@ class Tarea extends ExecQuery
     }
   } // INTEGRADO ✔
 
+  public function mostrarTareasEnTablaPorIdTarea($params = []): array
+  {
+    try {
+      $sp = parent::execQ("CALL mostrarTareasEnTablaPorIdTarea(?)");
+      $sp->execute(array($params['idtarea']));
+      return $sp->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+      die($e->getMessage());
+    }
+  } // INTEGRADO ✔
+
   // METODOS DE ACTUALIZAR
   public function actualizarTarea($params = []): array
   {
@@ -122,7 +133,7 @@ class Tarea extends ExecQuery
       die($e->getMessage());
     }
   } // INTEGRADO ✔
-  
+
   public function obtenerTareasSinActivos(): array
   {
     try {

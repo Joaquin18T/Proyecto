@@ -130,8 +130,8 @@
                             <tr>
                                 <th></th>
                                 <th>Activo</th>
-                                <th>Marca</th>
                                 <th>Modelo</th>
+                                <th>Estado</th>
                             </tr>
                         </thead>
                         <tbody id="activosBodyTable"></tbody>
