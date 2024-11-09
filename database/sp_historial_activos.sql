@@ -27,5 +27,5 @@ BEGIN
 	END IF;
 END $$
 
--- CALL sp_add_historial_activo(@idhis, 20,2,'Cambio de ubicacion', 1,6);
+-- CALL sp_add_historial_activo(@idhis, 33,5,'Cambio de ubicacion', 1, 19); -- EN ESTE CASO ALA ACTUALIDAD SOLO EXISTEN 6 UBICACIONES EN LA BD
 -- SELECT @idhis as idhis;

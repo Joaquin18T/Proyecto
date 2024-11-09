@@ -193,6 +193,10 @@ $(document).ready(async () => {
                                     e.preventDefault();
                                     const idOdt = await registrarOdt(cardId, fechaInicioTarea, horaInicioTarea);
                                     console.log(idOdt);
+                                    for (let i = 0; i < tareasMostrarTabla.length; i++) {
+                                        const responsableRegistrado = await registrarResponsablesAsignados(tareasMostrarTabla[i].idusuario, idOdt.id)
+                                        console.log("responsableRegistrado : ", responsableRegistrado)
+                                    }
                                     //window.localStorage.clear()
                                     //window.localStorage.setItem("idtarea", cardId);
                                     //window.localStorage.setItem("idodt", idOdt.id);
@@ -428,8 +432,7 @@ $(document).ready(async () => {
                                     <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" data-id="dropdown">
                                         ⋮
                                     </button>
-                                    <ul class="dropdown-menu">
-                                        ${(todt.nom_estado !== "finalizado" && todt.nom_estado !== "revision" && (todt.clasificacion === 9 || todt.clasificacion == null)) ? `<li class="dropdown-item li-editar" data-id="${todt.idorden_trabajo}" data-tarea-id="${todt.idtarea}">Editar</li>` : ''}
+                                    <ul class="dropdown-menu">                                       
                                         ${(todt.nom_estado === "proceso" && todt.clasificacion === 11) ? `<li class="dropdown-item li-revision" data-id="${todt.idorden_trabajo}">Enviar a revision</li>` : ''}                                                                
                                     </ul>
                                 </div>
@@ -484,18 +487,7 @@ $(document).ready(async () => {
                         <div class="mb-3">                    
                             <div class="d-flex justify-content-between align-items-center">
                                 <h3 class="card-title">${todt.tarea}</h3>
-                                ${badgeClasificacion}
-                                ${verificarEstadoClasificacion ? ` 
-                                    <div class="btn-group dropstart">
-                                        <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" data-id="dropdown">
-                                            ⋮
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            ${(todt.nom_estado !== "finalizado" && todt.nom_estado !== "revision" && (todt.clasificacion === 9 || todt.clasificacion == null)) ? `<li class="dropdown-item li-editar" data-id="${todt.idorden_trabajo}" data-tarea-id="${todt.idtarea}">Editar</li>` : ''}
-                                            ${(todt.nom_estado === "proceso" && todt.clasificacion === 11) ? `<li class="dropdown-item li-revision" data-id="${todt.idorden_trabajo}">Enviar a revision</li>` : ''}                                                                
-                                        </ul>
-                                    </div>
-                                ` : ''}
+                                
                             </div>
                             <div class="tarea-odt" data-id="${todt.idorden_trabajo}">
                                 <div class="d-flex align-items-center mb-3">
@@ -733,6 +725,17 @@ $(document).ready(async () => {
         return idodt
     }
 
+    async function registrarResponsablesAsignados(idresponsable, idodt) {
+        console.log("ID ODT A ASIGNARLE: ", window.localStorage.getItem("idodt"))
+        const formResponsableAsignado = new FormData()
+        formResponsableAsignado.append("operation", "asignarResponsables")
+        formResponsableAsignado.append("idordentrabajo", idodt)
+        formResponsableAsignado.append("idresponsable", idresponsable)
+        const fresponsableId = await fetch(`${host}responsablesAsignados.controller.php`, { method: 'POST', body: formResponsableAsignado })
+        const responsableId = await fresponsableId.json()
+        return responsableId
+    }
+
     // ******************************* FIN DE SECCION DE REGISTROS ****************************
 
     // ********************* SECCION DE ACTUALIZAR ******************************************
@@ -756,6 +759,17 @@ $(document).ready(async () => {
         const actualizado = await Factualizado.json()
         return actualizado
     }
+
+    async function actualizarEstadoActivo(idactivo, idestado) {
+        const formActualizacion = new FormData()
+        formActualizacion.append("operation", "updateEstado")
+        formActualizacion.append("idactivo", idactivo)
+        formActualizacion.append("idestado", idestado)
+        const Factualizado = await fetch(`${host}activo.controller.php`, { method: 'POST', body: formActualizacion })
+        const actualizado = await Factualizado.json()
+        return actualizado
+    }
+
 
     //************************ FIN DE SECCION DE ACTUALIZAR ******************************** */
 

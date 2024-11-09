@@ -278,7 +278,7 @@ CREATE TABLE `odt`
     fecha_final			date		null,
     hora_final			time		null,
     idestado			int		null default 9,
-    incompleto 		boolean		null default true,
+    incompleto 		boolean		null default false,
     eliminado		boolean		null default false,
     CONSTRAINT 			fk_idtarea4					FOREIGN KEY (idtarea)					REFERENCES tareas 	(idtarea) ON DELETE CASCADE,
     CONSTRAINT			fk_creado_por				foreign key (creado_por) 				REFERENCES usuarios	(id_usuario),
