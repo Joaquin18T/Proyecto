@@ -176,8 +176,8 @@ VALUES
     (13, 5, 'Huawei AR1220', 'RD-004', '2023-03-30', 'Router de oficina', '{"seguridad":"integrada", "puertos":"4"}', 1),
     (14, 4, 'D-Link DGS-1016D', 'RD-005', '2022-10-01', 'Switch de 16 puertos', '{"puertos":"16", "velocidad":"1Gbps"}', 1),
     (12, 3, 'Fluke DTX-1800', 'RD-006', '2023-01-10', 'Medidor de cableado para redes', '{"capacidad":"hasta Cat 6A"}', 1),
-    (6, 4, 'Chevrolet Silverado', 'VE-006', '2021-12-11', 'Camioneta para trabajo', '{"motor":"V8", "capacidad_asientos":"6"}', 1);
-
+    (6, 4, 'Chevrolet Silverado', 'VE-006', '2021-12-11', 'Camioneta para trabajo', '{"motor":"V8", "capacidad_asientos":"6"}', 1),
+	(3,3, 'Teclado Logitech D4', 'FR5-345K', '2023-08-10', 'Teclado para empleados', '{"tipo":"mecanico"}', 4);
 
 -- select*from activos;
 INSERT INTO ubicaciones (ubicacion) 

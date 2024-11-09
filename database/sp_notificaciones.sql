@@ -23,56 +23,67 @@ CREATE PROCEDURE sp_list_notificacion
 	IN _idusuario INT
 )
 BEGIN
-	SELECT 
-		NA.idnotificacion_activo AS idnotificacion, 
-		NA.tipo AS tipo_notificacion, NA.mensaje, NA.fecha_creacion, NA.visto,
-		A.descripcion AS descripcion_activo, AR.idactivo_resp,
-		U.usuario AS usuario_nombre
-	FROM 
-		notificaciones_activos NA
-	INNER JOIN activos_responsables AR ON NA.idactivo_resp = AR.idactivo_resp
-	INNER JOIN activos A ON AR.idactivo = A.idactivo
-	INNER JOIN usuarios U ON AR.idusuario = U.id_usuario
-	WHERE U.id_usuario = _idusuario  -- Especifica aquí el usuario
+SELECT 
+    NA.idnotificacion_activo AS idnotificacion, 
+    NA.tipo AS tipo_notificacion, 
+    NA.mensaje, 
+    NA.fecha_creacion, 
+    NA.visto,
+    A.descripcion AS descripcion_activo,
+    AR.idactivo_resp,
+    U.usuario AS usuario_nombre
+FROM 
+    notificaciones_activos NA
+INNER JOIN 
+    activos_responsables AR ON NA.idactivo_resp = AR.idactivo_resp
+INNER JOIN 
+    activos A ON AR.idactivo = A.idactivo
+INNER JOIN 
+    usuarios U ON AR.idusuario = U.id_usuario
+WHERE U.id_usuario = _idusuario  -- Especifica aquí el usuario
 
-	UNION ALL
+UNION ALL
 
-	SELECT 
-		NM.idnotificacion_mantenimiento AS idnotificacion, 
-		'Mantenimiento' AS tipo_notificacion,  -- Etiqueta fija para diferenciar el tipo
-		NM.mensaje, NM.fecha_creacion, NM.visto, NM.activos AS descripcion_activo, 
-		AR.idactivo_resp,
-		U.usuario AS usuario_nombre
-	FROM notificaciones_mantenimiento NM
-	INNER JOIN activos_responsables AR ON NM.idresp = AR.idactivo_resp
-	INNER JOIN usuarios U ON AR.idusuario = U.id_usuario
-	WHERE U.id_usuario = _idusuario -- Especifica aquí el mismo usuario
-    
-    UNION ALL
+SELECT 
+    NM.idnotificacion_mantenimiento AS idnotificacion, 
+    'Mantenimiento' AS tipo_notificacion,  -- Etiqueta fija para diferenciar el tipo
+    NM.mensaje, 
+    NM.fecha_creacion, 
+    NM.visto, 
+    NM.activos AS descripcion_activo, 
+    NM.idresp as idactivo_resp,
+    U.usuario AS usuario_nombre
+FROM 
+    notificaciones_mantenimiento NM
+INNER JOIN 
+    usuarios U ON NM.idresp = U.id_usuario  -- Ahora usamos idresp directamente en la relación con usuarios
+WHERE U.id_usuario = _idusuario -- Especifica aquí el mismo usuario
 
-	SELECT 
-		NA.idnotificacion_activo AS idnotificacion, 
-		NA.tipo AS tipo_notificacion, 
-		NA.mensaje, 
-		NA.fecha_creacion, 
-		NA.visto, 
-		ACT.descripcion AS descripcion_activo,
-        HA.idactivo_resp,
-		U.usuario AS usuario_nombre -- Ahora se une el usuario basado en `responsable_accion`
-	FROM 
-		notificaciones_activos NA
-	LEFT JOIN 
-		activos ACT ON NA.idactivo = ACT.idactivo
-	LEFT JOIN 
-		historial_activos HA ON ACT.idactivo = HA.idactivo
-	LEFT JOIN 
-		usuarios U ON HA.responsable_accion = U.id_usuario -- Relación con usuarios
-	WHERE 
-		NA.idactivo_resp IS NULL 
-		AND HA.responsable_accion IS NOT NULL
-		AND HA.responsable_accion = _idusuario
-	ORDER BY 
-		fecha_creacion DESC;
+UNION ALL
+
+SELECT 
+    NA.idnotificacion_activo AS idnotificacion, 
+    NA.tipo AS tipo_notificacion, 
+    NA.mensaje, 
+    NA.fecha_creacion, 
+    NA.visto, 
+    ACT.descripcion AS descripcion_activo,
+    HA.idactivo_resp,
+    U.usuario AS usuario_nombre -- Relación con usuarios
+FROM 
+    notificaciones_activos NA
+LEFT JOIN 
+    activos ACT ON NA.idactivo = ACT.idactivo
+LEFT JOIN 
+    historial_activos HA ON ACT.idactivo = HA.idactivo
+LEFT JOIN 
+    usuarios U ON HA.responsable_accion = U.id_usuario -- Relación con usuarios
+WHERE 
+    NA.idactivo_resp IS NULL 
+    AND HA.responsable_accion IS NOT NULL
+    AND HA.responsable_accion = _idusuario
+ORDER BY 
+    fecha_creacion DESC;
 END $$
 -- CALL sp_list_notificacion(2);
 

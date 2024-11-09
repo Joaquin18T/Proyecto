@@ -52,15 +52,78 @@ DELETE FROM historial_activos where idhistorial_activo >=47;
 DELETE FROM notificaciones_activos where idactivo_resp >9;
 
 select*from plandetareas;
+select*from especificacionesDefecto;
 SELECT * FROM tareas inner join estados ON tareas.idestado=estados.idestado;
 SELECT * FROM odt;
 SELECT*FROM notificaciones_mantenimiento;
 
 -- INSERT INTO odt (idtarea, creado_por) VALUES
--- 	(1, 1);
+-- (1, 1);
 
 -- INSERT INTO notificaciones_mantenimiento (idorden_trabajo, tarea, activos, idresp, mensaje) VALUES
 -- 	(1, 'Cambio de rodillos', 'Impresora DR 5, Impresora HP 5T',20, 'Se ha creado una tarea a un activo asignado');
+
+SELECT 
+    NA.idnotificacion_activo AS idnotificacion, 
+    NA.tipo AS tipo_notificacion, 
+    NA.mensaje, 
+    NA.fecha_creacion, 
+    NA.visto,
+    A.descripcion AS descripcion_activo,
+    AR.idactivo_resp,
+    U.usuario AS usuario_nombre
+FROM 
+    notificaciones_activos NA
+INNER JOIN 
+    activos_responsables AR ON NA.idactivo_resp = AR.idactivo_resp
+INNER JOIN 
+    activos A ON AR.idactivo = A.idactivo
+INNER JOIN 
+    usuarios U ON AR.idusuario = U.id_usuario
+WHERE U.id_usuario = 1  -- Especifica aquí el usuario
+
+UNION ALL
+
+SELECT 
+    NM.idnotificacion_mantenimiento AS idnotificacion, 
+    'Mantenimiento' AS tipo_notificacion,  -- Etiqueta fija para diferenciar el tipo
+    NM.mensaje, 
+    NM.fecha_creacion, 
+    NM.visto, 
+    NM.activos AS descripcion_activo, 
+    NM.idresp as idactivo_resp,
+    U.usuario AS usuario_nombre
+FROM 
+    notificaciones_mantenimiento NM
+INNER JOIN 
+    usuarios U ON NM.idresp = U.id_usuario  -- Ahora usamos idresp directamente en la relación con usuarios
+WHERE U.id_usuario = 1 -- Especifica aquí el mismo usuario
+
+UNION ALL
+
+SELECT 
+    NA.idnotificacion_activo AS idnotificacion, 
+    NA.tipo AS tipo_notificacion, 
+    NA.mensaje, 
+    NA.fecha_creacion, 
+    NA.visto, 
+    ACT.descripcion AS descripcion_activo,
+    HA.idactivo_resp,
+    U.usuario AS usuario_nombre -- Relación con usuarios
+FROM 
+    notificaciones_activos NA
+LEFT JOIN 
+    activos ACT ON NA.idactivo = ACT.idactivo
+LEFT JOIN 
+    historial_activos HA ON ACT.idactivo = HA.idactivo
+LEFT JOIN 
+    usuarios U ON HA.responsable_accion = U.id_usuario -- Relación con usuarios
+WHERE 
+    NA.idactivo_resp IS NULL 
+    AND HA.responsable_accion IS NOT NULL
+    AND HA.responsable_accion = 1
+ORDER BY 
+    fecha_creacion DESC;
 
 
 
