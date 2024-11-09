@@ -334,32 +334,45 @@ DELIMITER ;
 -- CALL sp_filtrar_activos_responsables_asignados(3, null, null);
 DROP PROCEDURE IF EXISTS listarActivosResponsables; 
 DELIMITER $$
-CREATE PROCEDURE listarActivosResponsables
-(IN _idsubcategoria INT, IN _idubicacion INT)
-BEGIN
-	SELECT DISTINCT
-		AR.idactivo_resp,
-		AR.idactivo,
-		ACT.descripcion,
-		ACT.modelo,
-		MAR.marca,
-		EST.nom_estado,
-		HA.idubicacion
-	FROM activos_responsables AR
-	INNER JOIN activos ACT ON AR.idactivo = ACT.idactivo
-	INNER JOIN marcas MAR ON ACT.idmarca = MAR.idmarca
-	INNER JOIN usuarios USU ON AR.idusuario = USU.id_usuario
-	INNER JOIN subcategorias SUB ON ACT.idsubcategoria = SUB.idsubcategoria
-	INNER JOIN estados EST ON ACT.idestado = EST.idestado
-	INNER JOIN historial_activos HA ON HA.idactivo_resp = AR.idactivo_resp
-	INNER JOIN ubicaciones UBI ON UBI.idubicacion = HA.idubicacion
-	where AR.es_responsable = 1 
-		AND (SUB.idsubcategoria = _idsubcategoria OR _idsubcategoria IS NULL)
-			AND (UBI.idubicacion = _idubicacion OR _idubicacion IS NULL);
 
+CREATE PROCEDURE listarActivosResponsables
+(
+    IN _idsubcategoria INT, 
+    IN _idubicacion INT
+)
+BEGIN
+    SELECT DISTINCT
+        AR.idactivo_resp,
+        AR.idactivo,
+        ACT.descripcion,
+        ACT.modelo,
+        MAR.marca,
+        EST.nom_estado,
+        HA.idubicacion,
+        AR.es_responsable
+    FROM activos_responsables AR
+    INNER JOIN activos ACT ON AR.idactivo = ACT.idactivo
+    INNER JOIN marcas MAR ON ACT.idmarca = MAR.idmarca
+    INNER JOIN usuarios USU ON AR.idusuario = USU.id_usuario
+    INNER JOIN subcategorias SUB ON ACT.idsubcategoria = SUB.idsubcategoria
+    INNER JOIN estados EST ON ACT.idestado = EST.idestado
+    INNER JOIN (
+        SELECT idactivo_resp, idubicacion
+        FROM historial_activos
+        WHERE (idactivo_resp, fecha_movimiento) IN (
+            SELECT idactivo_resp, MAX(fecha_movimiento)
+            FROM historial_activos
+            GROUP BY idactivo_resp
+        )
+    ) HA ON HA.idactivo_resp = AR.idactivo_resp
+    LEFT JOIN ubicaciones UBI ON UBI.idubicacion = HA.idubicacion
+    WHERE AR.es_responsable = 1
+        AND (SUB.idsubcategoria = _idsubcategoria OR _idsubcategoria IS NULL)
+        AND (UBI.idubicacion = _idubicacion OR _idubicacion IS NULL);
 END $$
 
-call listarActivosResponsables(3,5)
+DELIMITER ;
+-- call listarActivosResponsables(3,null)
 
 DROP PROCEDURE IF EXISTS sp_list_resp_activo;
 DELIMITER $$
