@@ -385,19 +385,5 @@ CREATE TABLE historial_odt
 (
 	idhistorial			int		auto_increment primary key,
 	idorden_trabajo		int 	not null,
-    clasificacion		int		not null,
-    creador				varchar(100) not null,
-    responsables		longtext	not null,
-    tiempo_ejecucion	varchar(20) not null,
-    activos				longtext	not null,
-    tarea				varchar(100)	not null,
-    revisado_por		varchar(100)	not null,
-	tipo_prioridad		varchar(20)		not null,
-    fecha_inicio		varchar(20)		not null,    
-    hora_inicio			varchar(20)		not null,
-    nom_estado			varchar(15) 	not null,
-    incompleto			int				not null,
-    fecha_final			varchar(20)		not null,
-    hora_final			varchar(20)		not null,
-	CONSTRAINT			fk_clasificacion2	foreign key (clasificacion) references estados (idestado)    
+    CONSTRAINT 			fk_idordentrabajo3 foreign key (idorden_trabajo) references odt (idorden_trabajo)
 )ENGINE=INNODB;

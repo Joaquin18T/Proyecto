@@ -304,15 +304,30 @@ BEGIN
     ORDER BY RES.idactivo_resp ASC;
 END $$
 DELIMITER ;
--- CALL sp_filtrar_activos_responsables_asignados(2, null, null);
-select * from subcategorias;
+-- CALL sp_filtrar_activos_responsables_asignados(3, null, null);
+DROP PROCEDURE IF EXISTS listarActivosResponsables; 
+DELIMITER $$
+CREATE PROCEDURE listarActivosResponsables
+(IN _idsubcategoria INT)
+BEGIN
+	select
+*
+        from historial_activos HA
+	LEFT JOIN activos_responsables AR ON HA.idactivo_resp = AR.idactivo_resp
+	INNER JOIN activos ACT ON AR.idactivo = ACT.idactivo
+    INNER JOIN marcas MAR ON ACT.idmarca = MAR.idmarca
+    INNER JOIN usuarios USU ON AR.idusuario = USU.id_usuario
+    INNER JOIN subcategorias SUB ON ACT.idsubcategoria = SUB.idsubcategoria
+    INNER JOIN estados EST ON ACT.idestado = EST.idestado        
+    where AR.es_responsable = 1 AND SUB.idsubcategoria = 3;
+END $$
+
+SELECT * FROM historial_activos
 
 DROP PROCEDURE IF EXISTS sp_list_resp_activo;
 DELIMITER $$
 CREATE PROCEDURE sp_list_resp_activo
-(
-
-)
+()
 BEGIN
 	SELECT R.idactivo_resp, A.descripcion
     FROM activos_responsables R

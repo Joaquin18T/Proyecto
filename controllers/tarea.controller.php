@@ -26,6 +26,11 @@ if (isset($_GET['operation'])) {
         case 'obtenerTareasSinActivos':
             echo json_encode($tarea->obtenerTareasSinActivos());
             break;
+
+
+        case 'mostrarTareasEnTablaPorIdTarea':
+            echo json_encode($tarea->mostrarTareasEnTablaPorIdTarea(['idtarea' => $_GET['idtarea']]));
+            break;
     }
 }
 

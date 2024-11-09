@@ -148,21 +148,7 @@ DELIMITER //
 CREATE PROCEDURE `registrarHistorialOdt`
 (
 	OUT _idhistorial 		INT,
-	IN _idorden_trabajo 	INT,
-    IN _clasificacion		INT,
-    IN _creador				VARCHAR(100),
-    IN _responsables		LONGTEXT,
-    IN _tiempo_ejecucion	VARCHAR(20),
-    IN _activos				LONGTEXT,
-    IN _tarea				VARCHAR(100),
-    IN _revisado_por		VARCHAR(100),
-    IN _tipo_prioridad		VARCHAR(20),
-    IN _fecha_inicio		VARCHAR(20),
-    IN _hora_inicio			VARCHAR(20),
-    IN _nom_estado			VARCHAR(15),
-    IN _incompleto			INT,
-    IN _fecha_final			VARCHAR(20),
-    IN _hora_final			VARCHAR(20)
+	IN _idorden_trabajo 	INT
 )
 BEGIN	
 	-- Declaración de variable de control de error
@@ -175,39 +161,7 @@ BEGIN
 		END;
 		
 	-- Insertar el registro en historial_odt
-	INSERT INTO historial_odt (
-		idorden_trabajo,
-        clasificacion,
-        creador,
-        responsables,
-        tiempo_ejecucion,
-        activos,
-        tarea,
-        revisado_por,
-        tipo_prioridad,
-        fecha_inicio,
-        hora_inicio,
-        nom_estado,
-        incompleto,
-        fecha_final,
-        hora_final
-	) VALUES (
-		_idorden_trabajo,
-        _clasificacion,
-        _creador,
-        _responsables,
-        _tiempo_ejecucion,
-        _activos,
-        _tarea,
-        _revisado_por,
-        _tipo_prioridad,
-        _fecha_inicio,
-        _hora_inicio,
-        _nom_estado,
-        _incompleto,
-        _fecha_final,
-        _hora_final
-	);
+	INSERT INTO historial_odt (idorden_trabajo) values (_idorden_trabajo);	
 
 	-- Asignar el ID del último registro insertado o devolver -1 si hay error
 	IF existe_error = 1 THEN

@@ -9,8 +9,12 @@ BEGIN
         PT.descripcion AS plantarea,
         TAR.descripcion,
         TAR.pausado,
-        GROUP_CONCAT(ACT.idactivo SEPARATOR ', ') AS ids_activos,
-        GROUP_CONCAT(ACT.descripcion SEPARATOR ', ') AS activos, -- Concatenar activos
+        ACT.idactivo AS id_activo,
+        ACT.descripcion AS activo,
+        AR.idusuario,
+        PER.nombres,
+        PER.apellidos,
+        AR.es_responsable,
         TP.tipo_prioridad AS prioridad,
         TAR.intervalo,
         FRE.frecuencia,
@@ -21,13 +25,52 @@ BEGIN
     INNER JOIN plandetareas PT ON PT.idplantarea = TAR.idplantarea
     INNER JOIN activos_vinculados_tarea AVT ON AVT.idtarea = TAR.idtarea
     INNER JOIN activos ACT ON ACT.idactivo = AVT.idactivo
+    INNER JOIN activos_responsables AR ON AR.idactivo = ACT.idactivo AND AR.es_responsable = 1
+    INNER JOIN usuarios USU ON USU.id_usuario = AR.idusuario
+    INNER JOIN personas PER ON PER.id_persona = USU.idpersona
     INNER JOIN tipo_prioridades TP ON TP.idtipo_prioridad = TAR.idtipo_prioridad
     INNER JOIN estados EST ON EST.idestado = TAR.idestado
     INNER JOIN frecuencias FRE ON FRE.idfrecuencia = TAR.idfrecuencia
-    WHERE PT.eliminado = 0 AND PT.incompleto = 0
-    GROUP BY TAR.idtarea; -- Agrupar por tarea
+    WHERE PT.eliminado = 0 AND PT.incompleto = 0;
 END //
 DELIMITER ;
+
+DROP PROCEDURE IF EXISTS `mostrarTareasEnTablaPorIdTarea`;
+DELIMITER //
+CREATE PROCEDURE `mostrarTareasEnTablaPorIdTarea`(IN _idtarea INT)
+BEGIN 
+    SELECT 
+        TAR.idtarea,
+        PT.descripcion AS plantarea,
+        TAR.descripcion,
+        TAR.pausado,
+        ACT.idactivo AS id_activo,
+        ACT.descripcion AS activo,
+        AR.idusuario,
+        PER.nombres,
+        PER.apellidos,
+        AR.es_responsable,
+        TP.tipo_prioridad AS prioridad,
+        TAR.intervalo,
+        FRE.frecuencia,
+        EST.nom_estado,
+        PT.eliminado,
+        PT.incompleto
+    FROM tareas TAR
+    INNER JOIN plandetareas PT ON PT.idplantarea = TAR.idplantarea
+    INNER JOIN activos_vinculados_tarea AVT ON AVT.idtarea = TAR.idtarea
+    INNER JOIN activos ACT ON ACT.idactivo = AVT.idactivo
+    INNER JOIN activos_responsables AR ON AR.idactivo = ACT.idactivo AND AR.es_responsable = 1
+    INNER JOIN usuarios USU ON USU.id_usuario = AR.idusuario
+    INNER JOIN personas PER ON PER.id_persona = USU.idpersona
+    INNER JOIN tipo_prioridades TP ON TP.idtipo_prioridad = TAR.idtipo_prioridad
+    INNER JOIN estados EST ON EST.idestado = TAR.idestado
+    INNER JOIN frecuencias FRE ON FRE.idfrecuencia = TAR.idfrecuencia
+    WHERE PT.eliminado = 0 AND PT.incompleto = 0 AND TAR.idtarea = _idtarea;
+END //
+DELIMITER ;
+
+-- call mostrarTareasEnTablaPorIdTarea(38)
 
 DROP PROCEDURE IF EXISTS `obtenerTareasSinActivos`;
 DELIMITER //
@@ -91,6 +134,7 @@ CREATE PROCEDURE `obtenerTareasOdt`()
 BEGIN
     SELECT 
         ODT.idorden_trabajo,
+        GROUP_CONCAT(DISTINCT USURES.id_usuario SEPARATOR ', ') AS responsables_ids,
         GROUP_CONCAT(DISTINCT CONCAT(PERRES.nombres, ' ', PERRES.apellidos) SEPARATOR ', ') AS responsables,
         TAR.descripcion AS tarea,
         ODT.fecha_inicio,
@@ -107,15 +151,15 @@ BEGIN
         ODT.fecha_final,
         ODT.hora_final
     FROM odt ODT
-    LEFT JOIN responsables_asignados_odt RA ON RA.idorden_trabajo = ODT.idorden_trabajo
-    LEFT JOIN usuarios USURES ON USURES.id_usuario = RA.idresponsable
-    LEFT JOIN personas PERRES ON PERRES.id_persona = USURES.idpersona
-    LEFT JOIN usuarios USUCRE ON USUCRE.id_usuario = ODT.creado_por
-    LEFT JOIN personas PERCRE ON PERCRE.id_persona = USUCRE.idpersona
     LEFT JOIN tareas TAR ON TAR.idtarea = ODT.idtarea
 	LEFT JOIN tipo_prioridades TP ON TP.idtipo_prioridad = TAR.idtipo_prioridad
     LEFT JOIN activos_vinculados_tarea AVT ON AVT.idtarea = TAR.idtarea
     LEFT JOIN activos ACT ON ACT.idactivo = AVT.idactivo
+	LEFT JOIN activos_responsables AR ON AR.idactivo = ACT.idactivo AND AR.es_responsable = 1
+    LEFT JOIN usuarios USURES ON USURES.id_usuario = AR.idusuario
+    LEFT JOIN personas PERRES ON PERRES.id_persona = USURES.idpersona
+    LEFT JOIN usuarios USUCRE ON USUCRE.id_usuario = ODT.creado_por
+    LEFT JOIN personas PERCRE ON PERCRE.id_persona = USUCRE.idpersona
     LEFT JOIN estados EST ON EST.idestado = ODT.idestado
     LEFT JOIN detalle_odt DODT ON DODT.idorden_trabajo = ODT.idorden_trabajo
     LEFT JOIN comentarios_odt CO ON CO.idorden_trabajo = ODT.idorden_trabajo
@@ -126,8 +170,20 @@ BEGIN
 END //
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS `obtenerIdsUsuariosOdt`
+DELIMITER //
+CREATE PROCEDURE `obtenerIdsUsuariosOdt`()
+BEGIN
+	select 
+    ODT.idorden_trabajo,
+    AVT.idtarea,
+	AR.idusuario
+	 from odt ODT
+	INNER JOIN tareas TAR ON TAR.idtarea = ODT.idtarea
+	inner join activos_vinculados_tarea AVT ON AVT.idtarea = TAR.idtarea
+	inner join activos_responsables AR ON AR.idactivo = AVT.idactivo AND AR.es_responsable = 1;
+END //
 
-call obtenerTareasOdt
 
 DROP PROCEDURE IF EXISTS `obtenerTareaDeOdtGenerada`
 DELIMITER //
@@ -254,12 +310,54 @@ END //
 
 
 
-DROP PROCEDURE IF EXISTS `obtenerHistorialOdt`
+DROP PROCEDURE IF EXISTS obtenerHistorialOdt
 DELIMITER //
-CREATE PROCEDURE `obtenerHistorialOdt`
+CREATE PROCEDURE obtenerHistorialOdt
 ()
 BEGIN
-	SELECT * from historial_odt;
+	SELECT 
+    
+		HO.idhistorial,
+		ODT.idorden_trabajo,
+        DODT.clasificacion,
+		CONCAT(PERCRE.nombres, ' ', PERCRE.apellidos) AS creador,
+		GROUP_CONCAT(DISTINCT CONCAT(PERRES.nombres, ' ', PERRES.apellidos) SEPARATOR ', ') AS responsables,        
+        DODT.tiempo_ejecucion,
+        DIA.diagnostico,
+        
+        GROUP_CONCAT(DISTINCT ACT.descripcion SEPARATOR ', ') AS activos,
+        
+        TAR.descripcion AS tarea,				
+        
+        CONCAT(PERCO.nombres, ' ', PERCO.apellidos) as revisado_por,
+        TAR.idtarea AS idtarea,
+        TP.tipo_prioridad,
+        ODT.fecha_inicio,
+        ODT.hora_inicio,
+        
+        EST.nom_estado,
+        ODT.incompleto,
+		ODT.fecha_final,
+        ODT.hora_final
+            FROM historial_odt HO
+    INNER JOIN odt ODT ON ODT.idorden_trabajo = HO.idorden_trabajo
+    INNER JOIN diagnosticos DIA ON DIA.idorden_trabajo = ODT.idorden_trabajo
+    INNER JOIN responsables_asignados_odt RA ON RA.idorden_trabajo = ODT.idorden_trabajo
+    INNER JOIN usuarios USURES ON USURES.id_usuario = RA.idresponsable
+    INNER JOIN personas PERRES ON PERRES.id_persona = USURES.idpersona
+    INNER JOIN usuarios USUCRE ON USUCRE.id_usuario = ODT.creado_por
+    INNER JOIN personas PERCRE ON PERCRE.id_persona = USUCRE.idpersona
+    INNER JOIN tareas TAR ON TAR.idtarea = ODT.idtarea
+    INNER JOIN tipo_prioridades TP ON TP.idtipo_prioridad = TAR.idtipo_prioridad
+    INNER JOIN activos_vinculados_tarea AVT ON AVT.idtarea = TAR.idtarea
+    INNER JOIN activos ACT ON ACT.idactivo = AVT.idactivo
+    INNER JOIN estados EST ON EST.idestado = ODT.idestado
+    INNER JOIN detalle_odt DODT ON DODT.idorden_trabajo = ODT.idorden_trabajo
+    INNER JOIN comentarios_odt CO ON CO.idorden_trabajo = ODT.idorden_trabajo
+    INNER JOIN usuarios USUCO ON USUCO.id_usuario = CO.revisadoPor
+    INNER JOIN personas PERCO ON PERCO.id_persona = USUCO.idpersona
+    GROUP BY ODT.idorden_trabajo, TAR.descripcion, ODT.fecha_inicio, 
+             PERCRE.nombres, PERCRE.apellidos, TAR.idtarea, EST.nom_estado;
 END //
 
 call obtenerHistorialOdt()

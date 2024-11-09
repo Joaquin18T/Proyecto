@@ -158,40 +158,10 @@ $(document).ready(async () => {
         return comentario
     }
 
-    async function registrarHistorialOdt(
-        clasificacion,
-        creador,
-        responsables,
-        tiempo_ejecucion,
-        activos,
-        tarea,
-        revisado_por,
-        tipo_prioridad,
-        fecha_inicio,
-        hora_inicio,
-        nom_estado,
-        incompleto,
-        fecha_final,
-        hora_final
-    ) {
+    async function registrarHistorialOdt() {
         const formRegistroHistorialOdt = new FormData();
         formRegistroHistorialOdt.append("operation", "registrarHistorialOdt");
         formRegistroHistorialOdt.append("idodt", idordengenerada);
-        formRegistroHistorialOdt.append("clasificacion", clasificacion);
-        formRegistroHistorialOdt.append("creador", creador);
-        formRegistroHistorialOdt.append("responsables", responsables);
-        formRegistroHistorialOdt.append("tiempo_ejecucion", tiempo_ejecucion);
-        formRegistroHistorialOdt.append("activos", activos);
-        formRegistroHistorialOdt.append("tarea", tarea);
-        formRegistroHistorialOdt.append("revisado_por", revisado_por);
-        formRegistroHistorialOdt.append("tipo_prioridad", tipo_prioridad);
-        formRegistroHistorialOdt.append("fecha_inicio", fecha_inicio);
-        formRegistroHistorialOdt.append("hora_inicio", hora_inicio);
-        formRegistroHistorialOdt.append("nom_estado", nom_estado);
-        formRegistroHistorialOdt.append("incompleto", incompleto);
-        formRegistroHistorialOdt.append("fecha_final", fecha_final);
-        formRegistroHistorialOdt.append("hora_final", hora_final);
-
         const Fcomentario = await fetch(`${host}ordentrabajo.controller.php`, {
             method: 'POST',
             body: formRegistroHistorialOdt
@@ -420,22 +390,7 @@ $(document).ready(async () => {
             if (actualizadoODT.actualizado) {
                 const odtObtenida = await obtenerOdtporId()
                 console.log("odtObtenida: ", odtObtenida)
-                const registroHistorial = await registrarHistorialOdt(
-                    odtObtenida[0]?.clasificacion,
-                    odtObtenida[0]?.creador,
-                    odtObtenida[0]?.responsables,
-                    odtObtenida[0]?.tiempo_ejecucion,
-                    odtObtenida[0]?.activos,
-                    odtObtenida[0]?.tarea,
-                    odtObtenida[0]?.revisado_por,
-                    odtObtenida[0]?.tipo_prioridad,
-                    odtObtenida[0]?.fecha_inicio,
-                    odtObtenida[0]?.hora_inicio,
-                    odtObtenida[0]?.nom_estado,
-                    odtObtenida[0]?.incompleto,
-                    odtObtenida[0]?.fecha_final,
-                    odtObtenida[0]?.hora_final
-                );
+                const registroHistorial = await registrarHistorialOdt();
                 console.log("Historial ODT registrado?: ", registroHistorial);
                 const estadoTareaActualizada = await actualizarTareaEstado(idtarea, 8)
                 console.log("ESTADO DE TAREA ACTUALIZADA?: ", estadoTareaActualizada)

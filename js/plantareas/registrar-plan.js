@@ -200,13 +200,19 @@ $(document).ready(async () => {
     async function filtrarActivosList() {
         const tarea = await obtenerTareaPorId(selectElegirTareaParaActivo.value.trim())
         console.log("tarea obtenida con filter: ", tarea)
-        const params = new URLSearchParams()
+        /* const params = new URLSearchParams()
         params.append("operation", "filtrarActivosResponsablesAsignados")
         params.append("idsubcategoria", (tarea[0]?.idsubcategoria === "" || tarea[0]?.idsubcategoria == -1) ? "" : tarea[0]?.idsubcategoria) //
         params.append("idubicacion", (selectUbicacion.value.trim() === "" || selectUbicacion.value == -1) ? "" : selectUbicacion.value) //
         params.append("cod_identificacion", "")
 
-        const data = await getDatos(`${host}respActivo.controller.php`, params)
+        const data = await getDatos(`${host}respActivo.controller.php`, params) */
+        /* const params = new URLSearchParams()
+        params.append("operation", "listarActivosResponsables")
+        params.append("idsubcategoria", (tarea[0]?.idsubcategoria === "" || tarea[0]?.idsubcategoria == -1) ? "" : tarea[0]?.idsubcategoria)
+        const data = await getDatos(`${host}respActivo.controller.php`, params) */
+    
+        
         activosList.innerHTML = "";
         console.log("activos fitlrados", data);
         for (let i = 0; i < data.length; i++) {
@@ -216,8 +222,8 @@ $(document).ready(async () => {
                     <input type="checkbox" class="activo-checkbox" data-descact="${data[i].descripcion}" data-idactivo="${data[i].idactivo}" data-idactivoresp="${data[i].idactivo_resp}">
                 </th>
                 <td>${data[i].descripcion}</td>
-                <td>${data[i].marca}</td>
                 <td>${data[i].modelo}</td>
+                <td>${data[i].nom_estado}</td>
             </tr>
             `;
         }

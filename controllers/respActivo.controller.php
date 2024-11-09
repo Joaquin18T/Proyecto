@@ -55,6 +55,14 @@ if (isset($_GET['operation'])) {
       echo json_encode($respAct->filtrarActivosResponsablesAsignados($valoresBuscar));
       break;
 
+    case 'listarActivosResponsables':
+      $valoresBuscar = [
+        'idsubcategoria' => $_GET['idsubcategoria'] == "" ? null : $respAct->limpiarCadena($_GET['idsubcategoria']),
+        'idubicacion' => $_GET['idubicacion'] == "" ? null : $respAct->limpiarCadena($_GET['idubicacion']),
+      ];
+      echo json_encode($respAct->listarActivosResponsables($valoresBuscar));
+      break;
+
     case 'listRespActivo':
       echo json_encode($respAct->listResp_activo());
       break;
