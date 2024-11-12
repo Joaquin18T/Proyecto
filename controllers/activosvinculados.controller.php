@@ -7,7 +7,7 @@ $activosvinculados = new Activosvinculados();
 
 if (isset($_GET['operation'])) {
   switch ($_GET['operation']) {
-    case 'listarActivosPorTareaYPlan':      
+    case 'listarActivosPorTareaYPlan':
       echo json_encode($activosvinculados->listarActivosPorTareaYPlan(["idplantarea" => $_GET["idplantarea"]]));
       break;
 
@@ -15,7 +15,7 @@ if (isset($_GET['operation'])) {
       echo json_encode($activosvinculados->obtenerUnActivoVinculadoAtarea(["idactivovinculado" => $_GET["idactivovinculado"]]));
       break;
 
-    /* case 'obtenerActivosPorPlanTarea':
+      /* case 'obtenerActivosPorPlanTarea':
       echo json_encode($activosvinculados->obtenerActivosPorPlanTarea(["idplantarea" => $_GET["idplantarea"]]));
       break; */
   }
@@ -41,7 +41,14 @@ if (isset($_POST['operation'])) {
       $eliminado = $activosvinculados->eliminarActivosVinculadosTarea(["idactivovinculado" => $idactivovinculado]);
       echo json_encode(["eliminado" => $eliminado]);
       break;
+
+    case 'actualizarEstadoDesvinculadoAVT':
+      $datosEnviar = [
+        "idactivovinculado"           => $_POST["idactivovinculado"],
+        "desvinculado"                => $_POST["desvinculado"]
+      ];
+      $actualizado = $activosvinculados->actualizarEstadoDesvinculadoAVT($datosEnviar);
+      echo json_encode(["actualizado"=>$actualizado]); // array , accedemos a posicion 0 por que ahi se encuentra
+      break;
   }
 }
-
-

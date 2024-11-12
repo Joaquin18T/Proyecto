@@ -338,7 +338,7 @@ $(document).ready(async () => {
                     const idTarea = parseInt(btn.getAttribute("data-tarea-id"));
                     let procesoEncontrado = false;
 
-                    for (let w = 0; w < tareasObtenidasAntesDeEliminar.length; w++) {
+                    /* for (let w = 0; w < tareasObtenidasAntesDeEliminar.length; w++) {
                         if (tareasObtenidasAntesDeEliminar[w].idtarea === idTarea) {
                             if (tareasObtenidasAntesDeEliminar[w].nom_estado === "proceso" || tareasObtenidasAntesDeEliminar[w].trabajado === 1) {
                                 alert("ESTA TAREA NO SE PUEDE ELIMINAR.");
@@ -346,31 +346,35 @@ $(document).ready(async () => {
                                 break;
                             }
                         }
-                    }
+                    } */
 
                     if (!procesoEncontrado) {
                         const li = btn.closest("li");
                         li.remove();
 
-                        const formEliminacionTarea = new FormData();
+                        /* const formEliminacionTarea = new FormData();
                         formEliminacionTarea.append("operation", "eliminarTarea");
                         const eliminado = await fetch(`${host}tarea.controller.php/${idTarea}`, { method: 'POST', body: formEliminacionTarea });
                         const elim = await eliminado.json()
-                        console.log("eliminado?: ", elim.eliminado)
+                        console.log("eliminado?: ", elim.eliminado) */
 
-                        const tareasRegistradasObtenidas = await obtenerTareas()
+                        //const tareasRegistradasObtenidas = await obtenerTareas()
                         const avtObtenidas = await obtenerActivosVinculados()
-                        console.log("tareasRegistradasObtenidas: ", await tareasRegistradasObtenidas) // me quede aca
+                        //console.log("tareasRegistradasObtenidas: ", await tareasRegistradasObtenidas) // me quede aca
                         console.log("avt data hasta el momento: ", avtObtenidas)
+                        for (let a = 0; a < avtObtenidas.length; a++) {
+                            const actualizado = await actualizarEstadoDesvinculadoAVT(avtObtenidas[a].idactivo_vinculado, true)
+                            console.log("actualizado avt desvinculado?: ", actualizado)
+                        }
                         //ELIMINAR CONTENIDO DE LAS CAJAS DE TEXTO
                         formtarea.reset()
 
-                        if (elim.eliminado) {
+                        /* if (elim.eliminado) {
                             if (tareasRegistradasObtenidas.length == 0 && avtObtenidas.length == 0) {
                                 console.log("ya no hay tareas");
                                 habilitarCamposActivo(true)
                             }
-                        }
+                        } */
 
                         await renderUItareas();
                         await renderTareasSelect()
@@ -529,8 +533,7 @@ $(document).ready(async () => {
     }
 
     // ************************ FIN SECCCION ***********************************************************
-
-    //******************************** SECCION DE ACTUALIZACIONES ************************************** */
+    // ****************************************** SECCION DE ACTUALIZAR **************************************
 
     async function actualizarTareaEstadoPausado(idtarea, pausado) {
         const paramsActualizar = new FormData()
@@ -540,6 +543,16 @@ $(document).ready(async () => {
         const FtareaPausada = await fetch(`${host}tarea.controller.php`, { method: 'POST', body: paramsActualizar })
         const tareaPausada = await FtareaPausada.json()
         return tareaPausada
+    }
+
+    async function actualizarEstadoDesvinculadoAVT(idactivovinculado, desvinculado) {
+        const formActualizarAVT = new FormData()
+        formActualizarAVT.append("operation", "actualizarEstadoDesvinculadoAVT")
+        formActualizarAVT.append("idactivovinculado", idactivovinculado)
+        formActualizarAVT.append("desvinculado", desvinculado)
+        const Factualizado = await fetch(`${host}activosvinculados.controller.php`, formActualizarAVT)
+        const actualizado = await Factualizado.json()
+        return actualizado
     }
 
     // ************************************ FIN DE SECCION ***********************************************

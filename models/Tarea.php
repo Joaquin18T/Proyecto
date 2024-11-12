@@ -123,6 +123,22 @@ class Tarea extends ExecQuery
     }
   }
 
+  public function actualizarEstadoInhabilitadoTarea($params = []): bool
+  {
+    try {
+      $status = false;
+      $sp = parent::execQ("CALL actualizarEstadoInhabilitadoTarea(?)");
+      $status = $sp->execute(array(
+        $params['idtarea'],
+        $params['inhabilitado']
+      ));
+      return $status;
+    } catch (Exception $e) {
+      die($e->getMessage());
+    }
+  }
+
+
   public function obtenerTareas(): array
   {
     try {

@@ -102,5 +102,14 @@ if (isset($_POST['operation'])) {
             $estado = $tarea->eliminarTarea(["idtarea" => $idtarea]);
             echo json_encode(["eliminado" => $estado]);
             break;
+
+        case 'actualizarEstadoInhabilitadoTarea':
+            $datosEnviar = [
+                "idtarea"  => $_POST["idtarea"],
+                "inhabilitado" => $_POST["inhabilitado"]
+            ];
+            $actualizado = $tarea->actualizarEstadoInhabilitadoTarea($datosEnviar);
+            echo json_encode(["actualizado" => $actualizado]);
+            break;
     }
 }

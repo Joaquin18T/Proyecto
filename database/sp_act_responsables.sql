@@ -366,13 +366,13 @@ BEGIN
         )
     ) HA ON HA.idactivo_resp = AR.idactivo_resp
     LEFT JOIN ubicaciones UBI ON UBI.idubicacion = HA.idubicacion
-    WHERE AR.es_responsable = 1
+    WHERE AR.es_responsable = 1 AND EST.idestado = 1
         AND (SUB.idsubcategoria = _idsubcategoria OR _idsubcategoria IS NULL)
         AND (UBI.idubicacion = _idubicacion OR _idubicacion IS NULL);
 END $$
 
 DELIMITER ;
--- call listarActivosResponsables(3,null)
+-- call listarActivosResponsables(1,null)
 
 DROP PROCEDURE IF EXISTS sp_list_resp_activo;
 DELIMITER $$

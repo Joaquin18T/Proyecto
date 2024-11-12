@@ -207,10 +207,11 @@ $(document).ready(async () => {
         params.append("cod_identificacion", "")
 
         const data = await getDatos(`${host}respActivo.controller.php`, params) */
-        /* const params = new URLSearchParams()
+        const params = new URLSearchParams()
         params.append("operation", "listarActivosResponsables")
         params.append("idsubcategoria", (tarea[0]?.idsubcategoria === "" || tarea[0]?.idsubcategoria == -1) ? "" : tarea[0]?.idsubcategoria)
-        const data = await getDatos(`${host}respActivo.controller.php`, params) */
+        params.append("idubicacion", (selectUbicacion.value.trim() === "" || selectUbicacion.value == -1) ? "" : selectUbicacion.value)
+        const data = await getDatos(`${host}respActivo.controller.php`, params)
     
         
         activosList.innerHTML = "";
@@ -325,6 +326,11 @@ $(document).ready(async () => {
         console.log("categorias: ",categorias)
         return categorias
     }
+
+    
+
+    // ******************************************* FIN DE SECCION DE ATUALIZACION **********************************
+
     /* ********************************************* EVENTOS *************************************************** */
 
 
@@ -591,10 +597,10 @@ $(document).ready(async () => {
         let permitir = true
         const descripcionPlanTarea = $q("#txtDescripcionPlanTarea");
         if (
-            !descripcionPlanTarea.value.trim() ||
-            !/^[a-zA-Z\s]+$/.test(descripcionPlanTarea.value)
+            !descripcionPlanTarea.value.trim()
+            //!/^[a-zA-Z\s]+$/.test(descripcionPlanTarea.value)
         ) {
-            alert("Solo se permite letras y espacios");
+            alert("Redacte bien su descripcion.");
             return;
         }
 
