@@ -58,30 +58,6 @@ FROM
 INNER JOIN 
     usuarios U ON NM.idresp = U.id_usuario  -- Ahora usamos idresp directamente en la relación con usuarios
 WHERE U.id_usuario = _idusuario -- Especifica aquí el mismo usuario
-
-UNION ALL
-
-SELECT 
-    NA.idnotificacion_activo AS idnotificacion, 
-    NA.tipo AS tipo_notificacion, 
-    NA.mensaje, 
-    NA.fecha_creacion, 
-    NA.visto, 
-    ACT.descripcion AS descripcion_activo,
-    HA.idactivo_resp,
-    U.usuario AS usuario_nombre -- Relación con usuarios
-FROM 
-    notificaciones_activos NA
-LEFT JOIN 
-    activos ACT ON NA.idactivo = ACT.idactivo
-LEFT JOIN 
-    historial_activos HA ON ACT.idactivo = HA.idactivo
-LEFT JOIN 
-    usuarios U ON HA.responsable_accion = U.id_usuario -- Relación con usuarios
-WHERE 
-    NA.idactivo_resp IS NULL 
-    AND HA.responsable_accion IS NOT NULL
-    AND HA.responsable_accion = _idusuario
 ORDER BY 
     fecha_creacion DESC;
 END $$

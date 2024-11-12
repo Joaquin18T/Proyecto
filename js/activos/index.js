@@ -357,26 +357,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
   //Datos a enviar a la vista registrar (cantidad de activos a registrar)
   $selector("#toRegistrar").addEventListener("click",()=>{
-    //href="<?= $host ?>views/activo/register-activo"
     const sidebar = $selector("#sbRegistrar");
     const offCanvas = new bootstrap.Offcanvas(sidebar);
     offCanvas.show();
+    $selector("#sb-fecha").value = getDate();
   });
 
   $selector("#registerAceptar").addEventListener("click",()=>{
     const value = parseInt($selector("#cantidadEnviar").value);
+    const valueSbFecha = $selector("#sb-fecha").value;
 
-    if(value>0){
-      console.log("puedes registar");
+    if(value>0 && (valueSbFecha<=getDate())){
       localStorage.setItem("cantidad", value);
       localStorage.setItem("subcategoria", $selector("#sb-subcategoria").value);
       localStorage.setItem("marca", $selector("#sb-marca").value);
       localStorage.setItem("modelo", $selector("#sb-modelo").value);
+      localStorage.setItem("fechaDefault", $selector("#sb-fecha").value);
       $selector("#cantidadEnviar").value = 0;
+      $selector("#sb-subcategoria").value = "";
+      $selector("#sb-marca").value = "";
+      $selector("#sb-modelo").value = "";
+      $selector("#sb-fecha").value = "";
       window.location.href = "http://localhost/CMMS/views/activo/register-activo";
       
     }else{
-      alert("Debes registrar al menos 1");
+      if(value<0){
+        alert("Debes registrar al menos 1");
+      }
+      if(valueSbFecha>getDate()){
+        alert("La fecha no debe ser mayor a la actual");
+      }
     }
   });
 

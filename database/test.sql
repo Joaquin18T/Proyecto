@@ -22,6 +22,7 @@ select*from marcas;
 select*from subcategorias;
 select*from ubicaciones;
 select*from especificacionesDefecto;
+select*from estados;
 
 DELETE FROM bajas_activo where idbaja_activo=59;
 DELETE FROM activos_responsables where idactivo_resp=22;

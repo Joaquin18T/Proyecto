@@ -1,17 +1,19 @@
 document.addEventListener("DOMContentLoaded",()=>{
   const globals={
     datosActivos:[], //Almacena todos los datos de los activos a registrar
-    fields:["subcategoria", "marca", "modelo", "fecha", "descripcion"], // Campos que tiene la tabla
+    fields:["subcategoria", "marca", "modelo", "descripcion"], // Campos que tiene la tabla
     objTemporal:{}, //Objeto temporal para el almacenamientos de datos de los activos
     host: "http://localhost/CMMS/controllers/",
     variableActivos:[],
     cantidadRegistrar:localStorage.getItem("cantidad"),
+    fechaDefault: localStorage.getItem("fechaDefault"),
     list_codes:[],
     contCodeInputs:0,
     contSave:0,
     numBlock:-1,
     deleteBlock:false
   };
+  //console.log(globals.fechaDefault);
   (async()=>{
     renderRegisters();
     if(parseInt(globals.cantidadRegistrar)===1){
@@ -57,12 +59,12 @@ document.addEventListener("DOMContentLoaded",()=>{
     return formattedDate;
   }
 
-  (() => {
-    const fieldsFecha = allSelector("fecha");
-    fieldsFecha.forEach(x=>{
-      x.value = getDate();
-    });
-  })();
+  // (() => {
+  //   const fieldsFecha = allSelector("fecha");
+  //   fieldsFecha.forEach(x=>{
+  //     x.value = getDate();
+  //   });
+  // })();
   //fecha actual
 
   //SUBCATEGORIAS
@@ -417,23 +419,19 @@ document.addEventListener("DOMContentLoaded",()=>{
             <div class="row">
               <div class="col-md-3">
                 <label for="subcategoria">SubCategorias</label>
-                <select id="subcategoria" class="form-control w-75 subcategoria activo-${i+1}" required autofocus>
+                <select id="subcategoria" class="form-control w-75 subcategoria activo-${i+1}" required autofocus disabled>
                   <option value="">Selecciona</option>
                 </select>
               </div>
               <div class="col-md-3">
                 <label for="marca">Marca</label>
-                <select name="marcas" id="marca" class="form-control w-75 marca activo-${i+1}" style="max-height: 50px; overflow-y: auto;" required>
+                <select name="marcas" id="marca" class="form-control w-75 marca activo-${i+1}" style="max-height: 50px; overflow-y: auto;" required disabled>
                   <option value="">Selecciona</option>
                 </select>
               </div>
               <div class="col-md-3">
                 <label for="modelo">Modelo</label>
-                <input type="text" class="form-control w-75 modelo activo-${i+1}" placeholder="Modelo" id="modelo" minlength="3" required>
-              </div>
-              <div class="col-md-3">
-                <label for="fecha">Fecha Adquisicion</label>
-                <input type="date" class="form-control w-75 fecha activo-${i+1}" id="fecha" required>
+                <input type="text" class="form-control w-75 modelo activo-${i+1}" placeholder="Modelo" id="modelo" minlength="3" required autocomplete="off" disabled>
               </div>
             </div>
             <div class="row mt-3">
@@ -814,17 +812,17 @@ document.addEventListener("DOMContentLoaded",()=>{
   }
 
   //Funcion que guarda los activos en la DB
-  async function saveActivos(cod, idsubcategoria, idmarca, modelo, fecha, descripcion, especificaciones){
+  async function saveActivos(cod, idsubcategoria, idmarca, modelo, descripcion, especificaciones){
     console.log("cod", cod);
     console.log("subcategoria", idsubcategoria);
     console.log("idmarca", idmarca);
     console.log("modelo", modelo);
-    console.log("fecha", fecha);
+    console.log("fecha", globals.fechaDefault);
     console.log("descripcion", descripcion);
     console.log("espec", JSON.stringify(especificaciones));
     
 
-    const fields = [cod, idsubcategoria, idmarca, modelo, fecha, descripcion];
+    const fields = [cod, idsubcategoria, idmarca, modelo, descripcion];
     const verifierEmptyField = fields.every(x=>x.trim().length>0); //Todos los elementos deben de cumplir la condicion
 
     const onlyObject = especificaciones.reduce((acum, objeto) => {
@@ -843,7 +841,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       params.append("idmarca", idmarca);
       params.append("modelo", modelo);
       params.append("cod_identificacion", cod);
-      params.append("fecha_adquisicion", fecha);
+      params.append("fecha_adquisicion", globals.fechaDefault);
       params.append("descripcion", descripcion);
       params.append("especificaciones", JSON.stringify(onlyObject));
 
@@ -865,6 +863,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     return dataBack;
   }
 
+  //Valida todas las fechas de cada activo (no se usa)
   function validarFechas(){
     let allValidate = false;
     const curentDate = getDate();
@@ -882,52 +881,49 @@ document.addEventListener("DOMContentLoaded",()=>{
     const isValid = await validateAllCodes();
     let isEmpty = false;
     if(isValid){
-      const validateAllFechas = validarFechas();
-      if(validateAllFechas){
-        if(confirm("¿Deseas registrar estos activos?")){
-          getAllCodesSB();
-          recorrerTodosActivos();
-          console.log(globals.list_codes);
-  
-          const allActivos = selector("list-register-activos").childElementCount;
-          for (let i = 0; i < allActivos; i++) {
-            catchDataEspecificaciones(i);
-            isEmpty=false;
-            console.log(globals.variableActivos[i].valores);
-            const isSave = await saveActivos(globals.list_codes[i], globals.datosActivos[i].subcategoria, globals.datosActivos[i].marca,
-              globals.datosActivos[i].modelo, globals.datosActivos[i].fecha, globals.datosActivos[i].descripcion, globals.variableActivos[i].valores 
-            );
-            if(isSave>0){
-              globals.contSave++;
-            }else if(isSave===0){
-              isEmpty=true;
-            }
+      //const validateAllFechas = validarFechas();
+      if(confirm("¿Deseas registrar estos activos?")){
+        getAllCodesSB();
+        recorrerTodosActivos();
+        console.log(globals.list_codes);
+
+        const allActivos = selector("list-register-activos").childElementCount;
+        for (let i = 0; i < allActivos; i++) {
+          catchDataEspecificaciones(i);
+          isEmpty=false;
+          console.log(globals.variableActivos[i].valores);
+          const isSave = await saveActivos(globals.list_codes[i], globals.datosActivos[i].subcategoria, globals.datosActivos[i].marca,
+            globals.datosActivos[i].modelo, globals.datosActivos[i].descripcion, globals.variableActivos[i].valores 
+          );
+          if(isSave>0){
+            globals.contSave++;
+          }else if(isSave===0){
+            isEmpty=true;
           }
-          if(globals.contSave===allActivos){
-            alert("Se han guardado correctamente");
-            localStorage.removeItem("cantidad");
-            localStorage.removeItem("subcategoria");
-            localStorage.removeItem("marca");
-            resetUI();
-            const sidebar = bootstrap.Offcanvas.getOrCreateInstance(
-              selector("sb-code")
-            );
-            sidebar.hide();
-            window.location.href = "http://localhost/CMMS/views/activo";
-          }else{
-            if(isEmpty){
-              alert("Completa los campos");
-              globals.list_codes = [];
-              globals.datosActivos=[];
-            }else{
-              alert("Hubo un error al registrar");
-            }
-            globals.contSave=0;
-          }
-          
         }
-      }else{
-        alert("La fecha de adquisicion no debe ser posterior a la fecha actual");
+        if(globals.contSave===allActivos){
+          alert("Se han guardado correctamente");
+          localStorage.removeItem("cantidad");
+          localStorage.removeItem("subcategoria");
+          localStorage.removeItem("marca");
+          localStorage.removeItem("fechaDefault");
+          resetUI();
+          const sidebar = bootstrap.Offcanvas.getOrCreateInstance(
+            selector("sb-code")
+          );
+          sidebar.hide();
+          window.location.href = "http://localhost/CMMS/views/activo";
+        }else{
+          if(isEmpty){
+            alert("Completa los campos");
+            globals.list_codes = [];
+            globals.datosActivos=[];
+          }else{
+            alert("Hubo un error al registrar");
+          }
+          globals.contSave=0;
+        }
+        
       }
     }else{
       alert("El codigo de identificacion debe ser unico");
@@ -1089,7 +1085,6 @@ document.addEventListener("DOMContentLoaded",()=>{
     const allCategorias = allSelector("subcategoria");
     const allMarcas = allSelector("marca");
     const allModelos = allSelector("modelo");
-    const allFecha = allSelector("fecha");
     const allDescripcion = allSelector("descripcion");
 
     //globals.contEspecificaciones = 2;
@@ -1100,7 +1095,6 @@ document.addEventListener("DOMContentLoaded",()=>{
       allCategorias[i].value="";
       allMarcas[i].value="";
       allModelos[i].value="";
-      allFecha[i].value=getDate();
       allDescripcion[i].value="";
       
       globals.variableActivos[i].contEspecificaciones=2;

@@ -13,8 +13,9 @@ if(isset($_GET['operation'])){
       break;
     case 'estadoByRange':
       $params=[
+        'idestado'=>$estado->limpiarCadena($_GET['idestado']),
         'menor'=>$estado->limpiarCadena($_GET['menor']),
-        'mayor'=>$estado->limpiarCadena($_GET['mayor']),
+        'mayor'=>$estado->limpiarCadena($_GET['mayor'])
       ];
       echo json_encode($estado->estadoByRange($params));
       break;

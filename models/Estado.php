@@ -16,11 +16,13 @@ class Estado extends ExecQuery{
 
   public function estadoByRange($params=[]):array{
     try{
-      $cmd = parent::execQ("SELECT idestado, nom_estado FROM estados WHERE idestado>? AND idestado<?");
+      $cmd = parent::execQ("SELECT idestado, nom_estado FROM estados WHERE idestado!=? AND
+      (idestado>? AND idestado<?)");
       $cmd->execute(
         array(
+          $params['idestado'],
           $params['menor'],
-          $params['mayor'],
+          $params['mayor']
         )
       );
       return $cmd->fetchAll(PDO::FETCH_ASSOC);
@@ -31,6 +33,6 @@ class Estado extends ExecQuery{
 }
 
 // $est = new Estado();
-// echo json_encode($est->estadoByRange(['menor'=>1, 'mayor'=>5]));
+// echo json_encode($est->estadoByRange(['idestado'=>6, 'menor'=>1, 'mayor'=>6]));
 
 // echo json_encode($est->getAll());

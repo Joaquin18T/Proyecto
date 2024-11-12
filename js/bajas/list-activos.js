@@ -35,8 +35,9 @@ document.addEventListener("DOMContentLoaded", () => {
   (async () => {
     const params = new URLSearchParams();
     params.append("operation", "estadoByRange");
+    params.append("idestado", 4);
     params.append("menor", 1);
-    params.append("mayor", 5);
+    params.append("mayor", 6);
     const data = await getDatos(`${globals.host}estado.controller.php`, params);
     //console.log(data);
 
@@ -423,7 +424,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const params = new URLSearchParams();
     params.append("operation", "updateEstado");
     params.append("idactivo", globals.idactivo);
-    params.append("idestado", 5);
+    params.append("idestado", 4);
 
     const data = await fetch(`${globals.host}activo.controller.php`, {
       method: "POST",

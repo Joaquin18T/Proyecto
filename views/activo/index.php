@@ -180,6 +180,14 @@
           </div>
         </div>
       </div>
+      <div class="row mt-3">
+        <div class="col-md-9">
+          <div class="form-floating">
+            <input type="date" class="form-control" id="sb-fecha">
+            <label for="sb-fecha" class="form-label">Fecha de registro</label>
+          </div>
+        </div>
+      </div>
       <div class="row mt-3 d-flex justify-content-between">
         <div class="text-end col-12">
           <button type="button" class="btn btn-sm btn-primary mt-2" id="registerAceptar" disabled>Ir a registrar</button>

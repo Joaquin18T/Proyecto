@@ -15,7 +15,10 @@ document.addEventListener("DOMContentLoaded",()=>{
   }
 
   (async () => {
-    const data = await getDatos("http://localhost/CMMS/controllers/ubicacion.controller.php", "operation=getAll");
+    const params = new URLSearchParams();
+    params.append("operation", "getUbiExcept");
+    params.append("idubicacion", 6);
+    const data = await getDatos("http://localhost/CMMS/controllers/ubicacion.controller.php", params);
     
     data.forEach((x,i) => {
       //console.log(x);
