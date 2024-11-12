@@ -326,6 +326,11 @@ $(document).ready(async () => {
         console.log("categorias: ",categorias)
         return categorias
     }
+
+    
+
+    // ******************************************* FIN DE SECCION DE ATUALIZACION **********************************
+
     /* ********************************************* EVENTOS *************************************************** */
 
 

@@ -5,7 +5,7 @@ require_once 'ExecQuery.php';
 class Activosvinculados extends ExecQuery
 {
 
- /*  public function obtenerActivosPorPlanTarea($params = []): array
+  /*  public function obtenerActivosPorPlanTarea($params = []): array
   {
     try {
       $sp = parent::execQ("CALL obtenerActivosVinculadosPorPlanTarea(?)");
@@ -63,7 +63,7 @@ class Activosvinculados extends ExecQuery
       die($e->getMessage());
     }
   } // integrado
-  
+
 
   // METODO DE ELIMIMNAR
   public function eliminarActivosVinculadosTarea($params = []): bool
@@ -72,6 +72,23 @@ class Activosvinculados extends ExecQuery
       $status = false;
       $sp = parent::execQ("CALL eliminarActivosVinculadosTarea(?)");
       $status = $sp->execute(array($params['idactivovinculado']));
+      return $status;
+    } catch (Exception $e) {
+      die($e->getMessage());
+    }
+  } // INTEGRADO
+
+
+
+  public function actualizarEstadoDesvinculadoAVT($params = []): bool
+  {
+    try {
+      $status = false;
+      $sp = parent::execQ("CALL actualizarEstadoDesvinculadoAVT(?,?)");
+      $status = $sp->execute(array(
+        $params['idactivovinculado'],
+        $params['desvinculado']
+      ));
       return $status;
     } catch (Exception $e) {
       die($e->getMessage());
