@@ -1,4 +1,4 @@
-# PROYECTO DE MEJORA: Sistema de Gestion de Mantenimiento Preventivo
+# PROYECTO DE MEJORA: Sistema de Gestion de Mantenimiento Preventivo (projecto con una version antigua)
 
 ## Integrantes
 - Torres Condo Joaquin
